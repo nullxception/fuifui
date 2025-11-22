@@ -121,10 +121,10 @@ function App() {
     if (isProcessing) {
       handleStop();
     } else {
-      const newPrompt = optimizePrompt(store.params.prompt);
-      const newNegPrompt = optimizePrompt(store.params.negativePrompt);
-      store.updatePrompt(newPrompt);
-      store.updateNegativePrompt(newNegPrompt);
+      store.updateAll({
+        prompt: optimizePrompt(store.params.prompt),
+        negativePrompt: optimizePrompt(store.params.negativePrompt),
+      });
       setOutputTab("console");
       startDiffusion(store.params);
     }
@@ -132,8 +132,11 @@ function App() {
 
   useEffect(() => {
     fetchModels();
+  }, [fetchModels]);
+
+  useEffect(() => {
     fetchVaes();
-  }, [fetchModels, fetchVaes]);
+  }, [fetchVaes]);
 
   return (
     <>

@@ -2,6 +2,7 @@ import type { Image, ParsedMetadata } from "../../utils/metadataParser";
 import { useAppStore, useDiffusionConfigStore } from "../../stores";
 import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
+import type { DiffusionParams } from "../../../server/types";
 
 interface ImageMetadataProps {
   image: Image;
@@ -21,18 +22,7 @@ export default function ImageMetadata({
     if (!parsedMetadata) return;
 
     // Map parsed metadata to diffusion config parameters
-    const paramsToUpdate: Partial<{
-      prompt: string;
-      negativePrompt: string;
-      steps: number;
-      cfgScale: number;
-      width: number;
-      height: number;
-      samplingMethod: string;
-      scheduler: string;
-      seed: number;
-      model: string;
-    }> = {};
+    const paramsToUpdate: Partial<DiffusionParams> = {};
 
     if (parsedMetadata.prompt) {
       paramsToUpdate.prompt = parsedMetadata.prompt;

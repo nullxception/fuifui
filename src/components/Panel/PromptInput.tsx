@@ -68,13 +68,14 @@ export const PromptInput: React.FC = () => {
   ) => {
     const embeddingName = embeddingFilename.replace(".safetensors", "");
     const embeddingText = `embedding:${embeddingName}, `;
-    if (target === "prompt") {
-      store.updatePrompt(optimizePrompt(embeddingText + store.params.prompt));
-    } else {
-      store.updateNegativePrompt(
-        optimizePrompt(embeddingText + store.params.negativePrompt),
-      );
-    }
+    store.update(
+      target,
+      optimizePrompt(
+        embeddingText + target === "prompt"
+          ? store.params.prompt
+          : store.params.negativePrompt,
+      ),
+    );
   };
 
   const addLora = (
@@ -83,13 +84,14 @@ export const PromptInput: React.FC = () => {
   ) => {
     const loraName = loraFilename.replace(".safetensors", "");
     const loraText = `<lora:${loraName}:1>, `;
-    if (target === "prompt") {
-      store.updatePrompt(optimizePrompt(loraText + store.params.prompt));
-    } else {
-      store.updateNegativePrompt(
-        optimizePrompt(loraText + store.params.negativePrompt),
-      );
-    }
+    store.update(
+      target,
+      optimizePrompt(
+        loraText + target === "prompt"
+          ? store.params.prompt
+          : store.params.negativePrompt,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -113,7 +115,7 @@ export const PromptInput: React.FC = () => {
           }}
           value={store.params.prompt}
           onChange={(e) => {
-            store.updatePrompt(e.target.value);
+            store.update("prompt", e.target.value);
             autoResize(e.target);
           }}
           className="focus-visible:ring-blue-500"
@@ -141,7 +143,7 @@ export const PromptInput: React.FC = () => {
           }}
           value={store.params.negativePrompt}
           onChange={(e) => {
-            store.updateNegativePrompt(e.target.value);
+            store.update("negativePrompt", e.target.value);
             autoResize(e.target);
           }}
           className="focus-visible:ring-pink-500"

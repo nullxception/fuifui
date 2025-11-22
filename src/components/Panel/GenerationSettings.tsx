@@ -61,7 +61,7 @@ export const GenerationSettings: React.FC = () => {
           min={1}
           max={100}
           value={store.params.steps}
-          onChange={(e) => store.updateSteps(parseInt(e.target.value))}
+          onChange={(e) => store.update("steps", parseInt(e.target.value))}
         />
         <Slider
           label="CFG Scale"
@@ -70,7 +70,7 @@ export const GenerationSettings: React.FC = () => {
           max={20}
           step={0.5}
           value={store.params.cfgScale}
-          onChange={(e) => store.updateCfgScale(parseFloat(e.target.value))}
+          onChange={(e) => store.update("cfgScale", parseFloat(e.target.value))}
         />
       </div>
 
@@ -81,7 +81,7 @@ export const GenerationSettings: React.FC = () => {
             <Label>Sampling Method</Label>
             <Select
               value={store.params.samplingMethod}
-              onChange={(e) => store.updateSamplingMethod(e.target.value)}
+              onChange={(e) => store.update("samplingMethod", e.target.value)}
             >
               {samplingMethods.map((method) => (
                 <option key={method} value={method}>
@@ -94,7 +94,7 @@ export const GenerationSettings: React.FC = () => {
             <Label>Scheduler</Label>
             <Select
               value={store.params.scheduler}
-              onChange={(e) => store.updateScheduler(e.target.value)}
+              onChange={(e) => store.update("scheduler", e.target.value)}
             >
               {schedulers.map((sched) => (
                 <option key={sched} value={sched}>
@@ -110,7 +110,7 @@ export const GenerationSettings: React.FC = () => {
             <Label>RNG</Label>
             <Select
               value={store.params.rng}
-              onChange={(e) => store.updateRng(e.target.value)}
+              onChange={(e) => store.update("rng", e.target.value)}
             >
               {rngOptions.map((rng) => (
                 <option key={rng} value={rng}>
@@ -123,7 +123,7 @@ export const GenerationSettings: React.FC = () => {
             <Label>Sampler RNG</Label>
             <Select
               value={store.params.samplerRng}
-              onChange={(e) => store.updateSamplerRng(e.target.value)}
+              onChange={(e) => store.update("samplerRng", e.target.value)}
             >
               <option value="">Use RNG</option>
               {rngOptions.map((rng) => (
@@ -144,7 +144,7 @@ export const GenerationSettings: React.FC = () => {
             <Input
               type="number"
               value={store.params.width}
-              onChange={(e) => store.updateWidth(parseInt(e.target.value))}
+              onChange={(e) => store.update("width", parseInt(e.target.value))}
             />
           </div>
           <div className="space-y-4">
@@ -152,7 +152,7 @@ export const GenerationSettings: React.FC = () => {
             <Input
               type="number"
               value={store.params.height}
-              onChange={(e) => store.updateHeight(parseInt(e.target.value))}
+              onChange={(e) => store.update("height", parseInt(e.target.value))}
             />
           </div>
         </div>
@@ -169,7 +169,7 @@ export const GenerationSettings: React.FC = () => {
               type="checkbox"
               id="flashAttention"
               checked={store.params.flashAttention}
-              onChange={(e) => store.updateDiffusionFa(e.target.checked)}
+              onChange={(e) => store.update("flashAttention", e.target.checked)}
               className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
             />
           </div>
@@ -180,12 +180,12 @@ export const GenerationSettings: React.FC = () => {
               <Input
                 type="number"
                 value={store.params.seed}
-                onChange={(e) => store.updateSeed(parseInt(e.target.value))}
+                onChange={(e) => store.update("seed", parseInt(e.target.value))}
                 placeholder="-1 for random"
               />
               <button
                 type="button"
-                onClick={() => store.updateSeed(-1)}
+                onClick={() => store.update("seed", -1)}
                 className="px-3 py-2 rounded-md text-white transition-colors"
                 title="Random Seed"
               >
@@ -204,7 +204,7 @@ export const GenerationSettings: React.FC = () => {
             min={-1}
             max={cpuCount}
             value={store.params.threads}
-            onChange={(e) => store.updateThreads(parseInt(e.target.value))}
+            onChange={(e) => store.update("threads", parseInt(e.target.value))}
           />
         </div>
 
@@ -216,7 +216,7 @@ export const GenerationSettings: React.FC = () => {
             type="checkbox"
             id="offloadToCpu"
             checked={store.params.offloadToCpu}
-            onChange={(e) => store.updateOffloadToCpu(e.target.checked)}
+            onChange={(e) => store.update("offloadToCpu", e.target.checked)}
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -229,7 +229,9 @@ export const GenerationSettings: React.FC = () => {
             type="checkbox"
             id="diffusionConvDirect"
             checked={store.params.diffusionConvDirect}
-            onChange={(e) => store.updateDiffusionConvDirect(e.target.checked)}
+            onChange={(e) =>
+              store.update("diffusionConvDirect", e.target.checked)
+            }
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -242,7 +244,7 @@ export const GenerationSettings: React.FC = () => {
             type="checkbox"
             id="vaeConvDirect"
             checked={store.params.vaeConvDirect}
-            onChange={(e) => store.updateVaeConvDirect(e.target.checked)}
+            onChange={(e) => store.update("vaeConvDirect", e.target.checked)}
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -255,7 +257,7 @@ export const GenerationSettings: React.FC = () => {
             id="forceSdxlVaeConvScale"
             checked={store.params.forceSdxlVaeConvScale}
             onChange={(e) =>
-              store.updateForceSdxlVaeConvScale(e.target.checked)
+              store.update("forceSdxlVaeConvScale", e.target.checked)
             }
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />

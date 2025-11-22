@@ -14,7 +14,7 @@ export const ModelSelector: React.FC = () => {
         <Select
           id="model-select"
           value={store.params.model}
-          onChange={(e) => store.updateModel(e.target.value)}
+          onChange={(e) => store.update("model", e.target.value)}
         >
           {models.map((model) => (
             <option key={model} value={model}>
@@ -28,7 +28,7 @@ export const ModelSelector: React.FC = () => {
         <Select
           id="vae-select"
           value={store.params.vae}
-          onChange={(e) => store.updateVae(e.target.value)}
+          onChange={(e) => store.update("vae", e.target.value)}
         >
           <option key="none" value="">
             Unset
