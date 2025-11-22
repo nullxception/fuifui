@@ -125,8 +125,7 @@ function App() {
       const newNegPrompt = optimizePrompt(diffusionConfig.negativePrompt);
       diffusionConfig.updatePrompt(newPrompt);
       diffusionConfig.updateNegativePrompt(newNegPrompt);
-
-      // Use current diffusion config state
+      setOutputTab("console");
       startDiffusion({
         model: diffusionConfig.model,
         vae: diffusionConfig.vae,
