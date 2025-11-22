@@ -72,23 +72,6 @@ export const processBackgroundImage = async (
   };
 };
 
-export const getBackgroundImage = async (): Promise<Response> => {
-  const filePath = path.join(UPLOAD_DIR, "background.webp");
-  try {
-    const file = await fs.readFile(filePath);
-    return new Response(file, {
-      headers: {
-        "Content-Type": "image/webp",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-  } catch {
-    throw new Error("Background not found");
-  }
-};
-
 export const deleteBackgroundImage = async (): Promise<void> => {
   const filePath = path.join(UPLOAD_DIR, "background.webp");
   try {

@@ -5,13 +5,19 @@ import {
 import {
   listImages,
   processBackgroundImage,
-  getBackgroundImage,
   deleteBackgroundImage,
 } from "../services/imageService";
 import { readConfig, saveConfig } from "../services/configService";
 import { jsonResponse } from "../middleware/response";
 import { createJob, getJob } from "../services/jobService";
 import type { DiffusionRequest } from "../types/index";
+import { getModelfiles } from "./api";
+import {
+  MODEL_DIR,
+  EMBEDDING_DIR,
+  LORA_DIR,
+  VAE_DIR,
+} from "../config/constants";
 
 export const apiRoutes: Record<
   string,
@@ -22,65 +28,10 @@ export const apiRoutes: Record<
     return jsonResponse({ status: "ok", timestamp: new Date().toISOString() });
   },
 
-  // GET /api/models
-  "GET:/api/models": async () => {
-    try {
-      const { promises: fs } = await import("fs");
-      const { MODEL_DIR } = await import("../config/constants");
-
-      const files = await fs.readdir(MODEL_DIR);
-      const models = files.filter((file) => file != "placeholder");
-      return jsonResponse(models);
-    } catch (error) {
-      console.error("Error reading models directory:", error);
-      return jsonResponse({ error: "Failed to list models" }, 500);
-    }
-  },
-
-  // GET /api/embeddings
-  "GET:/api/embeddings": async () => {
-    try {
-      const { promises: fs } = await import("fs");
-      const { EMBEDDING_DIR } = await import("../config/constants");
-
-      const files = await fs.readdir(EMBEDDING_DIR);
-      const embeddings = files.filter((file) => file.endsWith(".safetensors"));
-      return jsonResponse(embeddings);
-    } catch (error) {
-      console.error("Error reading embeddings directory:", error);
-      return jsonResponse({ error: "Failed to list embeddings" }, 500);
-    }
-  },
-
-  // GET /api/loras
-  "GET:/api/loras": async () => {
-    try {
-      const { promises: fs } = await import("fs");
-      const { LORA_DIR } = await import("../config/constants");
-
-      const files = await fs.readdir(LORA_DIR);
-      const loras = files.filter((file) => file.endsWith(".safetensors"));
-      return jsonResponse(loras);
-    } catch (error) {
-      console.error("Error reading loras directory:", error);
-      return jsonResponse({ error: "Failed to list loras" }, 500);
-    }
-  },
-
-  // GET /api/vaes
-  "GET:/api/vaes": async () => {
-    try {
-      const { promises: fs } = await import("fs");
-      const { VAE_DIR } = await import("../config/constants");
-
-      const files = await fs.readdir(VAE_DIR);
-      const models = files.filter((file) => file != "placeholder");
-      return jsonResponse(models);
-    } catch (error) {
-      console.error("Error reading vae directory:", error);
-      return jsonResponse({ error: "Failed to list vae" }, 500);
-    }
-  },
+  "GET:/api/models": async () => await getModelfiles(MODEL_DIR),
+  "GET:/api/embeddings": async () => await getModelfiles(EMBEDDING_DIR),
+  "GET:/api/loras": async () => await getModelfiles(LORA_DIR),
+  "GET:/api/vaes": async () => await getModelfiles(VAE_DIR),
 
   // GET /api/images
   "GET:/api/images": async () => {
@@ -157,15 +108,6 @@ export const apiRoutes: Record<
     } catch (error) {
       console.error("Image processing error:", error);
       return jsonResponse({ error: "Image processing failed" }, 500);
-    }
-  },
-
-  // GET /upload/background.webp
-  "GET:/upload/background.webp": async () => {
-    try {
-      return await getBackgroundImage();
-    } catch {
-      return jsonResponse({ error: "Background not found" }, 404);
     }
   },
 
