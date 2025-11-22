@@ -15,7 +15,7 @@ export default function ImageMetadata({
   className = "",
 }: ImageMetadataProps) {
   const { setActiveTab } = useAppStore();
-  const diffusionConfig = useDiffusionConfigStore();
+  const store = useDiffusionConfigStore();
 
   const handleRemake = () => {
     if (!parsedMetadata) return;
@@ -78,7 +78,7 @@ export default function ImageMetadata({
     }
 
     // Update all parameters at once
-    diffusionConfig.updateAll(paramsToUpdate);
+    store.updateAll(paramsToUpdate);
 
     // Navigate back to generate tab
     setActiveTab("generate");

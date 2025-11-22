@@ -1,53 +1,5 @@
 import useYamlConf from "../hooks/useYamlConf";
-
-// This store will wrap the useYamlConf hook for diffusion parameters
-// We'll use a pattern where the store manages the state but persists via YAML
-
-interface DiffusionConfigState {
-  // Diffusion parameters (these will be synced with YAML config)
-  model: string;
-  vae: string;
-  prompt: string;
-  negativePrompt: string;
-  steps: number;
-  cfgScale: number;
-  seed: number;
-  width: number;
-  height: number;
-  flashAttention: boolean;
-  samplingMethod: string;
-  scheduler: string;
-  rng: string;
-  samplerRng: string;
-  diffusionConvDirect: boolean;
-  vaeConvDirect: boolean;
-  threads: number;
-  offloadToCpu: boolean;
-  forceSdxlVaeConvScale: boolean;
-
-  // Actions that update both store and YAML
-  updateModel: (model: string) => void;
-  updatePrompt: (prompt: string) => void;
-  updateNegativePrompt: (negativePrompt: string) => void;
-  updateSteps: (steps: number) => void;
-  updateCfgScale: (cfgScale: number) => void;
-  updateSeed: (seed: number) => void;
-  updateWidth: (width: number) => void;
-  updateHeight: (height: number) => void;
-  updateDiffusionFa: (flashAttention: boolean) => void;
-  updateSamplingMethod: (samplingMethod: string) => void;
-  updateScheduler: (scheduler: string) => void;
-  updateRng: (rng: string) => void;
-  updateSamplerRng: (samplerRng: string) => void;
-  updateDiffusionConvDirect: (diffusionConvDirect: boolean) => void;
-  updateVaeConvDirect: (vaeConvDirect: boolean) => void;
-  updateThreads: (threads: number) => void;
-  updateOffloadToCpu: (offloadToCpu: boolean) => void;
-  updateForceSdxlVaeConvScale: (forceSdxlVaeConvScale: boolean) => void;
-
-  // Bulk update
-  updateAll: (params: Partial<DiffusionConfigState>) => void;
-}
+import type { DiffusionParams } from "../../server/types";
 
 // Create a hook that combines Zustand store with YAML persistence
 export const useDiffusionConfigStore = () => {
@@ -83,25 +35,27 @@ export const useDiffusionConfigStore = () => {
 
   return {
     // Current values
-    model,
-    vae,
-    prompt,
-    negativePrompt,
-    steps,
-    cfgScale,
-    seed,
-    width,
-    height,
-    flashAttention,
-    samplingMethod,
-    scheduler,
-    rng,
-    samplerRng,
-    diffusionConvDirect,
-    vaeConvDirect,
-    threads,
-    offloadToCpu,
-    forceSdxlVaeConvScale,
+    params: {
+      model,
+      vae,
+      prompt,
+      negativePrompt,
+      steps,
+      cfgScale,
+      seed,
+      width,
+      height,
+      flashAttention,
+      samplingMethod,
+      scheduler,
+      rng,
+      samplerRng,
+      diffusionConvDirect,
+      vaeConvDirect,
+      threads,
+      offloadToCpu,
+      forceSdxlVaeConvScale,
+    } as DiffusionParams,
 
     // Actions
     updateModel: setModel,
@@ -125,7 +79,7 @@ export const useDiffusionConfigStore = () => {
     updateForceSdxlVaeConvScale: setForceSdxlVaeConvScale,
 
     // Bulk update
-    updateAll: (params: Partial<DiffusionConfigState>) => {
+    updateAll: (params: Partial<DiffusionParams>) => {
       if (params.model !== undefined) setModel(params.model);
       if (params.vae !== undefined) setModel(params.vae);
       if (params.prompt !== undefined) setPrompt(params.prompt);

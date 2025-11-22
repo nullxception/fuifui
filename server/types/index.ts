@@ -1,26 +1,24 @@
 export interface DiffusionParams {
-  model?: string;
-  vae?: string;
-  prompt?: string;
-  negativePrompt?: string;
-  steps?: number;
-  cfgScale?: number;
-  seed?: number;
-  width?: number;
-  height?: number;
-  flashAttention?: boolean;
-  samplingMethod?: string;
-  scheduler?: string;
-  rng?: string;
-  samplerRng?: string;
-  diffusionConvDirect?: boolean;
-  vaeConvDirect?: boolean;
-  threads?: number;
-  offloadToCpu?: boolean;
-  forceSdxlVaeConvScale?: boolean;
+  model: string;
+  vae: string;
+  prompt: string;
+  negativePrompt: string;
+  steps: number;
+  cfgScale: number;
+  seed: number;
+  width: number;
+  height: number;
+  flashAttention: boolean;
+  samplingMethod: string;
+  scheduler: string;
+  rng: string;
+  samplerRng: string;
+  diffusionConvDirect: boolean;
+  vaeConvDirect: boolean;
+  threads: number;
+  offloadToCpu: boolean;
+  forceSdxlVaeConvScale: boolean;
 }
-
-export type DiffusionRequest = DiffusionParams;
 
 export type JobStatus =
   | "pending"

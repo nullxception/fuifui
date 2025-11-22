@@ -1,5 +1,4 @@
 import { useRef, useEffect } from "react";
-import type { DiffusionParams } from "../server/types";
 import ControlPanel from "./components/ControlPanel";
 import ImageDisplay from "./components/ImageDisplay";
 import Gallery from "./components/Gallery";
@@ -17,6 +16,7 @@ import {
 } from "./stores";
 
 import { optimizePrompt } from "./utils/metadataParser";
+import type { DiffusionParams } from "../server/types";
 
 function App() {
   // Use stores instead of local state
@@ -36,7 +36,7 @@ function App() {
 
   const { fetchModels, fetchVaes } = useDataStore();
 
-  const diffusionConfig = useDiffusionConfigStore();
+  const store = useDiffusionConfigStore();
   const { backgroundSettings, setBackgroundSettings } =
     useBackgroundSettingsStore();
 
@@ -121,32 +121,12 @@ function App() {
     if (isProcessing) {
       handleStop();
     } else {
-      const newPrompt = optimizePrompt(diffusionConfig.prompt);
-      const newNegPrompt = optimizePrompt(diffusionConfig.negativePrompt);
-      diffusionConfig.updatePrompt(newPrompt);
-      diffusionConfig.updateNegativePrompt(newNegPrompt);
+      const newPrompt = optimizePrompt(store.params.prompt);
+      const newNegPrompt = optimizePrompt(store.params.negativePrompt);
+      store.updatePrompt(newPrompt);
+      store.updateNegativePrompt(newNegPrompt);
       setOutputTab("console");
-      startDiffusion({
-        model: diffusionConfig.model,
-        vae: diffusionConfig.vae,
-        prompt: diffusionConfig.prompt,
-        negativePrompt: diffusionConfig.negativePrompt,
-        steps: diffusionConfig.steps,
-        cfgScale: diffusionConfig.cfgScale,
-        seed: diffusionConfig.seed,
-        width: diffusionConfig.width,
-        height: diffusionConfig.height,
-        flashAttention: diffusionConfig.flashAttention,
-        samplingMethod: diffusionConfig.samplingMethod,
-        scheduler: diffusionConfig.scheduler,
-        rng: diffusionConfig.rng,
-        samplerRng: diffusionConfig.samplerRng,
-        diffusionConvDirect: diffusionConfig.diffusionConvDirect,
-        vaeConvDirect: diffusionConfig.vaeConvDirect,
-        threads: diffusionConfig.threads,
-        offloadToCpu: diffusionConfig.offloadToCpu,
-        forceSdxlVaeConvScale: diffusionConfig.forceSdxlVaeConvScale,
-      });
+      startDiffusion(store.params);
     }
   };
 

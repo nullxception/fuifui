@@ -6,7 +6,7 @@ import { Label } from "../ui/Label";
 import { Input } from "../ui/Input";
 
 export const GenerationSettings: React.FC = () => {
-  const diffusionConfig = useDiffusionConfigStore();
+  const store = useDiffusionConfigStore();
   const [cpuCount, setCpuCount] = useState(16);
 
   const samplingMethods = [
@@ -57,24 +57,20 @@ export const GenerationSettings: React.FC = () => {
       <div className="p-4 space-y-4">
         <Slider
           label="Steps"
-          valueDisplay={diffusionConfig.steps}
+          valueDisplay={store.params.steps}
           min={1}
           max={100}
-          value={diffusionConfig.steps}
-          onChange={(e) =>
-            diffusionConfig.updateSteps(parseInt(e.target.value))
-          }
+          value={store.params.steps}
+          onChange={(e) => store.updateSteps(parseInt(e.target.value))}
         />
         <Slider
           label="CFG Scale"
-          valueDisplay={diffusionConfig.cfgScale}
+          valueDisplay={store.params.cfgScale}
           min={1}
           max={20}
           step={0.5}
-          value={diffusionConfig.cfgScale}
-          onChange={(e) =>
-            diffusionConfig.updateCfgScale(parseFloat(e.target.value))
-          }
+          value={store.params.cfgScale}
+          onChange={(e) => store.updateCfgScale(parseFloat(e.target.value))}
         />
       </div>
 
@@ -84,10 +80,8 @@ export const GenerationSettings: React.FC = () => {
           <div className="space-y-4">
             <Label>Sampling Method</Label>
             <Select
-              value={diffusionConfig.samplingMethod}
-              onChange={(e) =>
-                diffusionConfig.updateSamplingMethod(e.target.value)
-              }
+              value={store.params.samplingMethod}
+              onChange={(e) => store.updateSamplingMethod(e.target.value)}
             >
               {samplingMethods.map((method) => (
                 <option key={method} value={method}>
@@ -99,8 +93,8 @@ export const GenerationSettings: React.FC = () => {
           <div className="space-y-4">
             <Label>Scheduler</Label>
             <Select
-              value={diffusionConfig.scheduler}
-              onChange={(e) => diffusionConfig.updateScheduler(e.target.value)}
+              value={store.params.scheduler}
+              onChange={(e) => store.updateScheduler(e.target.value)}
             >
               {schedulers.map((sched) => (
                 <option key={sched} value={sched}>
@@ -115,8 +109,8 @@ export const GenerationSettings: React.FC = () => {
           <div className="space-y-4">
             <Label>RNG</Label>
             <Select
-              value={diffusionConfig.rng}
-              onChange={(e) => diffusionConfig.updateRng(e.target.value)}
+              value={store.params.rng}
+              onChange={(e) => store.updateRng(e.target.value)}
             >
               {rngOptions.map((rng) => (
                 <option key={rng} value={rng}>
@@ -128,8 +122,8 @@ export const GenerationSettings: React.FC = () => {
           <div className="space-y-4">
             <Label>Sampler RNG</Label>
             <Select
-              value={diffusionConfig.samplerRng}
-              onChange={(e) => diffusionConfig.updateSamplerRng(e.target.value)}
+              value={store.params.samplerRng}
+              onChange={(e) => store.updateSamplerRng(e.target.value)}
             >
               <option value="">Use RNG</option>
               {rngOptions.map((rng) => (
@@ -149,20 +143,16 @@ export const GenerationSettings: React.FC = () => {
             <Label>Width</Label>
             <Input
               type="number"
-              value={diffusionConfig.width}
-              onChange={(e) =>
-                diffusionConfig.updateWidth(parseInt(e.target.value))
-              }
+              value={store.params.width}
+              onChange={(e) => store.updateWidth(parseInt(e.target.value))}
             />
           </div>
           <div className="space-y-4">
             <Label>Height</Label>
             <Input
               type="number"
-              value={diffusionConfig.height}
-              onChange={(e) =>
-                diffusionConfig.updateHeight(parseInt(e.target.value))
-              }
+              value={store.params.height}
+              onChange={(e) => store.updateHeight(parseInt(e.target.value))}
             />
           </div>
         </div>
@@ -178,10 +168,8 @@ export const GenerationSettings: React.FC = () => {
             <input
               type="checkbox"
               id="flashAttention"
-              checked={diffusionConfig.flashAttention}
-              onChange={(e) =>
-                diffusionConfig.updateDiffusionFa(e.target.checked)
-              }
+              checked={store.params.flashAttention}
+              onChange={(e) => store.updateDiffusionFa(e.target.checked)}
               className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
             />
           </div>
@@ -191,15 +179,13 @@ export const GenerationSettings: React.FC = () => {
             <div className="flex gap-2">
               <Input
                 type="number"
-                value={diffusionConfig.seed}
-                onChange={(e) =>
-                  diffusionConfig.updateSeed(parseInt(e.target.value))
-                }
+                value={store.params.seed}
+                onChange={(e) => store.updateSeed(parseInt(e.target.value))}
                 placeholder="-1 for random"
               />
               <button
                 type="button"
-                onClick={() => diffusionConfig.updateSeed(-1)}
+                onClick={() => store.updateSeed(-1)}
                 className="px-3 py-2 rounded-md text-white transition-colors"
                 title="Random Seed"
               >
@@ -212,15 +198,13 @@ export const GenerationSettings: React.FC = () => {
         <div className="space-y-2">
           <Label>
             Threads:{" "}
-            {diffusionConfig.threads === -1 ? "Auto" : diffusionConfig.threads}
+            {store.params.threads === -1 ? "Auto" : store.params.threads}
           </Label>
           <Slider
             min={-1}
             max={cpuCount}
-            value={diffusionConfig.threads}
-            onChange={(e) =>
-              diffusionConfig.updateThreads(parseInt(e.target.value))
-            }
+            value={store.params.threads}
+            onChange={(e) => store.updateThreads(parseInt(e.target.value))}
           />
         </div>
 
@@ -231,10 +215,8 @@ export const GenerationSettings: React.FC = () => {
           <input
             type="checkbox"
             id="offloadToCpu"
-            checked={diffusionConfig.offloadToCpu}
-            onChange={(e) =>
-              diffusionConfig.updateOffloadToCpu(e.target.checked)
-            }
+            checked={store.params.offloadToCpu}
+            onChange={(e) => store.updateOffloadToCpu(e.target.checked)}
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -246,10 +228,8 @@ export const GenerationSettings: React.FC = () => {
           <input
             type="checkbox"
             id="diffusionConvDirect"
-            checked={diffusionConfig.diffusionConvDirect}
-            onChange={(e) =>
-              diffusionConfig.updateDiffusionConvDirect(e.target.checked)
-            }
+            checked={store.params.diffusionConvDirect}
+            onChange={(e) => store.updateDiffusionConvDirect(e.target.checked)}
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -261,10 +241,8 @@ export const GenerationSettings: React.FC = () => {
           <input
             type="checkbox"
             id="vaeConvDirect"
-            checked={diffusionConfig.vaeConvDirect}
-            onChange={(e) =>
-              diffusionConfig.updateVaeConvDirect(e.target.checked)
-            }
+            checked={store.params.vaeConvDirect}
+            onChange={(e) => store.updateVaeConvDirect(e.target.checked)}
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
@@ -275,9 +253,9 @@ export const GenerationSettings: React.FC = () => {
           <input
             type="checkbox"
             id="forceSdxlVaeConvScale"
-            checked={diffusionConfig.forceSdxlVaeConvScale}
+            checked={store.params.forceSdxlVaeConvScale}
             onChange={(e) =>
-              diffusionConfig.updateForceSdxlVaeConvScale(e.target.checked)
+              store.updateForceSdxlVaeConvScale(e.target.checked)
             }
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />

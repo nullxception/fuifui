@@ -10,7 +10,6 @@ import {
 import { readConfig, saveConfig } from "../services/configService";
 import { jsonResponse } from "../middleware/response";
 import { createJob, getJob } from "../services/jobService";
-import type { DiffusionRequest } from "../types/index";
 import { getModelfiles } from "./api";
 import {
   MODEL_DIR,
@@ -18,22 +17,19 @@ import {
   LORA_DIR,
   VAE_DIR,
 } from "../config/constants";
+import type { DiffusionParams } from "../types/index";
 
 export const apiRoutes: Record<
   string,
   (request?: Request) => Promise<Response>
 > = {
-  // GET /api/health
   "GET:/api/health": async () => {
     return jsonResponse({ status: "ok", timestamp: new Date().toISOString() });
   },
-
   "GET:/api/models": async () => await getModelfiles(MODEL_DIR),
   "GET:/api/embeddings": async () => await getModelfiles(EMBEDDING_DIR),
   "GET:/api/loras": async () => await getModelfiles(LORA_DIR),
   "GET:/api/vaes": async () => await getModelfiles(VAE_DIR),
-
-  // GET /api/images
   "GET:/api/images": async () => {
     try {
       const images = await listImages();
@@ -43,13 +39,11 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "Failed to list images" }, 500);
     }
   },
-
-  // POST /api/diffuse
   "POST:/api/diffuse": async (request?: Request) => {
     if (!request) throw new Error("Request is required for this endpoint");
 
     try {
-      const body = (await request.json()) as DiffusionRequest;
+      const body = (await request.json()) as DiffusionParams;
 
       if (!body.model) {
         return jsonResponse({ error: "Model is required" }, 400);
@@ -63,8 +57,6 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "Invalid JSON body" }, 400);
     }
   },
-
-  // GET /api/diffusions (Server-Sent Events)
   "GET:/api/diffusions": async (request?: Request) => {
     if (!request) throw new Error("Request is required for this endpoint");
     const url = new URL(request.url);
@@ -91,8 +83,6 @@ export const apiRoutes: Record<
       },
     });
   },
-
-  // POST /api/background/upload
   "POST:/api/background/upload": async (request?: Request) => {
     if (!request) throw new Error("Request is required for this endpoint");
     try {
@@ -110,8 +100,6 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "Image processing failed" }, 500);
     }
   },
-
-  // DELETE /api/background
   "DELETE:/api/background": async () => {
     try {
       await deleteBackgroundImage();
@@ -123,8 +111,6 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "Background not found" }, 404);
     }
   },
-
-  // POST /api/stop
   "POST:/api/stop": async () => {
     if (stopDiffusion()) {
       return jsonResponse({
@@ -135,8 +121,6 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "No diffusion process running" }, 400);
     }
   },
-
-  // GET /api/config
   "GET:/api/config": async () => {
     try {
       const config = await readConfig();
@@ -146,8 +130,6 @@ export const apiRoutes: Record<
       return jsonResponse({ error: "Failed to read config" }, 500);
     }
   },
-
-  // POST /api/config/save
   "POST:/api/config/save": async (request?: Request) => {
     if (!request) throw new Error("Request is required for this endpoint");
     try {
@@ -165,8 +147,6 @@ export const apiRoutes: Record<
       );
     }
   },
-
-  // GET /api/system-info
   "GET:/api/system-info": async () => {
     try {
       async function getPhysicalCoreCount(): Promise<number | null> {

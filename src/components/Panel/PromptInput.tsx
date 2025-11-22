@@ -56,7 +56,7 @@ const LoraSelector: React.FC<{
 
 export const PromptInput: React.FC = () => {
   const { embeddings, loras, fetchEmbeddings, fetchLoras } = useDataStore();
-  const diffusionConfig = useDiffusionConfigStore();
+  const store = useDiffusionConfigStore();
   const autoResize = (element: HTMLTextAreaElement) => {
     element.style.height = "auto";
     element.style.height = element.scrollHeight + "px";
@@ -69,12 +69,10 @@ export const PromptInput: React.FC = () => {
     const embeddingName = embeddingFilename.replace(".safetensors", "");
     const embeddingText = `embedding:${embeddingName}, `;
     if (target === "prompt") {
-      diffusionConfig.updatePrompt(
-        optimizePrompt(embeddingText + diffusionConfig.prompt),
-      );
+      store.updatePrompt(optimizePrompt(embeddingText + store.params.prompt));
     } else {
-      diffusionConfig.updateNegativePrompt(
-        optimizePrompt(embeddingText + diffusionConfig.negativePrompt),
+      store.updateNegativePrompt(
+        optimizePrompt(embeddingText + store.params.negativePrompt),
       );
     }
   };
@@ -86,12 +84,10 @@ export const PromptInput: React.FC = () => {
     const loraName = loraFilename.replace(".safetensors", "");
     const loraText = `<lora:${loraName}:1>, `;
     if (target === "prompt") {
-      diffusionConfig.updatePrompt(
-        optimizePrompt(loraText + diffusionConfig.prompt),
-      );
+      store.updatePrompt(optimizePrompt(loraText + store.params.prompt));
     } else {
-      diffusionConfig.updateNegativePrompt(
-        optimizePrompt(loraText + diffusionConfig.negativePrompt),
+      store.updateNegativePrompt(
+        optimizePrompt(loraText + store.params.negativePrompt),
       );
     }
   };
@@ -115,9 +111,9 @@ export const PromptInput: React.FC = () => {
           ref={(element) => {
             if (element) autoResize(element);
           }}
-          value={diffusionConfig.prompt}
+          value={store.params.prompt}
           onChange={(e) => {
-            diffusionConfig.updatePrompt(e.target.value);
+            store.updatePrompt(e.target.value);
             autoResize(e.target);
           }}
           className="focus-visible:ring-blue-500"
@@ -143,9 +139,9 @@ export const PromptInput: React.FC = () => {
           ref={(element) => {
             if (element) autoResize(element);
           }}
-          value={diffusionConfig.negativePrompt}
+          value={store.params.negativePrompt}
           onChange={(e) => {
-            diffusionConfig.updateNegativePrompt(e.target.value);
+            store.updateNegativePrompt(e.target.value);
             autoResize(e.target);
           }}
           className="focus-visible:ring-pink-500"

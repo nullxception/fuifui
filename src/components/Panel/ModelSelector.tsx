@@ -5,7 +5,7 @@ import { Label } from "../ui/Label";
 
 export const ModelSelector: React.FC = () => {
   const { models, vaes } = useDataStore();
-  const diffusionConfig = useDiffusionConfigStore();
+  const store = useDiffusionConfigStore();
 
   return (
     <div className="px-4 pb-4 grid grid-cols-2 gap-2">
@@ -13,8 +13,8 @@ export const ModelSelector: React.FC = () => {
         <Label htmlFor="model-select">Model</Label>
         <Select
           id="model-select"
-          value={diffusionConfig.model}
-          onChange={(e) => diffusionConfig.updateModel(e.target.value)}
+          value={store.params.model}
+          onChange={(e) => store.updateModel(e.target.value)}
         >
           {models.map((model) => (
             <option key={model} value={model}>
@@ -27,8 +27,8 @@ export const ModelSelector: React.FC = () => {
         <Label htmlFor="vae-select">VAE</Label>
         <Select
           id="vae-select"
-          value={diffusionConfig.vae}
-          onChange={(e) => diffusionConfig.updateVae(e.target.value)}
+          value={store.params.vae}
+          onChange={(e) => store.updateVae(e.target.value)}
         >
           <option key="none" value="">
             Unset
