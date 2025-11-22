@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useDataStore, useDiffusionConfigStore } from "../../stores";
 import { Label } from "../ui/Label";
 import { Select } from "../ui/Select";
@@ -54,13 +54,15 @@ const LoraSelector: React.FC<{
   </Select>
 );
 
+const autoResize = (element: HTMLTextAreaElement) => {
+  element.style.height = "auto";
+  element.style.height = element.scrollHeight + "px";
+};
 export const PromptInput: React.FC = () => {
   const { embeddings, loras, fetchEmbeddings, fetchLoras } = useDataStore();
   const store = useDiffusionConfigStore();
-  const autoResize = (element: HTMLTextAreaElement) => {
-    element.style.height = "auto";
-    element.style.height = element.scrollHeight + "px";
-  };
+  const promptRef = useRef(null);
+  const negativePromptRef = useRef(null);
 
   const addExtraData = (
     filename: string,
@@ -82,6 +84,16 @@ export const PromptInput: React.FC = () => {
     fetchLoras();
   }, [fetchLoras]);
 
+  useLayoutEffect(() => {
+    const el = promptRef.current;
+    if (el) autoResize(el);
+  }, [store.params.prompt]);
+
+  useLayoutEffect(() => {
+    const el = negativePromptRef.current;
+    if (el) autoResize(el);
+  }, [store.params.negativePrompt]);
+
   return (
     <div>
       {/* Positive Prompt */}
@@ -90,14 +102,9 @@ export const PromptInput: React.FC = () => {
           Prompt
         </Label>
         <Textarea
-          ref={(element) => {
-            if (element) autoResize(element);
-          }}
+          ref={promptRef}
           value={store.params.prompt}
-          onChange={(e) => {
-            store.update("prompt", e.target.value);
-            autoResize(e.target);
-          }}
+          onChange={(e) => store.update("prompt", e.target.value)}
           className="focus-visible:ring-blue-500"
           placeholder="Enter your prompt here..."
           spellCheck={false}
@@ -124,14 +131,9 @@ export const PromptInput: React.FC = () => {
       <div className="p-4 bg-pink-500/20 space-y-4">
         <Label>Negative Prompt</Label>
         <Textarea
-          ref={(element) => {
-            if (element) autoResize(element);
-          }}
+          ref={negativePromptRef}
           value={store.params.negativePrompt}
-          onChange={(e) => {
-            store.update("negativePrompt", e.target.value);
-            autoResize(e.target);
-          }}
+          onChange={(e) => store.update("negativePrompt", e.target.value)}
           className="focus-visible:ring-pink-500"
           placeholder="Enter negative prompt..."
           spellCheck={false}
