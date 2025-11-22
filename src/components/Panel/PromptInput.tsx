@@ -62,36 +62,16 @@ export const PromptInput: React.FC = () => {
     element.style.height = element.scrollHeight + "px";
   };
 
-  const addEmbedding = (
-    embeddingFilename: string,
+  const addExtraData = (
+    filename: string,
     target: "prompt" | "negativePrompt",
+    type: "embedding" | "lora",
   ) => {
-    const embeddingName = embeddingFilename.replace(".safetensors", "");
-    const embeddingText = `embedding:${embeddingName}, `;
-    store.update(
-      target,
-      optimizePrompt(
-        embeddingText + target === "prompt"
-          ? store.params.prompt
-          : store.params.negativePrompt,
-      ),
-    );
-  };
-
-  const addLora = (
-    loraFilename: string,
-    target: "prompt" | "negativePrompt",
-  ) => {
-    const loraName = loraFilename.replace(".safetensors", "");
-    const loraText = `<lora:${loraName}:1>, `;
-    store.update(
-      target,
-      optimizePrompt(
-        loraText + target === "prompt"
-          ? store.params.prompt
-          : store.params.negativePrompt,
-      ),
-    );
+    const name = filename.replace(".safetensors", "");
+    const prefix = type === "lora" ? `<lora:${name}:1>` : `embedding:${name}`;
+    const prompt =
+      target === "prompt" ? store.params.prompt : store.params.negativePrompt;
+    store.update(target, optimizePrompt(`${prefix}, ${prompt}`));
   };
 
   useEffect(() => {
@@ -126,12 +106,18 @@ export const PromptInput: React.FC = () => {
           {embeddings.length > 0 && (
             <EmbeddingSelector
               target="prompt"
-              onAddEmbedding={addEmbedding}
+              onAddEmbedding={(file, target) =>
+                addExtraData(file, target, "embedding")
+              }
               embeddings={embeddings}
             />
           )}
           {loras.length > 0 && (
-            <LoraSelector target="prompt" onAddLora={addLora} loras={loras} />
+            <LoraSelector
+              target="prompt"
+              onAddLora={(file, target) => addExtraData(file, target, "lora")}
+              loras={loras}
+            />
           )}
         </div>
       </div>
@@ -154,14 +140,16 @@ export const PromptInput: React.FC = () => {
           {embeddings.length > 0 && (
             <EmbeddingSelector
               target="negativePrompt"
-              onAddEmbedding={addEmbedding}
+              onAddEmbedding={(file, target) =>
+                addExtraData(file, target, "embedding")
+              }
               embeddings={embeddings}
             />
           )}
           {loras.length > 0 && (
             <LoraSelector
               target="negativePrompt"
-              onAddLora={addLora}
+              onAddLora={(file, target) => addExtraData(file, target, "lora")}
               loras={loras}
             />
           )}
