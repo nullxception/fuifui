@@ -7,6 +7,7 @@ import {
   EMBEDDING_DIR,
   LORA_DIR,
   VAE_DIR,
+  projectRoot,
 } from "../config/constants";
 import type {
   DiffusionParams,
@@ -55,6 +56,16 @@ export const stopDiffusion = (jobId?: string): boolean => {
     return true;
   }
   return false;
+};
+
+const printableArgs = (args: (string | number)[]) => {
+  return args
+    .map((arg) =>
+      arg.toString().includes(" ")
+        ? `"${arg.toString().replace(/"/g, '\\"')}"`
+        : arg,
+    )
+    .join(" ");
 };
 
 /**
@@ -176,22 +187,23 @@ export const createDiffusionStream = (
       };
 
       const sendLog = (type: string, message: string) => {
+        const log = message.trim().replaceAll(projectRoot + path.sep, "");
         const data: LogData = {
           type,
-          message: message.trim(),
+          message: log,
           timestamp: Date.now(),
         };
         if (type === "stderr") {
-          console.error(message.trim());
+          console.error(log);
         } else {
-          console.log(message.trim());
+          console.log(log);
         }
         safeEnqueue(`data: ${JSON.stringify(data)}\n\n`);
       };
 
       sendLog(
         "stdout",
-        `Starting diffusion with command: ${SDCPP_BIN} ${args.join(" ")}`,
+        `Starting diffusion with command: ${SDCPP_BIN} ${printableArgs(args)}`,
       );
 
       const sdProcess = spawn({

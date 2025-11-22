@@ -1,6 +1,6 @@
 import path from "path";
 
-const projectRoot = path.dirname(Bun.main);
+export const projectRoot = path.dirname(Bun.main);
 
 export const PORT = 5141;
 export const SDCPP_BIN = "sd";
