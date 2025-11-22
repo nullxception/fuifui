@@ -3,6 +3,12 @@ import type { Image } from "../../utils/metadataParser";
 import { parseDiffusionParams } from "../../utils/metadataParser";
 import ImageMetadata from "./ImageMetadata";
 import { Button } from "../ui/Button";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  InformationCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 interface ImageLightboxProps {
   selectedImage: Image | null;
@@ -61,13 +67,13 @@ export default function ImageLightbox({
         />
         <Button
           variant="ghost"
-          className="lg:hidden absolute right-5 bottom-5 -translate-y-1/2 z-110 text-black/70 hover:text-white hover:bg-white/10 h-12 rounded-full"
+          className="lg:hidden absolute right-5 bottom-5 z-110 text-black/70 hover:text-white hover:bg-white/10 h-12 rounded-full"
           onClick={(e) => {
             e.stopPropagation();
             setShowMetadata((v) => !v);
           }}
         >
-          {showMetadata ? "Hide Details" : "Show Details"}
+          <InformationCircleIcon className="w-8 h-8" />
         </Button>
       </div>
 
@@ -77,20 +83,7 @@ export default function ImageLightbox({
         className="absolute top-5 right-5 md:left-5  z-110 text-white/70 hover:text-white hover:bg-white/10"
         onClick={onClose}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
+        <XMarkIcon className="w-6 h-6" />
       </Button>
 
       <Button
@@ -102,20 +95,7 @@ export default function ImageLightbox({
           onNavigate("prev");
         }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-8 h-8"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5L8.25 12l7.5-7.5"
-          />
-        </svg>
+        <ChevronLeftIcon className="w-8 h-8" />
       </Button>
 
       <Button
@@ -127,20 +107,7 @@ export default function ImageLightbox({
           onNavigate("next");
         }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-8 h-8"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.25 4.5l7.5 7.5-7.5 7.5"
-          />
-        </svg>
+        <ChevronRightIcon className="w-8 h-8" />
       </Button>
     </div>
   );

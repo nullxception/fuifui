@@ -3,6 +3,7 @@ import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Label } from "./ui/Label";
 import { Card } from "./ui/Card";
+import { CloudArrowUpIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface BackgroundSettings {
   imageType: "none" | "upload" | "url";
@@ -130,19 +131,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
             onClick={onClose}
             className="h-8 w-8"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <XMarkIcon className="w-4 h-4" />
           </Button>
         </div>
 
@@ -169,19 +158,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
                 }`}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-8 h-8 mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
+                  <CloudArrowUpIcon className="w-8 h-8 mb-3" />
                   <p className="text-sm">
                     {isUploading ? "Uploading..." : "Click to upload image"}
                   </p>
