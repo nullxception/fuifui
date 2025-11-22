@@ -17,6 +17,7 @@ export interface DiffusionParams {
   vaeConvDirect?: boolean;
   threads?: number;
   offloadToCpu?: boolean;
+  forceSdxlVaeConvScale?: boolean;
 }
 
 export type DiffusionRequest = DiffusionParams;

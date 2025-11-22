@@ -268,6 +268,20 @@ export const GenerationSettings: React.FC = () => {
             className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
           />
         </div>
+        <div className="flex items-center justify-between py-2">
+          <Label htmlFor="forceSdxlVaeConvScale" className="cursor-pointer">
+            Use SDXL VAE conv scale
+          </Label>
+          <input
+            type="checkbox"
+            id="forceSdxlVaeConvScale"
+            checked={diffusionConfig.forceSdxlVaeConvScale}
+            onChange={(e) =>
+              diffusionConfig.updateForceSdxlVaeConvScale(e.target.checked)
+            }
+            className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
+          />
+        </div>
       </div>
     </>
   );

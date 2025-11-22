@@ -146,6 +146,7 @@ function App() {
         vaeConvDirect: diffusionConfig.vaeConvDirect,
         threads: diffusionConfig.threads,
         offloadToCpu: diffusionConfig.offloadToCpu,
+        forceSdxlVaeConvScale: diffusionConfig.forceSdxlVaeConvScale,
       });
     }
   };

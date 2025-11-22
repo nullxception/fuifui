@@ -23,6 +23,7 @@ interface DiffusionConfigState {
   vaeConvDirect: boolean;
   threads: number;
   offloadToCpu: boolean;
+  forceSdxlVaeConvScale: boolean;
 
   // Actions that update both store and YAML
   updateModel: (model: string) => void;
@@ -42,6 +43,7 @@ interface DiffusionConfigState {
   updateVaeConvDirect: (vaeConvDirect: boolean) => void;
   updateThreads: (threads: number) => void;
   updateOffloadToCpu: (offloadToCpu: boolean) => void;
+  updateForceSdxlVaeConvScale: (forceSdxlVaeConvScale: boolean) => void;
 
   // Bulk update
   updateAll: (params: Partial<DiffusionConfigState>) => void;
@@ -74,6 +76,10 @@ export const useDiffusionConfigStore = () => {
   const [vaeConvDirect, setVaeConvDirect] = useYamlConf("vaeConvDirect", false);
   const [threads, setThreads] = useYamlConf("threads", -1);
   const [offloadToCpu, setOffloadToCpu] = useYamlConf("offloadToCpu", false);
+  const [forceSdxlVaeConvScale, setForceSdxlVaeConvScale] = useYamlConf(
+    "forceSdxlVaeConvScale",
+    false,
+  );
 
   return {
     // Current values
@@ -95,6 +101,7 @@ export const useDiffusionConfigStore = () => {
     vaeConvDirect,
     threads,
     offloadToCpu,
+    forceSdxlVaeConvScale,
 
     // Actions
     updateModel: setModel,
@@ -115,6 +122,7 @@ export const useDiffusionConfigStore = () => {
     updateVaeConvDirect: setVaeConvDirect,
     updateThreads: setThreads,
     updateOffloadToCpu: setOffloadToCpu,
+    updateForceSdxlVaeConvScale: setForceSdxlVaeConvScale,
 
     // Bulk update
     updateAll: (params: Partial<DiffusionConfigState>) => {
@@ -142,6 +150,8 @@ export const useDiffusionConfigStore = () => {
       if (params.threads !== undefined) setThreads(params.threads);
       if (params.offloadToCpu !== undefined)
         setOffloadToCpu(params.offloadToCpu);
+      if (params.forceSdxlVaeConvScale !== undefined)
+        setForceSdxlVaeConvScale(params.forceSdxlVaeConvScale);
     },
   };
 };

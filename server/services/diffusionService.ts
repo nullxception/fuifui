@@ -141,6 +141,10 @@ export const createDiffusionStream = (
         args.push("--offload-to-cpu");
       }
 
+      if (params.forceSdxlVaeConvScale) {
+        args.push("--force-sdxl-vae-conv-scale");
+      }
+
       const safeEnqueue = (data: string) => {
         try {
           controller.enqueue(encoder.encode(data));
