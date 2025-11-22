@@ -1,0 +1,77 @@
+@source not "../bin";
+@source not "../models";
+@source not "../public";
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@import "tailwindcss";
+@plugin "tailwind-scrollbar";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+
+  --color-background: #000000;
+  --color-surface: #0d0d14;
+  --color-surface-hover: #17171a;
+  --color-border: #17171a;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #27272a;
+  --color-secondary-hover: #3f3f46;
+  --color-secondary-foreground: #ffffff;
+
+  --color-muted: #71717a;
+  --color-muted-foreground: #a1a1aa;
+}
+
+html {
+  background-color: var(--color-background);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(162, 59, 246, 0.25) 0%,
+    transparent 50%
+  );
+}
+
+body:has(.wallpaper[style*="url"]) {
+  background: unset;
+}
+
+.wallpaper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.wallpaper > div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.5) 60%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
