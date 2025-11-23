@@ -1,4 +1,4 @@
-import { PhotoIcon } from "@heroicons/react/16/solid";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
 interface ImageDisplayProps {
@@ -27,10 +27,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
         />
       ) : (
         <div className="text-center p-8">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-black flex items-center justify-center text-white">
             <PhotoIcon className="w-12 h-12" />
           </div>
-          <p className="text-xl font-medium text-white mb-2">Ready to Create</p>
+          <p className="text-xl font-medium text-white mb-2">Ready to create</p>
           <p className="text-sm text-muted-foreground">
             Configure your settings and click Generate
           </p>

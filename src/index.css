@@ -37,41 +37,4 @@ html {
 
 body {
   min-height: 100vh;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(162, 59, 246, 0.25) 0%,
-    transparent 50%
-  );
-}
-
-body:has(.wallpaper[style*="url"]) {
-  background: unset;
-}
-
-.wallpaper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.wallpaper > div {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.1) 30%,
-    rgba(0, 0, 0, 0.5) 60%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
-  pointer-events: none;
-  z-index: 1;
 }

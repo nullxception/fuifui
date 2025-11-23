@@ -1,34 +1,24 @@
 import React, { useMemo } from "react";
+import type { BackgroundSettings } from "../stores";
 
-interface BackgroundSettings {
-  imageType: "none" | "upload" | "url";
-  imageData: string;
-}
-
-interface BackgroundLayerProps {
-  settings: BackgroundSettings;
-}
-
-const BackgroundLayer: React.FC<BackgroundLayerProps> = ({ settings }) => {
-  const imageUrl = useMemo(() => {
-    if (settings.imageType === "none" || !settings.imageData) {
+const BackgroundLayer: React.FC<{ bg: BackgroundSettings }> = ({ bg }) => {
+  const url = useMemo(() => {
+    if (bg.type === "none" || !bg.image) {
       return null;
     }
 
-    return settings.imageData;
-  }, [settings.imageData, settings.imageType]);
-
-  if (!imageUrl) {
-    return null;
-  }
-
-  const backgroundStyle: React.CSSProperties = {
-    backgroundImage: `url(${imageUrl})`,
-  };
+    return bg.image;
+  }, [bg.image, bg.type]);
 
   return (
-    <div className="wallpaper" style={backgroundStyle}>
-      <div />
+    <div
+      className="-z-2 fixed h-screen w-full top-0 left-0 bg-radial-[at_50%_0%] from-purple-950 to-black bg-cover bg-no-repeat"
+      style={url ? { backgroundImage: `url(${url})` } : {}}
+    >
+      <div
+        className="-z-1 fixed top-0 left-0 w-full h-screen bg-radial from-transparent from-50% to-black"
+        hidden={url ? false : true}
+      />
     </div>
   );
 };

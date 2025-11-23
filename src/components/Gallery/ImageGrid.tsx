@@ -24,7 +24,7 @@ export default function ImageGrid({ images, onImageClick }: ImageGridProps) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-[repeat(2,1fr)] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)] [masonry-auto-flow:next]">
+    <div className="grid gap-2 sm:grid-cols-[repeat(2,1fr)] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)] [masonry-auto-flow:next]">
       {images.map((image, index) => (
         <div
           key={index}

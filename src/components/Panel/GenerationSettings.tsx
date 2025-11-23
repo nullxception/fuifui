@@ -52,31 +52,29 @@ export const GenerationSettings: React.FC = () => {
 
   return (
     <>
-      {/* Basic Settings */}
+      <div className="p-4">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
+          <Slider
+            label="Steps"
+            valueDisplay={store.params.steps}
+            min={1}
+            max={100}
+            value={store.params.steps}
+            onChange={(e) => store.update("steps", parseInt(e.target.value))}
+          />
 
-      <div className="p-4 space-y-4">
-        <Slider
-          label="Steps"
-          valueDisplay={store.params.steps}
-          min={1}
-          max={100}
-          value={store.params.steps}
-          onChange={(e) => store.update("steps", parseInt(e.target.value))}
-        />
-        <Slider
-          label="CFG Scale"
-          valueDisplay={store.params.cfgScale}
-          min={1}
-          max={20}
-          step={0.5}
-          value={store.params.cfgScale}
-          onChange={(e) => store.update("cfgScale", parseFloat(e.target.value))}
-        />
-      </div>
+          <Slider
+            label="CFG Scale"
+            valueDisplay={store.params.cfgScale}
+            min={1}
+            max={20}
+            step={0.5}
+            value={store.params.cfgScale}
+            onChange={(e) =>
+              store.update("cfgScale", parseFloat(e.target.value))
+            }
+          />
 
-      {/* Sampling & Scheduler */}
-      <div className="px-4 space-y-4">
-        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-4">
             <Label>Sampling Method</Label>
             <Select
@@ -90,6 +88,7 @@ export const GenerationSettings: React.FC = () => {
               ))}
             </Select>
           </div>
+
           <div className="space-y-4">
             <Label>Scheduler</Label>
             <Select
@@ -103,9 +102,7 @@ export const GenerationSettings: React.FC = () => {
               ))}
             </Select>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-4">
             <Label>RNG</Label>
             <Select
@@ -119,6 +116,7 @@ export const GenerationSettings: React.FC = () => {
               ))}
             </Select>
           </div>
+
           <div className="space-y-4">
             <Label>Sampler RNG</Label>
             <Select
@@ -133,12 +131,7 @@ export const GenerationSettings: React.FC = () => {
               ))}
             </Select>
           </div>
-        </div>
-      </div>
 
-      {/* Dimensions */}
-      <div className="px-4 pt-4 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-4">
             <Label>Width</Label>
             <Input
@@ -147,6 +140,7 @@ export const GenerationSettings: React.FC = () => {
               onChange={(e) => store.update("width", parseInt(e.target.value))}
             />
           </div>
+
           <div className="space-y-4">
             <Label>Height</Label>
             <Input
@@ -155,13 +149,36 @@ export const GenerationSettings: React.FC = () => {
               onChange={(e) => store.update("height", parseInt(e.target.value))}
             />
           </div>
-        </div>
-      </div>
 
-      {/* Advanced */}
-      <div className="p-4 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center justify-between">
+          <Slider
+            label={`Threads ${store.params.threads < 0 ? ": Auto" : ""}`}
+            min={-1}
+            max={cpuCount}
+            value={store.params.threads}
+            onChange={(e) => store.update("threads", parseInt(e.target.value))}
+          />
+
+          <div className="space-y-4">
+            <Label>Seed</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={store.params.seed}
+                onChange={(e) => store.update("seed", parseInt(e.target.value))}
+                placeholder="-1 for random"
+              />
+              <button
+                type="button"
+                onClick={() => store.update("seed", -1)}
+                className="px-3 py-2 text-white transition-colors"
+                title="Random Seed"
+              >
+                🎲
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
             <Label htmlFor="flashAttention" className="cursor-pointer">
               Flash Attention
             </Label>
@@ -174,93 +191,60 @@ export const GenerationSettings: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Seed</Label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                value={store.params.seed}
-                onChange={(e) => store.update("seed", parseInt(e.target.value))}
-                placeholder="-1 for random"
-              />
-              <button
-                type="button"
-                onClick={() => store.update("seed", -1)}
-                className="px-3 py-2 rounded-md text-white transition-colors"
-                title="Random Seed"
-              >
-                🎲
-              </button>
-            </div>
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="offloadToCpu" className="cursor-pointer">
+              Offload Weights To CPU RAM
+            </Label>
+            <input
+              type="checkbox"
+              id="offloadToCpu"
+              checked={store.params.offloadToCpu}
+              onChange={(e) => store.update("offloadToCpu", e.target.checked)}
+              className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
+            />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label>
-            Threads:{" "}
-            {store.params.threads === -1 ? "Auto" : store.params.threads}
-          </Label>
-          <Slider
-            min={-1}
-            max={cpuCount}
-            value={store.params.threads}
-            onChange={(e) => store.update("threads", parseInt(e.target.value))}
-          />
-        </div>
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="diffusionConvDirect" className="cursor-pointer">
+              diffusion ggml_conv2d_direct
+            </Label>
+            <input
+              type="checkbox"
+              id="diffusionConvDirect"
+              checked={store.params.diffusionConvDirect}
+              onChange={(e) =>
+                store.update("diffusionConvDirect", e.target.checked)
+              }
+              className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
+            />
+          </div>
 
-        <div className="flex items-center justify-between py-2">
-          <Label htmlFor="offloadToCpu" className="cursor-pointer">
-            Offload Weights To CPU RAM
-          </Label>
-          <input
-            type="checkbox"
-            id="offloadToCpu"
-            checked={store.params.offloadToCpu}
-            onChange={(e) => store.update("offloadToCpu", e.target.checked)}
-            className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
-          />
-        </div>
-
-        <div className="flex items-center justify-between py-2">
-          <Label htmlFor="diffusionConvDirect" className="cursor-pointer">
-            diffusion ggml_conv2d_direct
-          </Label>
-          <input
-            type="checkbox"
-            id="diffusionConvDirect"
-            checked={store.params.diffusionConvDirect}
-            onChange={(e) =>
-              store.update("diffusionConvDirect", e.target.checked)
-            }
-            className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
-          />
-        </div>
-
-        <div className="flex items-center justify-between py-2">
-          <Label htmlFor="vaeConvDirect" className="cursor-pointer">
-            vae ggml_conv2d_direct
-          </Label>
-          <input
-            type="checkbox"
-            id="vaeConvDirect"
-            checked={store.params.vaeConvDirect}
-            onChange={(e) => store.update("vaeConvDirect", e.target.checked)}
-            className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
-          />
-        </div>
-        <div className="flex items-center justify-between py-2">
-          <Label htmlFor="forceSdxlVaeConvScale" className="cursor-pointer">
-            Use SDXL VAE conv scale
-          </Label>
-          <input
-            type="checkbox"
-            id="forceSdxlVaeConvScale"
-            checked={store.params.forceSdxlVaeConvScale}
-            onChange={(e) =>
-              store.update("forceSdxlVaeConvScale", e.target.checked)
-            }
-            className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
-          />
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="vaeConvDirect" className="cursor-pointer">
+              vae ggml_conv2d_direct
+            </Label>
+            <input
+              type="checkbox"
+              id="vaeConvDirect"
+              checked={store.params.vaeConvDirect}
+              onChange={(e) => store.update("vaeConvDirect", e.target.checked)}
+              className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
+            />
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="forceSdxlVaeConvScale" className="cursor-pointer">
+              Use SDXL VAE conv scale
+            </Label>
+            <input
+              type="checkbox"
+              id="forceSdxlVaeConvScale"
+              checked={store.params.forceSdxlVaeConvScale}
+              onChange={(e) =>
+                store.update("forceSdxlVaeConvScale", e.target.checked)
+              }
+              className="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary bg-black/50"
+            />
+          </div>
         </div>
       </div>
     </>

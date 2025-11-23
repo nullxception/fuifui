@@ -1,36 +1,23 @@
 import useYamlConf from "../hooks/useYamlConf";
 
 export interface BackgroundSettings {
-  imageType: "none" | "upload" | "url";
-  imageData: string;
+  type: "none" | "upload" | "url";
+  image: string;
 }
 
-// Create a hook that combines Zustand-like interface with YAML persistence
 export const useBackgroundSettingsStore = () => {
-  const [backgroundSettings, setBackgroundSettings] =
-    useYamlConf<BackgroundSettings>("backgroundSettings", {
-      imageType: "none",
-      imageData: "",
-    });
+  const [bg, setBg] = useYamlConf<BackgroundSettings>("background", {
+    type: "none",
+    image: "",
+  });
 
   return {
-    backgroundSettings,
-    setBackgroundSettings,
+    bg,
+    setBg,
 
-    // Convenience methods
-    setImageType: (imageType: BackgroundSettings["imageType"]) => {
-      setBackgroundSettings((prev) => ({ ...prev, imageType }));
-    },
-
-    setImageData: (imageData: string) => {
-      setBackgroundSettings((prev) => ({ ...prev, imageData }));
-    },
-
-    reset: () => {
-      setBackgroundSettings({
-        imageType: "none",
-        imageData: "",
-      });
-    },
+    setType: (type: BackgroundSettings["type"]) =>
+      setBg((prev) => ({ ...prev, type })),
+    setImage: (image: string) => setBg((prev) => ({ ...prev, image })),
+    reset: () => setBg({ type: "none", image: "" }),
   };
 };

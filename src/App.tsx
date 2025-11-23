@@ -17,11 +17,8 @@ import {
 
 import { optimizePrompt } from "./utils/metadataParser";
 import type { DiffusionParams } from "../server/types";
-import {
-  BoltIcon,
-  Cog6ToothIcon,
-  StopCircleIcon,
-} from "@heroicons/react/16/solid";
+import { BoltIcon } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon, StopCircleIcon } from "@heroicons/react/24/solid";
 
 function App() {
   // Use stores instead of local state
@@ -42,8 +39,7 @@ function App() {
   const { fetchModels, fetchVaes } = useDataStore();
 
   const store = useDiffusionConfigStore();
-  const { backgroundSettings, setBackgroundSettings } =
-    useBackgroundSettingsStore();
+  const { bg, setBg } = useBackgroundSettingsStore();
 
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -145,7 +141,7 @@ function App() {
 
   return (
     <>
-      <BackgroundLayer settings={backgroundSettings} />
+      <BackgroundLayer bg={bg} />
       <Layout>
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 flex justify-center">
           <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4 lg:px-6">
@@ -158,7 +154,7 @@ function App() {
               </h1>
             </div>
 
-            <nav className="flex items-center gap-4">
+            <nav className="flex items-center gap-2">
               <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-lg">
                 <Button
                   variant={activeTab === "generate" ? "primary" : "ghost"}
@@ -190,7 +186,7 @@ function App() {
 
         <main className="flex-1 container max-w-screen-2xl mx-auto lg:overflow-hidden flex flex-col min-h-0">
           {activeTab === "generate" ? (
-            <div className="flex flex-col lg:flex-row gap-6 p-4 lg:h-full">
+            <div className="flex flex-col lg:flex-row gap-4 p-2 lg:h-full">
               {/* Left Side: Image/Console */}
               <div className="flex-1 flex flex-col min-h-0">
                 <div className="flex-1 flex flex-col rounded-t-xl overflow-hidden border border-border bg-black/20 backdrop-blur-sm min-h-[50vh]">
@@ -250,7 +246,7 @@ function App() {
               <ControlPanel />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent p-4 lg:p-6">
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent p-2">
               <Gallery isActive={activeTab === "gallery"} />
             </div>
           )}
@@ -259,8 +255,8 @@ function App() {
         <SettingsPopup
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
-          backgroundSettings={backgroundSettings}
-          setBackgroundSettings={setBackgroundSettings}
+          bg={bg}
+          setBg={setBg}
         />
       </Layout>
     </>

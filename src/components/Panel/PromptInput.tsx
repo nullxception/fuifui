@@ -1,63 +1,39 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useDataStore, useDiffusionConfigStore } from "../../stores";
 import { Label } from "../ui/Label";
-import { Select } from "../ui/Select";
+import { SelectAdd } from "../ui/Select";
 import { Textarea } from "../ui/Textarea";
 import { optimizePrompt } from "../../utils/metadataParser";
 
-const EmbeddingSelector: React.FC<{
+const ExtraSelector: React.FC<{
   target: "prompt" | "negativePrompt";
-  onAddEmbedding: (
-    filename: string,
-    target: "prompt" | "negativePrompt",
-  ) => void;
-  embeddings: string[];
-}> = ({ target, onAddEmbedding, embeddings }) => (
-  <Select
+  onAddExtra: (filename: string, target: "prompt" | "negativePrompt") => void;
+  extras: string[];
+  type: "Embedding" | "LoRA";
+}> = ({ target, onAddExtra, extras, type }) => (
+  <SelectAdd
     onChange={(e) => {
       if (e.target.value) {
-        onAddEmbedding(e.target.value, target);
+        onAddExtra(e.target.value, target);
         e.target.value = "";
       }
     }}
     className="text-xs h-8"
   >
-    <option value="">Add Embedding</option>
-    {embeddings.map((embedding) => (
-      <option key={embedding} value={embedding}>
-        {embedding.replace(".safetensors", "")}
+    <option value="">Add {type}</option>
+    {extras.map((extra) => (
+      <option key={extra} value={extra}>
+        {extra.replace(".safetensors", "")}
       </option>
     ))}
-  </Select>
-);
-
-const LoraSelector: React.FC<{
-  target: "prompt" | "negativePrompt";
-  onAddLora: (filename: string, target: "prompt" | "negativePrompt") => void;
-  loras: string[];
-}> = ({ target, onAddLora, loras }) => (
-  <Select
-    onChange={(e) => {
-      if (e.target.value) {
-        onAddLora(e.target.value, target);
-        e.target.value = "";
-      }
-    }}
-    className="text-xs h-8"
-  >
-    <option value="">Add LoRA</option>
-    {loras.map((lora) => (
-      <option key={lora} value={lora}>
-        {lora.replace(".safetensors", "")}
-      </option>
-    ))}
-  </Select>
+  </SelectAdd>
 );
 
 const autoResize = (element: HTMLTextAreaElement) => {
   element.style.height = "auto";
   element.style.height = element.scrollHeight + "px";
 };
+
 export const PromptInput: React.FC = () => {
   const { embeddings, loras, fetchEmbeddings, fetchLoras } = useDataStore();
   const store = useDiffusionConfigStore();
@@ -97,10 +73,8 @@ export const PromptInput: React.FC = () => {
   return (
     <div>
       {/* Positive Prompt */}
-      <div className="p-4 bg-blue-500/20 space-y-4">
-        <Label className="block text-xs font-medium uppercase tracking-wider">
-          Prompt
-        </Label>
+      <div className="p-4 bg-blue-500/20 space-y-2">
+        <Label className="pb-2">Prompt</Label>
         <Textarea
           ref={promptRef}
           value={store.params.prompt}
@@ -111,25 +85,27 @@ export const PromptInput: React.FC = () => {
         />
         <div className="grid grid-cols-2 gap-2">
           {embeddings.length > 0 && (
-            <EmbeddingSelector
+            <ExtraSelector
+              type="Embedding"
               target="prompt"
-              onAddEmbedding={(file, target) =>
+              onAddExtra={(file, target) =>
                 addExtraData(file, target, "embedding")
               }
-              embeddings={embeddings}
+              extras={embeddings}
             />
           )}
           {loras.length > 0 && (
-            <LoraSelector
+            <ExtraSelector
+              type="LoRA"
               target="prompt"
-              onAddLora={(file, target) => addExtraData(file, target, "lora")}
-              loras={loras}
+              onAddExtra={(file, target) => addExtraData(file, target, "lora")}
+              extras={loras}
             />
           )}
         </div>
       </div>
-      <div className="p-4 bg-pink-500/20 space-y-4">
-        <Label>Negative Prompt</Label>
+      <div className="p-4 bg-pink-500/20 space-y-2">
+        <Label className="pb-2">Negative Prompt</Label>
         <Textarea
           ref={negativePromptRef}
           value={store.params.negativePrompt}
@@ -140,19 +116,21 @@ export const PromptInput: React.FC = () => {
         />
         <div className="grid grid-cols-2 gap-2">
           {embeddings.length > 0 && (
-            <EmbeddingSelector
+            <ExtraSelector
+              type="Embedding"
               target="negativePrompt"
-              onAddEmbedding={(file, target) =>
+              onAddExtra={(file, target) =>
                 addExtraData(file, target, "embedding")
               }
-              embeddings={embeddings}
+              extras={embeddings}
             />
           )}
           {loras.length > 0 && (
-            <LoraSelector
+            <ExtraSelector
+              type="LoRA"
               target="negativePrompt"
-              onAddLora={(file, target) => addExtraData(file, target, "lora")}
-              loras={loras}
+              onAddExtra={(file, target) => addExtraData(file, target, "lora")}
+              extras={loras}
             />
           )}
         </div>

@@ -4,17 +4,13 @@ import { Input } from "./ui/Input";
 import { Label } from "./ui/Label";
 import { Card } from "./ui/Card";
 import { CloudArrowUpIcon, XMarkIcon } from "@heroicons/react/24/outline";
-
-interface BackgroundSettings {
-  imageType: "none" | "upload" | "url";
-  imageData: string;
-}
+import type { BackgroundSettings } from "../stores";
 
 interface SettingsPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  backgroundSettings: BackgroundSettings;
-  setBackgroundSettings: (
+  bg: BackgroundSettings;
+  setBg: (
     settings:
       | BackgroundSettings
       | ((prev: BackgroundSettings) => BackgroundSettings),
@@ -24,8 +20,8 @@ interface SettingsPopupProps {
 const SettingsPopup: React.FC<SettingsPopupProps> = ({
   isOpen,
   onClose,
-  backgroundSettings,
-  setBackgroundSettings,
+  bg,
+  setBg,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
@@ -71,10 +67,10 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
 
       const { url } = await response.json();
 
-      setBackgroundSettings((prev) => ({
+      setBg((prev) => ({
         ...prev,
-        imageType: "upload",
-        imageData: url,
+        type: "upload",
+        image: url,
       }));
     } catch (error) {
       console.error("Upload error:", error);
@@ -86,20 +82,17 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
 
   const handleUrlSubmit = () => {
     if (imageUrl.trim()) {
-      setBackgroundSettings((prev) => ({
+      setBg((prev) => ({
         ...prev,
-        imageType: "url",
-        imageData: imageUrl.trim(),
+        type: "url",
+        image: imageUrl.trim(),
       }));
       setImageUrl("");
     }
   };
 
   const deleteBackground = async () => {
-    if (
-      backgroundSettings.imageType === "upload" &&
-      backgroundSettings.imageData
-    ) {
+    if (bg.type === "upload" && bg.image) {
       try {
         await fetch("/api/background", {
           method: "DELETE",
@@ -109,10 +102,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
       }
     }
 
-    setBackgroundSettings({
-      imageType: "none",
-      imageData: "",
-    });
+    setBg({ type: "none", image: "" });
   };
 
   return (
@@ -187,10 +177,10 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
             </div>
 
             {/* Preview */}
-            {backgroundSettings.imageData && (
+            {bg.image && (
               <div className="relative group">
                 <img
-                  src={backgroundSettings.imageData}
+                  src={bg.image}
                   alt="Background preview"
                   className="w-full h-48 object-cover rounded-md border border-border"
                 />
