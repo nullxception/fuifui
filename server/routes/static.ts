@@ -34,9 +34,15 @@ export const handleStaticRoutes = async (
 ): Promise<Response | null> => {
   const pathname = url.pathname;
 
-  // Serve static files from public directory (user-generated content)
-  if (pathname.startsWith("/result/") || pathname.startsWith("/upload/")) {
+  // Serve static files from public directory (user-uploaded images)
+  if (pathname.startsWith("/upload/")) {
     const filepath = path.join(__dirname, "public", pathname);
+    return await serveStatic(filepath);
+  }
+
+  // Serve output images
+  if (pathname.startsWith("/output/")) {
+    const filepath = path.join(__dirname, pathname);
     return await serveStatic(filepath);
   }
 

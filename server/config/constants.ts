@@ -9,7 +9,7 @@ export const MODEL_DIR = path.join(projectRoot, "models/checkpoint");
 export const EMBEDDING_DIR = path.join(projectRoot, "models/embedding");
 export const LORA_DIR = path.join(projectRoot, "models/lora");
 export const VAE_DIR = path.join(projectRoot, "models/vae");
-export const RESULT_DIR = path.join(projectRoot, "public/result");
+export const OUTPUT_DIR = path.join(projectRoot, "output");
 export const UPLOAD_DIR = path.join(projectRoot, "public/upload");
 export const CONFIG_PATH = path.join(projectRoot, "config.yaml");
 

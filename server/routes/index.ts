@@ -35,7 +35,7 @@ export const apiRoutes: Record<
       const images = await listImages();
       return jsonResponse(images);
     } catch (error) {
-      console.error("Error reading result directory:", error);
+      console.error("Error reading output directory:", error);
       return jsonResponse({ error: "Failed to list images" }, 500);
     }
   },

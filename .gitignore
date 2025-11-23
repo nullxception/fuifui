@@ -28,11 +28,13 @@ models/checkpoint/*
 models/embedding/*
 models/lora/*
 models/vae/*
+output/*
+public/upload/*
+sd
+config.yaml
 !models/checkpoint/placeholder
 !models/embedding/placeholder
 !models/lora/placeholder
 !models/vae/placeholder
-public/result/*
-public/upload/*
-sd
-config.yaml
+!output/placeholder
+!public/upload/placeholder

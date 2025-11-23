@@ -3,7 +3,7 @@ import path from "path";
 import exifr from "exifr";
 import sharp from "sharp";
 import {
-  RESULT_DIR,
+  OUTPUT_DIR,
   UPLOAD_DIR,
   SUPPORTED_IMAGE_EXTENSIONS,
 } from "../config/constants";
@@ -11,7 +11,8 @@ import type { ImageMetadata } from "../types/index";
 
 export const listImages = async (): Promise<ImageMetadata[]> => {
   try {
-    const files = await fs.readdir(RESULT_DIR);
+    const dir = path.join(OUTPUT_DIR, "txt2img");
+    const files = await fs.readdir(dir);
 
     const imagePromises = files
       .filter((file) =>
@@ -20,7 +21,7 @@ export const listImages = async (): Promise<ImageMetadata[]> => {
         ),
       )
       .map(async (file) => {
-        const filePath = path.join(RESULT_DIR, file);
+        const filePath = path.join(dir, file);
         const stats = await fs.stat(filePath);
         let metadata = {};
         try {
@@ -34,7 +35,7 @@ export const listImages = async (): Promise<ImageMetadata[]> => {
         }
 
         return {
-          url: `/result/${file}`,
+          url: `/output/txt2img/${file}`,
           mtime: stats.mtime.getTime(),
           metadata,
         };
@@ -43,7 +44,7 @@ export const listImages = async (): Promise<ImageMetadata[]> => {
     const images = await Promise.all(imagePromises);
     return images.sort((a, b) => b.mtime - a.mtime);
   } catch (error) {
-    console.error("Error reading result directory:", error);
+    console.error("Error reading output directory:", error);
     throw new Error("Failed to list images");
   }
 };

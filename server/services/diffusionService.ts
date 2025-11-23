@@ -3,7 +3,7 @@ import path from "path";
 import {
   SDCPP_BIN,
   MODEL_DIR,
-  RESULT_DIR,
+  OUTPUT_DIR,
   EMBEDDING_DIR,
   LORA_DIR,
   VAE_DIR,
@@ -85,7 +85,7 @@ export const createDiffusionStream = (
       const encoder = new TextEncoder();
       const timestamp = Date.now();
       const outputFilename = `${timestamp}.png`;
-      const outputPath = path.join(RESULT_DIR, outputFilename);
+      const outputPath = path.join(OUTPUT_DIR, "txt2img", outputFilename);
       const modelPath = path.join(MODEL_DIR, params.model || "");
       const vaePath = path.join(VAE_DIR, params.vae || "");
 
@@ -293,7 +293,7 @@ export const createDiffusionStream = (
           );
           const completeData: DiffusionComplete = {
             success: true,
-            imageUrl: `/result/${outputFilename}`,
+            imageUrl: `/output/txt2img/${outputFilename}`,
           };
           setJobResult(jobId, completeData);
           safeEnqueue(
