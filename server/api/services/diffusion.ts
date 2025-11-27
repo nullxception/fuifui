@@ -5,8 +5,8 @@ import {
   LORA_DIR,
   MODEL_DIR,
   OUTPUT_DIR,
+  ROOT_DIR,
   VAE_DIR,
-  projectRoot,
 } from "../../constants";
 import type {
   DiffusionComplete,
@@ -89,7 +89,7 @@ export const startDiffusion = async (
   const vaePath = path.join(VAE_DIR, params.vae || "");
 
   // sd at project root or from $PATH
-  const project_sd = path.join(projectRoot, "sd");
+  const project_sd = path.join(ROOT_DIR, "sd");
   const sd = (await file(project_sd).exists()) ? project_sd : "sd";
 
   const args = [
@@ -164,7 +164,7 @@ export const startDiffusion = async (
   }
 
   const sendLog = (type: string, message: string) => {
-    const log = message.trim().replaceAll(projectRoot + path.sep, "");
+    const log = message.trim().replaceAll(ROOT_DIR + path.sep, "");
     const data: LogData = {
       type,
       message: log,

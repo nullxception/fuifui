@@ -1,11 +1,7 @@
 import exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
-import {
-  OUTPUT_DIR,
-  SUPPORTED_IMAGE_EXTENSIONS,
-  projectRoot,
-} from "../constants";
+import { IMAGE_EXT, OUTPUT_DIR, ROOT_DIR } from "../constants";
 import type { Image } from "../types";
 
 const list = async (limit: number, offset: number): Promise<Image[]> => {
@@ -17,9 +13,7 @@ const list = async (limit: number, offset: number): Promise<Image[]> => {
     const stats = await Promise.all(
       files
         .filter((file) =>
-          SUPPORTED_IMAGE_EXTENSIONS.some((ext) =>
-            file.toLowerCase().endsWith(ext),
-          ),
+          IMAGE_EXT.some((ext) => file.toLowerCase().endsWith(ext)),
         )
         .map(async (filename) => {
           const filePath = path.join(dir, filename);
@@ -72,7 +66,7 @@ const remove = async (images: string[]): Promise<void> => {
       if (!img.startsWith("/output/")) {
         continue;
       }
-      img = path.join(projectRoot, img);
+      img = path.join(ROOT_DIR, img);
       console.log(`removing ${img}`);
       await Bun.file(img).delete();
     }

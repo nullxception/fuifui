@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
 import path from "path";
 import sharp from "sharp";
-import { projectRoot, THUMBS_DIR } from "../constants";
+import { ROOT_DIR, THUMBS_DIR } from "../constants";
 
 const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
   const pathname = url.pathname;
-  const filepath = path.join(projectRoot, pathname);
+  const filepath = path.join(ROOT_DIR, pathname);
   let thumb = path.basename(pathname);
   thumb = `${thumb}.cache-${size}.webp`;
   thumb = path.join(THUMBS_DIR, thumb);
@@ -29,13 +29,13 @@ const serveStatic = async (req: Request): Promise<Response> => {
 
   // Serve static files from public directory (user-uploaded images)
   if (pathname.startsWith("/upload/")) {
-    const filepath = path.join(projectRoot, "public", pathname);
+    const filepath = path.join(ROOT_DIR, "public", pathname);
     return new Response(Bun.file(filepath));
   }
 
   // Serve output images
   if (pathname.startsWith("/output/")) {
-    const filepath = path.join(projectRoot, pathname);
+    const filepath = path.join(ROOT_DIR, pathname);
     const size = Number(url.searchParams.get("size")) || 0;
     if (size >= 126 && size <= 512) {
       // looks like we're getting thumbnail request
