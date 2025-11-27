@@ -1,0 +1,40 @@
+@source not "../bin";
+@source not "../models";
+@source not "../public";
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@import "tailwindcss";
+@plugin "tailwind-scrollbar";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+
+  --color-background: #000000;
+  --color-surface: #0d0d14;
+  --color-surface-hover: #17171a;
+  --color-border: #17171a;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #27272a;
+  --color-secondary-hover: #3f3f46;
+  --color-secondary-foreground: #ffffff;
+
+  --color-muted: #71717a;
+  --color-muted-foreground: #a1a1aa;
+}
+
+html {
+  background-color: var(--color-background);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+}
