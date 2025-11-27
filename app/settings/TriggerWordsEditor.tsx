@@ -6,13 +6,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { splitSmart } from "app/gallery/metadataParser";
 import React, { useEffect, useState } from "react";
+import type { ExtraDataType, TriggerWord } from "server/types";
 import { useModels, useTriggerWords } from "../stores";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
 import { Select } from "../ui/Select";
-import type { TriggerWord } from "./useTriggerWords";
 
 const TriggerWordsEditor: React.FC = () => {
   const { triggerWords, addTriggerWord, updateTriggerWord, deleteTriggerWord } =
@@ -75,7 +75,7 @@ const TriggerWordsEditor: React.FC = () => {
     setEditingIndex(null);
   };
 
-  const getAvailableTargets = (type: "embedding" | "lora") => {
+  const getAvailableTargets = (type: ExtraDataType) => {
     const targets = type === "embedding" ? models.embeddings : models.loras;
     return targets.map((t) => t.replace(".safetensors", ""));
   };
@@ -266,7 +266,7 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
             onChange={(e) =>
               onChange({
                 ...entry,
-                type: e.target.value as "embedding" | "lora",
+                type: e.target.value as ExtraDataType,
                 target: "", // Reset target when type changes
               })
             }

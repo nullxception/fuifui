@@ -1,12 +1,5 @@
+import type { TriggerWord } from "server/types";
 import useConfig from "../stores/useConfig";
-
-export type ExtraDataType = "embedding" | "lora";
-
-export interface TriggerWord {
-  type: ExtraDataType;
-  target: string;
-  words: string[];
-}
 
 export const useTriggerWords = () => {
   const [triggerWords, setTriggerWords] = useConfig<TriggerWord[]>(

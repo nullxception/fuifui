@@ -64,8 +64,10 @@ export interface Models {
   vaes: string[];
 }
 
+export type ExtraDataType = "embedding" | "lora";
+
 export interface TriggerWord {
-  type: "embedding" | "lora";
+  type: ExtraDataType;
   target: string;
   words: string[];
 }
