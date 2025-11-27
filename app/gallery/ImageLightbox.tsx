@@ -5,43 +5,56 @@ import {
   InformationCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import ImageMetadata from "./ImageMetadata";
 import { parseDiffusionParams } from "./metadataParser";
-import { useGalleryImages } from "./useGalleryImages";
+import { useGallery } from "./useGallery";
 
 export default function ImageLightbox() {
-  const { selectedImage, closeLightbox, navigateImage, removeImages } =
-    useGalleryImages();
-  const [showMetadata, setShowMetadata] = useState(() => {
+  const { selectedImage, setSelectedImage, navigateImage, removeImages } =
+    useGallery(
+      useShallow((state) => ({
+        selectedImage: state.selectedImage,
+        setSelectedImage: state.setSelectedImage,
+        navigateImage: state.navigateImage,
+        removeImages: state.removeImages,
+      })),
+    );
+
+  const [shouldShowMetadata, showMetadata] = useState(() => {
     return window.innerWidth >= 1024; // lg breakpoint
   });
 
-  const [openRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [shouldShowRemoveDialog, showRemoveDialog] = useState(false);
+
+  const close = useCallback(() => {
+    setSelectedImage(null);
+  }, [setSelectedImage]);
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
 
-      if (e.key === "Escape") closeLightbox();
+      if (e.key === "Escape") close();
       if (e.key === "ArrowRight") navigateImage("next");
       if (e.key === "ArrowLeft") navigateImage("prev");
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedImage, closeLightbox, navigateImage]);
+  }, [selectedImage, setSelectedImage, navigateImage, close]);
 
   if (!selectedImage) return null;
 
   const parsedMetadata = parseDiffusionParams(selectedImage.metadata);
 
   const onRemove = () => {
-    setShowRemoveDialog(false);
-    closeLightbox();
+    showRemoveDialog(false);
+    close();
     removeImages([selectedImage.url]);
   };
 
@@ -49,7 +62,7 @@ export default function ImageLightbox() {
     <>
       <div
         className="animate-in fade-in fixed inset-0 z-100 flex items-center justify-center backdrop-blur-lg duration-200"
-        onClick={closeLightbox}
+        onClick={close}
       >
         <div
           className="flex h-screen w-screen max-w-7xl flex-col overflow-hidden rounded-xl border border-border bg-background/50 shadow-2xl md:flex-row lg:w-[95vw]"
@@ -88,7 +101,7 @@ export default function ImageLightbox() {
               className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-black/70 hover:bg-white/10 hover:text-white lg:hidden"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowMetadata((v) => !v);
+                showMetadata((v) => !v);
               }}
             >
               <InformationCircleIcon className="h-6 w-6 text-white" />
@@ -97,7 +110,7 @@ export default function ImageLightbox() {
               variant="ghost"
               size="icon"
               className="absolute top-5 right-5 z-110 text-white/70 hover:bg-white/10 hover:text-white md:left-5"
-              onClick={closeLightbox}
+              onClick={close}
             >
               <XMarkIcon className="h-6 w-6" />
             </Button>
@@ -106,17 +119,17 @@ export default function ImageLightbox() {
           <ImageMetadata
             image={selectedImage}
             parsedMetadata={parsedMetadata}
-            onRemove={() => setShowRemoveDialog(true)}
-            closeLightbox={closeLightbox}
-            className={`${showMetadata ? "block" : "hidden"} lg:block`}
+            onRemove={() => showRemoveDialog(true)}
+            closeLightbox={close}
+            className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}
           />
         </div>
       </div>
-      {openRemoveDialog ? (
+      {shouldShowRemoveDialog ? (
         <>
           <div
             className="fixed top-0 left-0 z-199 h-screen w-full bg-black/60 backdrop-blur-md"
-            onClick={() => setShowRemoveDialog(false)}
+            onClick={() => showRemoveDialog(false)}
           />
           <Card className="fixed top-1/2 left-1/2 z-200 flex w-full max-w-3xs -translate-1/2 flex-col justify-center shadow-black drop-shadow-lg">
             <ExclamationTriangleIcon className="mt-5 h-10 w-10 self-center text-red-400" />
@@ -125,7 +138,7 @@ export default function ImageLightbox() {
               <Button
                 variant="outline"
                 className="w-1/2"
-                onClick={() => setShowRemoveDialog(false)}
+                onClick={() => showRemoveDialog(false)}
               >
                 No
               </Button>

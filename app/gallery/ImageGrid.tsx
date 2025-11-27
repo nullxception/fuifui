@@ -1,8 +1,9 @@
 import { PhotoIcon } from "@heroicons/react/16/solid";
 import { useEffect, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import type { Image } from "../../server/types";
 import { Footer } from "../ui/Footer";
-import { useGalleryImages } from "./useGalleryImages";
+import { useGallery } from "./useGallery";
 
 function useElementWidth<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -60,17 +61,30 @@ function GalleryItem({ image, onClick }: GalleryItemProps) {
   );
 }
 export default function ImageGrid() {
-  const { images, loadMore, hasMore, isLoadingMore, openLightbox } =
-    useGalleryImages();
+  const { images, fetchImages, hasMore, isLoading, setSelectedImage } =
+    useGallery(
+      useShallow((state) => ({
+        images: state.images,
+        fetchImages: state.fetchImages,
+        hasMore: state.hasMore,
+        isLoading: state.isLoading,
+        setSelectedImage: state.setSelectedImage,
+      })),
+    );
 
+  const isLoadingMore = isLoading && images.length > 0;
   const observerTarget = useRef(null);
+
+  useEffect(() => {
+    fetchImages(false);
+  }, [fetchImages]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry && entry.isIntersecting && hasMore && !isLoadingMore) {
-          loadMore?.();
+        if (entry && entry.isIntersecting && hasMore && !isLoading) {
+          fetchImages(true);
         }
       },
       { threshold: 0.1 },
@@ -86,7 +100,7 @@ export default function ImageGrid() {
         observer.unobserve(currentTarget);
       }
     };
-  }, [hasMore, isLoadingMore, loadMore]);
+  }, [hasMore, isLoading, fetchImages]);
 
   if (images.length === 0 && !isLoadingMore) {
     return (
@@ -108,7 +122,7 @@ export default function ImageGrid() {
       {images.map((image, index) => (
         <GalleryItem
           key={index}
-          onClick={() => openLightbox(image)}
+          onClick={() => setSelectedImage(image)}
           image={image}
         />
       ))}
