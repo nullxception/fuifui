@@ -37,7 +37,8 @@ export const useGallery = create<GalleryState>((set, get) => ({
     });
   },
   navigateImage: (direction) => {
-    const { images, selectedImage, hasPrev, hasNext } = get();
+    const { images, selectedImage, hasPrev, hasNext, hasMore, fetchImages } =
+      get();
 
     if (
       (direction === "next" && !hasNext) ||
@@ -60,6 +61,10 @@ export const useGallery = create<GalleryState>((set, get) => ({
       hasPrev: newIndex > 0,
       hasNext: newIndex < images.length - 1,
     });
+    // Pre-fetch more images if navigating next and at the end of the list
+    if (direction === "next" && newIndex === images.length - 1 && hasMore) {
+      fetchImages(true);
+    }
   },
   fetchImages: async (isLoadMore = false) => {
     const { isLoading, offset } = get();
