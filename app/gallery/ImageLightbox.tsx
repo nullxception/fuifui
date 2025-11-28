@@ -122,7 +122,7 @@ export default function ImageLightbox() {
 
           <ImageMetadata
             image={selectedImage}
-            parsedMetadata={parsedMetadata}
+            metadata={parsedMetadata}
             onRemove={() => showRemoveDialog(true)}
             closeLightbox={close}
             className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}

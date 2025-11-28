@@ -24,15 +24,38 @@ const saveImage = async (image: Image) => {
 
 interface ImageMetadataProps {
   image: Image;
-  parsedMetadata: ParsedMetadata | null;
+  metadata: ParsedMetadata | null;
   onRemove: () => void;
   closeLightbox: () => void;
   className: string;
 }
 
+function MetadataChip({
+  data: metadata,
+  metakey,
+  className = "",
+}: {
+  data: ParsedMetadata;
+  metakey: keyof ParsedMetadata;
+  className?: string;
+}) {
+  return (
+    <div className="rounded border border-border/50 bg-background/50 p-2">
+      <Label
+        className={`mb-1 block text-[10px] tracking-wider text-gray-300 uppercase ${className}`}
+      >
+        {metakey.split(/(?=[A-Z])/).join(" ")}
+      </Label>
+      <p className="text-gray truncate font-mono text-xs whitespace-pre-wrap">
+        {metadata[metakey].toString()}
+      </p>
+    </div>
+  );
+}
+
 export default function ImageMetadata({
   image,
-  parsedMetadata,
+  metadata,
   onRemove,
   closeLightbox,
   className = "",
@@ -41,20 +64,19 @@ export default function ImageMetadata({
   const store = useDiffusionConfig();
 
   const handleRemake = () => {
-    if (!parsedMetadata) return;
+    if (!metadata) return;
 
     // Map parsed metadata to diffusion config parameters
-    const { otherParams } = parsedMetadata;
     store.updateAll({
-      prompt: parsedMetadata.prompt,
-      negativePrompt: parsedMetadata.negativePrompt,
-      steps: Number(otherParams.steps),
-      cfgScale: Number(otherParams.cfgScale),
-      width: Number(otherParams.width),
-      height: Number(otherParams.height),
-      samplingMethod: String(otherParams.samplingMethod),
-      scheduler: String(otherParams.scheduler),
-      model: String(otherParams.model),
+      prompt: metadata.prompt,
+      negativePrompt: metadata.negativePrompt,
+      steps: metadata.steps,
+      cfgScale: metadata.cfgScale,
+      width: metadata.baseWidth,
+      height: metadata.baseHeight,
+      samplingMethod: metadata.samplingMethod,
+      scheduler: metadata.scheduler,
+      model: metadata.model,
     });
 
     // Navigate back to generate tab
@@ -84,7 +106,7 @@ export default function ImageMetadata({
             <Button onClick={onRemove} size="sm" variant="destructive">
               <TrashIcon className="mr-2 h-4" /> Delete
             </Button>
-            {parsedMetadata && (
+            {metadata && (
               <Button onClick={handleRemake} size="sm" variant="default">
                 <RefreshCcwIcon className="mr-2 h-4" /> Remake
               </Button>
@@ -97,64 +119,41 @@ export default function ImageMetadata({
               <DownloadIcon className="mr-2 h-4" /> Download
             </Button>
           </div>
-          {parsedMetadata ? (
+          {metadata ? (
             <div className="space-y-2">
-              {parsedMetadata.prompt && (
-                <div className="rounded border border-border/50 bg-background/20 p-2">
-                  <Label className="mb-1 block text-[10px] tracking-wider text-pink-400 uppercase">
-                    Prompt
-                  </Label>
-                  <p className="truncate font-mono text-xs whitespace-pre-wrap text-gray-200">
-                    {parsedMetadata.prompt}
-                  </p>
-                </div>
-              )}
-
-              {parsedMetadata.negativePrompt && (
-                <div className="rounded border border-border/50 bg-background/20 p-2">
-                  <Label className="mb-1 block text-[10px] tracking-wider text-pink-400 uppercase">
-                    Negative Prompt
-                  </Label>
-                  <p className="truncate font-mono text-xs whitespace-pre-wrap text-gray-200">
-                    {parsedMetadata.negativePrompt}
-                  </p>
-                </div>
-              )}
-
-              {Object.keys(parsedMetadata.otherParams).length > 0 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(parsedMetadata.otherParams).map(
-                    ([key, value]) => (
-                      <div
-                        key={key}
-                        className="rounded border border-border/50 bg-background/20 p-2"
-                      >
-                        <Label className="mb-1 block text-[10px] tracking-wider text-muted-foreground uppercase">
-                          {key}
-                        </Label>
-                        <p className="font-mono text-xs wrap-break-word text-gray-200">
-                          {value}
-                        </p>
-                      </div>
-                    ),
-                  )}
-                </div>
-              )}
-            </div>
-          ) : // Fallback to raw metadata if parsing fails or no string found
-          image.metadata && Object.keys(image.metadata).length > 0 ? (
-            Object.entries(image.metadata).map(([key, value]) => (
-              <div key={key} className="space-y-1">
-                <Label className="text-xs tracking-wider text-muted-foreground uppercase">
-                  {key}
-                </Label>
-                <div className="rounded border border-border/50 bg-background/20 p-2 font-mono text-sm wrap-break-word whitespace-pre-wrap text-gray-300">
-                  {typeof value === "object"
-                    ? JSON.stringify(value, null, 2)
-                    : String(value)}
-                </div>
+              <MetadataChip
+                data={metadata}
+                metakey="prompt"
+                className="text-blue-400"
+              />
+              <MetadataChip
+                data={metadata}
+                metakey="negativePrompt"
+                className="text-pink-400"
+              />
+              <MetadataChip
+                data={metadata}
+                metakey="model"
+                className="text-purple-400"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <MetadataChip data={metadata} metakey="width" />
+                <MetadataChip data={metadata} metakey="height" />
+                <MetadataChip data={metadata} metakey="upscaled" />
+                {metadata.upscaled && (
+                  <MetadataChip data={metadata} metakey="baseWidth" />
+                )}
+                {metadata.upscaled && (
+                  <MetadataChip data={metadata} metakey="baseHeight" />
+                )}
+                <MetadataChip data={metadata} metakey="steps" />
+                <MetadataChip data={metadata} metakey="cfgScale" />
+                <MetadataChip data={metadata} metakey="rng" />
+                <MetadataChip data={metadata} metakey="samplingMethod" />
+                <MetadataChip data={metadata} metakey="scheduler" />
               </div>
-            ))
+              <MetadataChip data={metadata} metakey="version" />
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">
               No metadata found.

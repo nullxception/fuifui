@@ -1,12 +1,35 @@
 export interface ParsedMetadata {
   prompt: string;
   negativePrompt: string;
-  otherParams: Record<string, string | number>;
+  width: number;
+  height: number;
+  upscaled: boolean;
+  baseWidth: number;
+  baseHeight: number;
+  model: string;
+  steps: number;
+  cfgScale: number;
+  rng: string;
+  samplingMethod: string;
+  scheduler: string;
+  version: string;
 }
+
 const emptyMetadata: ParsedMetadata = {
   prompt: "",
   negativePrompt: "",
-  otherParams: {},
+  width: -1,
+  height: -1,
+  upscaled: false,
+  baseWidth: -1,
+  baseHeight: -1,
+  model: "",
+  steps: -1,
+  cfgScale: -1,
+  rng: "",
+  samplingMethod: "",
+  scheduler: "",
+  version: "",
 };
 
 const snakeToCamel = (str: string) =>
@@ -73,6 +96,7 @@ export const parseDiffusionParams = (
   metadata: Record<string, unknown>,
 ): ParsedMetadata => {
   if (!metadata) return emptyMetadata;
+  const data = emptyMetadata;
 
   // Try to find the parameters string. It's often in 'parameters' or 'UserComment'
   // based on how stable-diffusion.cpp or other tools save it.
@@ -93,7 +117,14 @@ export const parseDiffusionParams = (
     if (potentialValue) rawParams = potentialValue;
   }
 
-  if (!rawParams) return emptyMetadata;
+  if (typeof metadata.ImageWidth === "number") {
+    data.width = metadata.ImageWidth;
+  }
+  if (typeof metadata.ImageHeight === "number") {
+    data.height = metadata.ImageHeight;
+  }
+
+  if (!rawParams) return data;
 
   try {
     const lines = rawParams.split("\n").filter((l) => l.trim() !== "");
@@ -122,30 +153,43 @@ export const parseDiffusionParams = (
             k = snakeToCamel(k);
             const v = values.join(": ").trim();
             switch (k) {
+              case "version":
+                data.version = v;
+                break;
+              case "model":
+                data.model = v;
+                break;
               case "cfgScale":
-                otherParams["cfgScale"] = parseFloat(v);
+                data.cfgScale = parseFloat(v);
                 break;
               case "steps":
-                otherParams["steps"] = parseInt(v);
+                data.steps = parseInt(v);
                 break;
               case "size": {
                 const [width, height] = v.split("x").map((d) => d.trim());
+
                 if (width && height) {
-                  otherParams["width"] = parseInt(width);
-                  otherParams["height"] = parseInt(height);
+                  data.baseWidth = parseInt(width);
+                  data.baseHeight = parseInt(height);
+                }
+                if (
+                  data.width > data.baseWidth ||
+                  data.height > data.baseHeight
+                ) {
+                  data.upscaled = true;
                 }
                 break;
               }
               case "sampler": {
                 const [method, sched] = v.split(" ").map((s) => s.trim());
                 if (method && sched) {
-                  otherParams["samplingMethod"] = method;
-                  otherParams["scheduler"] = sched;
+                  data.samplingMethod = method;
+                  data.scheduler = sched;
                 }
                 break;
               }
               case "rng":
-                otherParams["rng"] = v;
+                data.rng = v;
                 break;
               case "guidance":
               case "eta":
@@ -169,15 +213,11 @@ export const parseDiffusionParams = (
       }
     }
 
-    prompt = prompt.replace(/['"]+/g, "");
-    negativePrompt = negativePrompt.replace(/['"]+/g, "");
-    return {
-      prompt: optimizePrompt(prompt),
-      negativePrompt: optimizePrompt(negativePrompt),
-      otherParams,
-    };
+    data.prompt = optimizePrompt(prompt.replace(/['"]+/g, ""));
+    data.negativePrompt = optimizePrompt(negativePrompt.replace(/['"]+/g, ""));
+    return data;
   } catch (e) {
     console.error("Failed to parse parameters", e);
-    return emptyMetadata;
+    return data;
   }
 };
