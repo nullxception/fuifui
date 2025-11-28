@@ -8,7 +8,7 @@
     @apply bg-background;
   }
   body {
-    @apply relative m-0 place-items-center bg-transparent text-foreground;
+    @apply relative m-0 bg-transparent text-foreground;
   }
 }
 

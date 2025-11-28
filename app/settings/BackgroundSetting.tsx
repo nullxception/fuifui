@@ -74,7 +74,7 @@ const BackgroundSetting: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex w-full flex-col space-y-4">
       <Label>Background</Label>
 
       {/* Upload Section */}

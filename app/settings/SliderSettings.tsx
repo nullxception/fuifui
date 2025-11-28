@@ -7,7 +7,7 @@ const SliderSettings: React.FC = () => {
   const { app, update } = useSettings();
   return (
     <div className={`mb-4 space-y-4 space-x-4`}>
-      <div className="flex flex-col justify-between space-y-2">
+      <div className="flex w-full flex-col justify-between space-y-2">
         <Label>Max width slider</Label>
         <Input
           type="number"
@@ -18,8 +18,7 @@ const SliderSettings: React.FC = () => {
           onChange={(e) => update("maxWidth", parseInt(e.target.value))}
         />
       </div>
-
-      <div className="flex flex-col justify-between space-y-2">
+      <div className="flex w-full flex-col justify-between space-y-2">
         <Label>Max height slider</Label>
         <Input
           type="number"

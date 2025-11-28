@@ -38,10 +38,10 @@ const SettingsPopup: React.FC = () => {
         </div>
         <div className="scrollbar-thin overflow-y-auto">
           <div className="flex flex-col space-y-6 space-x-4 p-4 md:flex-row">
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col">
               <BackgroundSetting />
             </div>
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col">
               <SliderSettings />
               <TriggerWordsEditor />
             </div>

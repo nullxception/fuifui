@@ -37,7 +37,7 @@ export const SliderInput: React.FC<SliderProps> = ({
           />
         </div>
       )}
-      <div className="relative flex w-full max-w-sm flex-col items-center">
+      <div className="relative flex w-full flex-col items-center">
         <SliderPrimitive.Root
           defaultValue={[value]}
           min={min}
