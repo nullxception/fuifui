@@ -14,15 +14,14 @@ import { parseDiffusionParams } from "./metadataParser";
 import { useGallery } from "./useGallery";
 
 export default function ImageLightbox() {
-  const { selectedImage, setSelectedImage, navigateImage, removeImages } =
-    useGallery(
-      useShallow((state) => ({
-        selectedImage: state.selectedImage,
-        setSelectedImage: state.setSelectedImage,
-        navigateImage: state.navigateImage,
-        removeImages: state.removeImages,
-      })),
-    );
+  const { selectedImage, hasPrev, hasNext } = useGallery(
+    useShallow((state) => ({
+      selectedImage: state.selectedImage,
+      hasPrev: state.hasPrev,
+      hasNext: state.hasNext,
+    })),
+  );
+  const { setSelectedImage, navigateImage, removeImages } = useGallery();
 
   const [shouldShowMetadata, showMetadata] = useState(() => {
     return window.innerWidth >= 1024; // lg breakpoint
@@ -74,28 +73,32 @@ export default function ImageLightbox() {
               alt="Full size"
               className="max-h-full max-w-full grow object-contain shadow-lg"
             />
-            <div
-              className={`absolute top-0 left-0 z-110 h-full w-1/6 cursor-pointer from-transparent to-black/50 select-none hover:-bg-linear-90`}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage("prev");
-              }}
-            >
-              <ChevronLeftIcon
-                className={`absolute top-1/2 left-4 z-110 h-8 w-8 -translate-y-1/2 rounded-full text-white/70`}
-              />
-            </div>
-            <div
-              className={`absolute top-0 right-0 z-110 h-full w-1/6 cursor-pointer from-black/50 to-transparent select-none hover:-bg-linear-90`}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage("next");
-              }}
-            >
-              <ChevronRightIcon
-                className={`absolute top-1/2 right-4 z-110 h-8 w-8 -translate-y-1/2 text-white/70`}
-              />
-            </div>
+            {hasPrev && (
+              <div
+                className={`absolute top-0 left-0 z-110 h-full w-1/6 cursor-pointer from-transparent to-black/50 select-none hover:-bg-linear-90`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateImage("prev");
+                }}
+              >
+                <ChevronLeftIcon
+                  className={`absolute top-1/2 left-4 z-110 h-8 w-8 -translate-y-1/2 rounded-full text-white/70`}
+                />
+              </div>
+            )}
+            {hasNext && (
+              <div
+                className={`absolute top-0 right-0 z-110 h-full w-1/6 cursor-pointer from-black/50 to-transparent select-none hover:-bg-linear-90`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateImage("next");
+                }}
+              >
+                <ChevronRightIcon
+                  className={`absolute top-1/2 right-4 z-110 h-8 w-8 -translate-y-1/2 text-white/70`}
+                />
+              </div>
+            )}
             <Button
               variant="ghost"
               className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-black/70 hover:bg-white/10 hover:text-white lg:hidden"
@@ -125,7 +128,7 @@ export default function ImageLightbox() {
           />
         </div>
       </div>
-      {shouldShowRemoveDialog ? (
+      {shouldShowRemoveDialog && (
         <>
           <div
             className="fixed top-0 left-0 z-199 h-screen w-full bg-black/60 backdrop-blur-md"
@@ -148,8 +151,6 @@ export default function ImageLightbox() {
             </div>
           </Card>
         </>
-      ) : (
-        <></>
       )}
     </>
   );

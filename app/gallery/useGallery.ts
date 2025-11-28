@@ -7,13 +7,10 @@ interface GalleryState {
   isLoading: boolean;
   offset: number;
   hasMore: boolean;
+  hasPrev: boolean;
+  hasNext: boolean;
 
-  setImages: (images: Image[]) => void;
-  appendImages: (images: Image[]) => void;
   setSelectedImage: (image: Image | null) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  addImage: (image: Image) => void;
-  removeImage: (url: string) => void;
   navigateImage: (direction: "next" | "prev") => void;
   fetchImages: (isLoadMore?: boolean) => Promise<void>;
   removeImages: (urls: string[]) => Promise<void>;
@@ -27,21 +24,28 @@ export const useGallery = create<GalleryState>((set, get) => ({
   isLoading: false,
   offset: 0,
   hasMore: true,
+  hasPrev: false,
+  hasNext: true,
 
-  setImages: (images) => set({ images }),
-  appendImages: (newImages) =>
-    set((state) => ({ images: [...state.images, ...newImages] })),
-  setSelectedImage: (image) => set({ selectedImage: image }),
-  setIsLoading: (isLoading) => set({ isLoading }),
-  addImage: (image) => set((state) => ({ images: [image, ...state.images] })),
-  removeImage: (url) =>
-    set((state) => ({
-      images: state.images.filter((img) => img.url !== url),
-      selectedImage:
-        state.selectedImage?.url === url ? null : state.selectedImage,
-    })),
+  setSelectedImage: (image) => {
+    set({
+      selectedImage: image,
+      hasPrev: image ? get().images.indexOf(image) > 0 : false,
+      hasNext: image
+        ? get().images.indexOf(image) < get().images.length - 1
+        : false,
+    });
+  },
   navigateImage: (direction) => {
-    const { images, selectedImage } = get();
+    const { images, selectedImage, hasPrev, hasNext } = get();
+
+    if (
+      (direction === "next" && !hasNext) ||
+      (direction === "prev" && !hasPrev)
+    ) {
+      return;
+    }
+
     if (!selectedImage || images.length === 0) return;
 
     const currentIndex = images.indexOf(selectedImage);
@@ -51,7 +55,11 @@ export const useGallery = create<GalleryState>((set, get) => ({
     } else {
       newIndex = (currentIndex - 1 + images.length) % images.length;
     }
-    set({ selectedImage: images[newIndex] });
+    set({
+      selectedImage: images[newIndex],
+      hasPrev: newIndex > 0,
+      hasNext: newIndex < images.length - 1,
+    });
   },
   fetchImages: async (isLoadMore = false) => {
     const { isLoading, offset } = get();
