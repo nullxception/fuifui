@@ -14,7 +14,7 @@
 
 .dark {
   --background: black;
-  --card: oklch(15% 0 271.152 / 0.6);
+  --card: oklch(15% 0 271.152 / 0.75);
   --primary: oklch(52.008% 0.2474 292.867 / 0.8);
   --primary-foreground: oklch(100% 0.00011 271.152);
   --destructive: var(--color-pink-500);

@@ -110,7 +110,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
 
   return (
     <div
-      className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/10" : "bg-pink-500/10"}`}
+      className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/20" : "bg-pink-500/20"}`}
     >
       <Label className="pb-2">{title}</Label>
       <Textarea
@@ -122,8 +122,8 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
         }}
         className={`scrollbar-none ${
           type === "prompt"
-            ? "focus-visible:ring-blue-500"
-            : "focus-visible:ring-pink-500"
+            ? "focus-visible:ring-blue-500/50"
+            : "focus-visible:ring-pink-500/50"
         }`}
         placeholder={`Enter your ${title.toLowerCase()} here...`}
         spellCheck={false}
