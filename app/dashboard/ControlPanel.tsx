@@ -1,6 +1,6 @@
+import { Footer } from "@/components/customized/Footer";
+import { Card } from "@/components/ui/card";
 import React from "react";
-import { Card } from "../ui/Card";
-import { Footer } from "../ui/Footer";
 import { GenerationSettings } from "./GenerationSettings";
 import { ModelSelector } from "./ModelSelector";
 import { PromptInput } from "./PromptInput";

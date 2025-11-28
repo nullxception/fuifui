@@ -1,7 +1,14 @@
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import React from "react";
 import { useDiffusionConfig, useModels } from "../stores";
-import { Label } from "../ui/Label";
-import { Select } from "../ui/Select";
 
 export const ModelSelector: React.FC = () => {
   const { models } = useModels();
@@ -12,32 +19,48 @@ export const ModelSelector: React.FC = () => {
       <div className="space-y-4">
         <Label htmlFor="model-select">Model</Label>
         <Select
-          id="model-select"
           value={store.params.model}
-          onChange={(e) => store.update("model", e.target.value)}
+          onValueChange={(e) => store.update("model", e)}
         >
-          {models.checkpoints.map((model) => (
-            <option key={model} value={model}>
-              {model}
-            </option>
-          ))}
+          <SelectTrigger id="model-select" className="w-full">
+            <SelectValue placeholder="Select a model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {models.checkpoints.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
         </Select>
       </div>
       <div className="space-y-4">
         <Label htmlFor="vae-select">VAE</Label>
         <Select
-          id="vae-select"
           value={store.params.vae}
-          onChange={(e) => store.update("vae", e.target.value)}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("vae", "");
+              return;
+            }
+            store.update("vae", e);
+          }}
         >
-          <option key="none" value="">
-            Unset
-          </option>
-          {models.vaes.map((vae) => (
-            <option key={vae} value={vae}>
-              {vae}
-            </option>
-          ))}
+          <SelectTrigger id="vae-select" className="w-full">
+            <SelectValue placeholder="Select a model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.vaes.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
         </Select>
       </div>
     </div>

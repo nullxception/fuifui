@@ -1,40 +1,47 @@
-@source not "../bin";
-@source not "../models";
-@source not "../public";
+@import "./globals.css";
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-
-@import "tailwindcss";
-@plugin "tailwind-scrollbar";
-
-@theme {
-  --font-sans: "Inter", sans-serif;
-
-  --color-background: #000000;
-  --color-surface: #0d0d14;
-  --color-surface-hover: #17171a;
-  --color-border: #17171a;
-
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-foreground: #ffffff;
-
-  --color-secondary: #27272a;
-  --color-secondary-hover: #3f3f46;
-  --color-secondary-foreground: #ffffff;
-
-  --color-muted: #71717a;
-  --color-muted-foreground: #a1a1aa;
+@layer base {
+  :root {
+    @apply font-sans;
+  }
+  html {
+    @apply bg-background;
+  }
+  body {
+    @apply relative m-0 place-items-center bg-transparent text-foreground;
+  }
 }
 
-html {
-  background-color: var(--color-background);
-  color: #ffffff;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.dark {
+  --background: black;
+  --card: oklch(15% 0 271.152 / 0.6);
+  --primary: oklch(52.008% 0.2474 292.867 / 0.8);
+  --primary-foreground: oklch(100% 0.00011 271.152);
+  --destructive: var(--color-pink-500);
 }
 
-body {
-  min-height: 100vh;
+@keyframes slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 256px 224px;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+  }
 }

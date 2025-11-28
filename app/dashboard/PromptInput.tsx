@@ -1,4 +1,12 @@
-import type { ExtraDataType } from "app/settings/useTriggerWords";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import React, {
   useCallback,
   useEffect,
@@ -6,11 +14,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { optimizePrompt } from "../gallery/metadataParser";
+import type { ExtraDataType } from "server/types";
+import { optimizePrompt } from "../lib/metadataParser";
 import { useDiffusionConfig, useModels, useTriggerWords } from "../stores";
-import { Label } from "../ui/Label";
-import { SelectAdd } from "../ui/Select";
-import { Textarea } from "../ui/Textarea";
 
 type PromptType = "prompt" | "negativePrompt";
 
@@ -19,22 +25,27 @@ const ExtraSelector: React.FC<{
   extras: string[];
   type: ExtraDataType;
 }> = ({ onAddExtra, extras, type }) => (
-  <SelectAdd
-    onChange={(e) => {
-      if (e.target.value) {
-        onAddExtra(e.target.value);
-        e.target.value = "";
+  <Select
+    onValueChange={(e) => {
+      if (e) {
+        onAddExtra(e);
+        e = "";
       }
     }}
-    className="h-8 text-xs"
   >
-    <option value="">Add {type === "lora" ? "LoRA" : "Embedding"}</option>
-    {extras.map((extra) => (
-      <option key={extra} value={extra}>
-        {extra.replace(".safetensors", "")}
-      </option>
-    ))}
-  </SelectAdd>
+    <SelectTrigger className="w-full">
+      <SelectValue
+        placeholder={`Add ${type === "lora" ? "LoRA" : "Embedding"}`}
+      />
+    </SelectTrigger>
+    <SelectContent>
+      {extras.map((extra) => (
+        <SelectItem key={extra} value={extra}>
+          {extra.replace(".safetensors", "")}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 );
 
 const autoResize = (el: HTMLTextAreaElement, cb: () => void) => {
@@ -99,7 +110,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
 
   return (
     <div
-      className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/20" : "bg-pink-500/20"}`}
+      className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/10" : "bg-pink-500/10"}`}
     >
       <Label className="pb-2">{title}</Label>
       <Textarea
@@ -109,11 +120,11 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
           store.update(type, e.target.value);
           updateCaret();
         }}
-        className={
+        className={`scrollbar-none ${
           type === "prompt"
             ? "focus-visible:ring-blue-500"
             : "focus-visible:ring-pink-500"
-        }
+        }`}
         placeholder={`Enter your ${title.toLowerCase()} here...`}
         spellCheck={false}
       />

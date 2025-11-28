@@ -1,6 +1,6 @@
-import { defaultSettings } from "../../server/defaults";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { defaultSettings } from "server/defaults";
 import { useSettings } from "./useSettings";
 
 const SliderSettings: React.FC = () => {

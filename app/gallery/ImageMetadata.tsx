@@ -1,13 +1,9 @@
-import {
-  ArrowDownTrayIcon,
-  ArrowPathIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
-import type { Image } from "../../server/types";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
+import type { Image } from "server/types";
+import type { ParsedMetadata } from "../lib/metadataParser";
 import { useAppStore, useDiffusionConfig } from "../stores";
-import { Button } from "../ui/Button";
-import { Label } from "../ui/Label";
-import type { ParsedMetadata } from "./metadataParser";
 
 const saveImage = async (image: Image) => {
   try {
@@ -69,10 +65,10 @@ export default function ImageMetadata({
   return (
     <>
       <div
-        className={`scrollbar-thin flex h-[65vh] w-full flex-col gap-6 overflow-y-auto border-l border-border bg-surface/95 p-6 backdrop-blur-sm md:h-full md:w-[400px] ${className}`}
+        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-6 overflow-y-auto border-l border-border p-6 backdrop-blur-sm md:h-full md:w-[400px] ${className}`}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white">Details</h3>
+          <h3 className="text-xl font-bold text-foreground">Details</h3>
         </div>
 
         <div className="space-y-4">
@@ -80,17 +76,17 @@ export default function ImageMetadata({
             <Label className="text-xs tracking-wider text-muted-foreground uppercase">
               Created
             </Label>
-            <p className="font-mono text-sm text-white">
+            <p className="font-mono text-sm text-foreground">
               {new Date(image.mtime).toLocaleString()}
             </p>
           </div>
           <div className="space-y-2 space-x-2">
-            <Button onClick={onRemove} size="sm" variant="danger">
+            <Button onClick={onRemove} size="sm" variant="destructive">
               <TrashIcon className="mr-2 h-4" /> Delete
             </Button>
             {parsedMetadata && (
-              <Button onClick={handleRemake} size="sm" variant="primary">
-                <ArrowPathIcon className="mr-2 h-4" /> Remake
+              <Button onClick={handleRemake} size="sm" variant="default">
+                <RefreshCcwIcon className="mr-2 h-4" /> Remake
               </Button>
             )}
             <Button
@@ -98,13 +94,13 @@ export default function ImageMetadata({
               size="sm"
               variant="secondary"
             >
-              <ArrowDownTrayIcon className="mr-2 h-4" /> Download
+              <DownloadIcon className="mr-2 h-4" /> Download
             </Button>
           </div>
           {parsedMetadata ? (
             <div className="space-y-2">
               {parsedMetadata.prompt && (
-                <div className="rounded border border-border/50 bg-black/20 p-2">
+                <div className="rounded border border-border/50 bg-background/20 p-2">
                   <Label className="mb-1 block text-[10px] tracking-wider text-pink-400 uppercase">
                     Prompt
                   </Label>
@@ -115,7 +111,7 @@ export default function ImageMetadata({
               )}
 
               {parsedMetadata.negativePrompt && (
-                <div className="rounded border border-border/50 bg-black/20 p-2">
+                <div className="rounded border border-border/50 bg-background/20 p-2">
                   <Label className="mb-1 block text-[10px] tracking-wider text-pink-400 uppercase">
                     Negative Prompt
                   </Label>
@@ -131,7 +127,7 @@ export default function ImageMetadata({
                     ([key, value]) => (
                       <div
                         key={key}
-                        className="rounded border border-border/50 bg-black/20 p-2"
+                        className="rounded border border-border/50 bg-background/20 p-2"
                       >
                         <Label className="mb-1 block text-[10px] tracking-wider text-muted-foreground uppercase">
                           {key}
@@ -152,7 +148,7 @@ export default function ImageMetadata({
                 <Label className="text-xs tracking-wider text-muted-foreground uppercase">
                   {key}
                 </Label>
-                <div className="rounded border border-border/50 bg-black/20 p-2 font-mono text-sm wrap-break-word whitespace-pre-wrap text-gray-300">
+                <div className="rounded border border-border/50 bg-background/20 p-2 font-mono text-sm wrap-break-word whitespace-pre-wrap text-gray-300">
                   {typeof value === "object"
                     ? JSON.stringify(value, null, 2)
                     : String(value)}

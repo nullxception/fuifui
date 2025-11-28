@@ -1,4 +1,4 @@
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import { ImageIcon } from "lucide-react";
 import React from "react";
 
 interface ImageDisplayProps {
@@ -11,7 +11,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
   isProcessing,
 }) => {
   return (
-    <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-black/60 lg:h-full">
+    <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
       {isProcessing ? (
         <div className="p-8 text-center">
           <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-t-2 border-b-2 border-primary"></div>
@@ -27,10 +27,12 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
         />
       ) : (
         <div className="p-8 text-center">
-          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-black text-white">
-            <PhotoIcon className="h-12 w-12" />
+          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-background text-foreground">
+            <ImageIcon className="h-12 w-12" />
           </div>
-          <p className="mb-2 text-xl font-medium text-white">Ready to create</p>
+          <p className="mb-2 text-xl font-medium text-foreground">
+            Ready to create
+          </p>
           <p className="text-sm text-muted-foreground">
             Configure your settings and click Generate
           </p>

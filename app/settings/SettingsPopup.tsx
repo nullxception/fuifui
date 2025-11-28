@@ -1,7 +1,7 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { XIcon } from "lucide-react";
 import { useAppStore } from "../stores";
-import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
 import BackgroundSetting from "./BackgroundSetting";
 import SliderSettings from "./SliderSettings";
 import TriggerWordsEditor from "./TriggerWordsEditor";
@@ -19,11 +19,11 @@ const SettingsPopup: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <Card className="mx-4 flex max-h-[80vh] flex-col overflow-clip border-border bg-surface shadow-2xl scrollbar-thumb-border scrollbar-track-border">
-        <div className="sticky top-0 z-10 flex flex-row items-center justify-between space-y-1.5 border-b border-border bg-surface p-2">
+      <Card className="mx-4 flex max-h-[80vh] flex-col overflow-clip border-border bg-background/90 shadow-2xl scrollbar-thumb-border scrollbar-track-border">
+        <div className="bg-surface sticky top-0 z-10 flex flex-row items-center justify-between border-b border-border p-2">
           <div className="px-2 leading-none font-semibold tracking-tight">
             Settings
           </div>
@@ -33,7 +33,7 @@ const SettingsPopup: React.FC = () => {
             onClick={() => setShowSettings(false)}
             className="h-8 w-8"
           >
-            <XMarkIcon className="h-4 w-4" />
+            <XIcon className="h-4 w-4" />
           </Button>
         </div>
         <div className="scrollbar-thin overflow-y-auto">

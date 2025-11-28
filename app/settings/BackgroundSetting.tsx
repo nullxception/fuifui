@@ -1,8 +1,8 @@
-import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { CloudUploadIcon } from "lucide-react";
 import React, { useState } from "react";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
 import { useSettings } from "./useSettings";
 
 const BackgroundSetting: React.FC = () => {
@@ -92,11 +92,11 @@ const BackgroundSetting: React.FC = () => {
           className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
             isUploading
               ? "cursor-not-allowed border-border text-muted-foreground"
-              : "border-border text-muted-foreground hover:border-primary hover:bg-surface-hover hover:text-white"
+              : "hover:bg-surface-hover border-border text-muted-foreground hover:border-primary hover:text-foreground"
           }`}
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <CloudArrowUpIcon className="mb-3 h-8 w-8" />
+            <CloudUploadIcon className="mb-3 h-8 w-8" />
             <p className="text-sm">
               {isUploading ? "Uploading..." : "Click to upload image"}
             </p>
@@ -132,8 +132,8 @@ const BackgroundSetting: React.FC = () => {
             alt="Background preview"
             className="h-48 w-full rounded-md border border-border object-cover"
           />
-          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-            <Button onClick={deleteBackground} variant="danger" size="sm">
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button onClick={deleteBackground} variant="destructive" size="sm">
               Remove Background
             </Button>
           </div>

@@ -1,5 +1,5 @@
-import { defaultDiffusionParams } from "../../server/defaults";
-import type { DiffusionParams } from "../../server/types";
+import { defaultDiffusionParams } from "server/defaults";
+import type { DiffusionParams } from "server/types";
 import useConfig from "../stores/useConfig";
 
 export const useDiffusionConfig = () => {

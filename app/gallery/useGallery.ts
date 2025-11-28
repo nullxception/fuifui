@@ -1,5 +1,5 @@
+import type { Image } from "server/types";
 import { create } from "zustand";
-import type { Image } from "../../server/types";
 
 interface GalleryState {
   images: Image[];

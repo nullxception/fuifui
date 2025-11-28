@@ -9,4 +9,4 @@
 - Component props extend HTML attributes when appropriate
 - Use forwardRef for components needing ref forwarding
 - Code formatting, tailwind class name order, and imports order is handled by prettier
-- Tailwind CSS for styling, follow existing variant patterns
+- Use shadcn/ui components for UI elements, Tailwind CSS for styling, follow existing patterns

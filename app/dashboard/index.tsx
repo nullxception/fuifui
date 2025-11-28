@@ -1,15 +1,14 @@
-import { BoltIcon } from "@heroicons/react/24/outline";
-import { StopCircleIcon } from "@heroicons/react/24/solid";
+import { Button } from "@/components/ui/button";
+import { CircleStopIcon, ZapIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { DiffusionParams } from "../../server/types";
-import { optimizePrompt } from "../gallery/metadataParser";
+import type { DiffusionParams } from "server/types";
+import { optimizePrompt } from "../lib/metadataParser";
 import {
   useAppStore,
   useDiffusionConfig,
   useDiffusionStatus,
   useModels,
 } from "../stores";
-import { Button } from "../ui/Button";
 import ConsoleOutput from "./ConsoleOutput";
 import ControlPanel from "./ControlPanel";
 import ImageDisplay from "./ImageDisplay";
@@ -155,22 +154,22 @@ export default function TextToImage() {
   return (
     <div className="flex flex-col gap-4 p-2 lg:h-full lg:flex-row">
       {/* Left Side: Image/Console */}
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden rounded-t-xl border border-border bg-black/20 backdrop-blur-sm">
-          <div className="flex items-center gap-2 border-b border-border/40 bg-black/20 p-3">
+      <div className="mb-4 flex min-h-0 flex-1 flex-col overflow-clip rounded-xl border border-border">
+        <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden bg-background/20 backdrop-blur-sm">
+          <div className="flex items-center justify-center gap-2 border-b border-border/40 bg-background/20 p-3">
             <Button
-              variant={outputTab === "image" ? "secondary" : "ghost"}
+              variant={outputTab === "image" ? "default" : "outline"}
               size="sm"
               onClick={() => setOutputTab("image")}
-              className="bg-black/40 backdrop-blur-md hover:bg-black/60"
+              className="w-1/4"
             >
               Image
             </Button>
             <Button
-              variant={outputTab === "console" ? "secondary" : "ghost"}
+              variant={outputTab === "console" ? "default" : "outline"}
               size="sm"
               onClick={() => setOutputTab("console")}
-              className="bg-black/40 backdrop-blur-md hover:bg-black/60"
+              className="w-1/4"
             >
               Console
             </Button>
@@ -187,26 +186,27 @@ export default function TextToImage() {
             )}
           </div>
         </div>
-
         {/* Generate Button */}
-        <Button
-          onClick={handleDiffusion}
-          variant={jobId.length > 1 ? "danger" : "primary"}
-          size="lg"
-          className="w-full rounded-t-none rounded-b-xl"
-        >
-          {jobId.length > 1 ? (
-            <>
-              <StopCircleIcon className="mr-2 h-5 w-5 animate-pulse" />
-              Stop Generation
-            </>
-          ) : (
-            <>
-              <BoltIcon className="mr-2 h-5 w-5" />
-              Generate
-            </>
-          )}
-        </Button>
+        <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border bg-background/20 p-2 backdrop-blur-sm">
+          <Button
+            onClick={handleDiffusion}
+            variant={jobId.length > 1 ? "destructive" : "default"}
+            size="lg"
+            className="w-full rounded-xl"
+          >
+            {jobId.length > 1 ? (
+              <>
+                <CircleStopIcon className="mr-2 h-5 w-5 animate-pulse" />
+                Stop Generation
+              </>
+            ) : (
+              <>
+                <ZapIcon className="mr-2 h-5 w-5" />
+                Generate
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Right Side: Control Panel */}

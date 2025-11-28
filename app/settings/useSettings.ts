@@ -1,5 +1,5 @@
-import { defaultSettings } from "../../server/defaults";
-import type { AppSettings } from "../../server/types";
+import { defaultSettings } from "server/defaults";
+import type { AppSettings } from "server/types";
 import useConfig from "../stores/useConfig";
 
 export const useSettings = () => {

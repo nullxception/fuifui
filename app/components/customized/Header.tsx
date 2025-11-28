@@ -1,6 +1,6 @@
-import { Cog6ToothIcon } from "@heroicons/react/24/solid";
-import { useAppStore } from "../stores";
-import { Button } from "../ui/Button";
+import { Button } from "@/components/ui/button";
+import { useAppStore } from "app/stores";
+import { SettingsIcon } from "lucide-react";
 
 export const Header = () => {
   const { activeTab, setActiveTab, setShowSettings } = useAppStore();
@@ -20,14 +20,14 @@ export const Header = () => {
         <nav className="flex items-center gap-2">
           <div className="flex items-center gap-1 rounded-lg bg-secondary/50 p-1">
             <Button
-              variant={activeTab === "generate" ? "primary" : "ghost"}
+              variant={activeTab === "generate" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("generate")}
             >
               Diffusion
             </Button>
             <Button
-              variant={activeTab === "gallery" ? "primary" : "ghost"}
+              variant={activeTab === "gallery" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("gallery")}
             >
@@ -41,7 +41,7 @@ export const Header = () => {
             onClick={() => setShowSettings(true)}
             title="Settings"
           >
-            <Cog6ToothIcon className="h-5 w-5" />
+            <SettingsIcon className="h-5 w-5" />
           </Button>
         </nav>
       </div>

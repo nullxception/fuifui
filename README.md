@@ -40,24 +40,3 @@ bun dev
 ```
 
 The application will be available at `http://localhost:5141`.
-
-## Project Structure
-
-- `app/`: Frontend React application.
-  - `components/`: Reusable UI components.
-  - `dashboard/`: Main dashboard view.
-  - `gallery/`: Image gallery view.
-  - `stores/`: Zustand state management.
-- `server/`: Backend server (Bun).
-  - `api/`: API route handlers.
-  - `index.ts`: Server entry point.
-- `models/`: Directory to store Stable Diffusion models.
-- `output/`: Directory where generated images are saved.
-
-## Tech
-
-- **Runtime**: [Bun](https://bun.sh/)
-- **Frontend**: [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Backend**: Bun native HTTP server
-- **Image Processing**: [Sharp](https://sharp.pixelplumbing.com/), [exifr](https://github.com/MikeKovarik/exifr)

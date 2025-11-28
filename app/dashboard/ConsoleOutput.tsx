@@ -56,7 +56,7 @@ const ConsoleOutput: React.FC<ConsoleOutputProps> = ({ logs }) => {
 
   return (
     <div
-      className="scrollbar-thin h-[50vh] w-full overflow-auto bg-black/60 p-6 font-mono text-xs scrollbar-thumb-secondary scrollbar-track-transparent md:text-sm lg:h-full"
+      className="scrollbar-thin h-[50vh] w-full overflow-auto bg-background/60 p-6 font-mono text-xs scrollbar-thumb-secondary scrollbar-track-transparent md:text-sm lg:h-full"
       ref={consoleRef}
     >
       {processedLogs.length === 0 ? (

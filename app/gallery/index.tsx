@@ -1,8 +1,8 @@
-import { PhotoIcon } from "@heroicons/react/16/solid";
+import { Footer } from "@/components/customized/Footer";
+import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { Image } from "server/types";
 import { useShallow } from "zustand/react/shallow";
-import type { Image } from "../../server/types";
-import { Footer } from "../ui/Footer";
 import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
 
@@ -45,7 +45,7 @@ function GalleryItem({ image, onClick }: GalleryItemProps) {
   return (
     <div
       ref={ref}
-      className="group relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-primary/50"
+      className="group bg-surface relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border border-border transition-colors hover:border-primary/50"
       onClick={onClick}
     >
       {width > 1 ? (
@@ -103,16 +103,18 @@ export default function Gallery() {
 
   if (images.length === 0 && !isLoadingMore) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-muted-foreground">
-          <PhotoIcon className="h-12 w-12" />
+      <>
+        <div className="flex h-full flex-col items-center justify-center py-24 text-center">
+          <div className="mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-background/50 p-2 text-foreground">
+            <ImageIcon className="h-12 w-12" />
+          </div>
+          <p className="text-lg font-medium text-foreground">No images yet</p>
+          <p className="text-sm text-muted-foreground">
+            Generated images will appear here
+          </p>
         </div>
-        <p className="text-lg font-medium text-white">No images yet</p>
-        <p className="text-sm text-muted-foreground">
-          Generated images will appear here
-        </p>
         <Footer />
-      </div>
+      </>
     );
   }
 
@@ -130,7 +132,7 @@ export default function Gallery() {
           <div ref={observerTarget} className="col-span-full h-10 w-full" />
           {isLoadingMore && (
             <div className="col-span-full flex justify-center p-4">
-              <span className="text-white">Loading more...</span>
+              <span className="text-foreground">Loading more...</span>
             </div>
           )}
           <Footer className="col-start-1 sm:col-end-3 md:col-end-4 lg:col-end-5" />

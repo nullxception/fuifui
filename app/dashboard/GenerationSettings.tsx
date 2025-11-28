@@ -1,11 +1,18 @@
-import Switch from "app/ui/Switch";
+import { SliderInput } from "@/components/customized/SliderInput";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useDiffusionConfig, useSettings } from "app/stores";
 import React, { useEffect, useState } from "react";
-import { defaultSettings } from "../../server/defaults";
-import { useDiffusionConfig, useSettings } from "../stores";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
-import { Select } from "../ui/Select";
-import { Slider } from "../ui/Slider";
+import { defaultSettings } from "server/defaults";
 
 export const GenerationSettings: React.FC = () => {
   const store = useDiffusionConfig();
@@ -60,38 +67,43 @@ export const GenerationSettings: React.FC = () => {
     <>
       <div className="p-4">
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <Slider
+          <SliderInput
             label="Steps"
             valueDisplay={store.params.steps}
             min={1}
             max={100}
             value={store.params.steps}
-            onChange={(e) => store.update("steps", parseInt(e.target.value))}
+            onChange={(e) => store.update("steps", e)}
           />
 
-          <Slider
+          <SliderInput
             label="CFG Scale"
             valueDisplay={store.params.cfgScale}
             min={1}
             max={20}
             step={0.5}
             value={store.params.cfgScale}
-            onChange={(e) =>
-              store.update("cfgScale", parseFloat(e.target.value))
-            }
+            onChange={(e) => store.update("cfgScale", e)}
           />
 
           <div className="space-y-4">
             <Label>Sampling Method</Label>
             <Select
               value={store.params.samplingMethod}
-              onChange={(e) => store.update("samplingMethod", e.target.value)}
+              onValueChange={(e) => store.update("samplingMethod", e)}
             >
-              {samplingMethods.map((method) => (
-                <option key={method} value={method}>
-                  {method}
-                </option>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={`Sampling method`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {samplingMethods.map((method) => (
+                    <SelectItem key={method} value={method}>
+                      {method}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
             </Select>
           </div>
 
@@ -99,13 +111,20 @@ export const GenerationSettings: React.FC = () => {
             <Label>Scheduler</Label>
             <Select
               value={store.params.scheduler}
-              onChange={(e) => store.update("scheduler", e.target.value)}
+              onValueChange={(e) => store.update("scheduler", e)}
             >
-              {schedulers.map((sched) => (
-                <option key={sched} value={sched}>
-                  {sched}
-                </option>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={`Scheduler`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {schedulers.map((sched) => (
+                    <SelectItem key={sched} value={sched}>
+                      {sched}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
             </Select>
           </div>
 
@@ -113,13 +132,20 @@ export const GenerationSettings: React.FC = () => {
             <Label>RNG</Label>
             <Select
               value={store.params.rng}
-              onChange={(e) => store.update("rng", e.target.value)}
+              onValueChange={(e) => store.update("rng", e)}
             >
-              {rngOptions.map((rng) => (
-                <option key={rng} value={rng}>
-                  {rng}
-                </option>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={`RNG`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {rngOptions.map((rng) => (
+                    <SelectItem key={rng} value={rng}>
+                      {rng}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
             </Select>
           </div>
 
@@ -127,38 +153,44 @@ export const GenerationSettings: React.FC = () => {
             <Label>Sampler RNG</Label>
             <Select
               value={store.params.samplerRng}
-              onChange={(e) => store.update("samplerRng", e.target.value)}
+              onValueChange={(e) => store.update("samplerRng", e)}
             >
-              <option value="">Use RNG</option>
-              {rngOptions.map((rng) => (
-                <option key={rng} value={rng}>
-                  {rng}
-                </option>
-              ))}
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={`Sampler RNG`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {rngOptions.map((rng) => (
+                    <SelectItem key={rng} value={rng}>
+                      {rng}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-4">
-            <Slider
+            <SliderInput
               label="Width"
               valueDisplay={store.params.width}
               min={128}
               step={64}
               max={maxSliderWidth}
               value={store.params.width}
-              onChange={(e) => store.update("width", parseInt(e.target.value))}
+              onChange={(e) => store.update("width", e)}
             />
           </div>
 
           <div className="space-y-4">
-            <Slider
+            <SliderInput
               label="Height"
               valueDisplay={store.params.height}
               min={128}
               step={64}
               max={maxSliderHeight}
               value={store.params.height}
-              onChange={(e) => store.update("height", parseInt(e.target.value))}
+              onChange={(e) => store.update("height", e)}
             />
           </div>
 
@@ -190,7 +222,7 @@ export const GenerationSettings: React.FC = () => {
               <button
                 type="button"
                 onClick={() => store.update("seed", -1)}
-                className="px-3 py-2 text-white transition-colors"
+                className="px-3 py-2 text-foreground transition-colors"
                 title="Random Seed"
               >
                 🎲
@@ -198,12 +230,12 @@ export const GenerationSettings: React.FC = () => {
             </div>
           </div>
 
-          <Slider
+          <SliderInput
             label={`Threads ${store.params.threads < 0 ? ": Auto" : ""}`}
             min={-1}
             max={cpuCount}
             value={store.params.threads}
-            onChange={(e) => store.update("threads", parseInt(e.target.value))}
+            onChange={(e) => store.update("threads", e)}
           />
 
           <div className="flex items-center justify-between py-2">
@@ -212,46 +244,47 @@ export const GenerationSettings: React.FC = () => {
             </Label>
             <Switch
               checked={store.params.diffusionFa}
-              onChange={(e) => store.update("diffusionFa", e)}
+              onCheckedChange={(e) => store.update("diffusionFa", e)}
             />
           </div>
 
           <div className="flex items-center justify-between py-2">
             <Label htmlFor="offloadToCpu" className="cursor-pointer">
-              Offload Weights To CPU RAM
+              Offload weights to (CPU) RAM
             </Label>
             <Switch
               checked={store.params.offloadToCpu}
-              onChange={(e) => store.update("offloadToCpu", e)}
+              onCheckedChange={(e) => store.update("offloadToCpu", e)}
             />
           </div>
 
-          <div className="flex items-center justify-between py-2">
-            <Label htmlFor="diffusionConvDirect" className="cursor-pointer">
-              diffusion ggml_conv2d_direct
-            </Label>
-            <Switch
-              checked={store.params.diffusionConvDirect}
-              onChange={(e) => store.update("diffusionConvDirect", e)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between py-2">
-            <Label htmlFor="vaeConvDirect" className="cursor-pointer">
-              vae ggml_conv2d_direct
-            </Label>
-            <Switch
-              checked={store.params.vaeConvDirect}
-              onChange={(e) => store.update("vaeConvDirect", e)}
-            />
-          </div>
           <div className="flex items-center justify-between py-2">
             <Label htmlFor="forceSdxlVaeConvScale" className="cursor-pointer">
               Use SDXL VAE conv scale
             </Label>
             <Switch
               checked={store.params.forceSdxlVaeConvScale}
-              onChange={(e) => store.update("forceSdxlVaeConvScale", e)}
+              onCheckedChange={(e) => store.update("forceSdxlVaeConvScale", e)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="diffusionConvDirect" className="cursor-pointer">
+              Diffusion ggml_conv2d_direct
+            </Label>
+            <Switch
+              checked={store.params.diffusionConvDirect}
+              onCheckedChange={(e) => store.update("diffusionConvDirect", e)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <Label htmlFor="vaeConvDirect" className="cursor-pointer">
+              VAE ggml_conv2d_direct
+            </Label>
+            <Switch
+              checked={store.params.vaeConvDirect}
+              onCheckedChange={(e) => store.update("vaeConvDirect", e)}
             />
           </div>
         </div>

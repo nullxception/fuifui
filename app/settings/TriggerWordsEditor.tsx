@@ -1,18 +1,21 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  PencilIcon,
-  PlusIcon,
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { splitSmart } from "app/gallery/metadataParser";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PencilIcon, PlusIcon, TrashIcon, XIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import type { ExtraDataType, TriggerWord } from "server/types";
+import { splitSmart } from "../lib/metadataParser";
 import { useModels, useTriggerWords } from "../stores";
-import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
-import { Input } from "../ui/Input";
-import { Label } from "../ui/Label";
-import { Select } from "../ui/Select";
 
 const TriggerWordsEditor: React.FC = () => {
   const { triggerWords, addTriggerWord, updateTriggerWord, deleteTriggerWord } =
@@ -97,7 +100,7 @@ const TriggerWordsEditor: React.FC = () => {
 
       {/* New Entry Form */}
       {newEntry && (
-        <Card className="border-primary bg-surface-hover p-4">
+        <Card className="bg-surface-hover border-primary p-4">
           <TriggerWordForm
             entry={newEntry}
             onChange={setNewEntry}
@@ -111,7 +114,7 @@ const TriggerWordsEditor: React.FC = () => {
       {/* Existing Entries */}
       <div className="space-y-2">
         {triggerWords.map((entry, index) => (
-          <Card key={index} className="border-border bg-surface p-4">
+          <Card key={index} className="bg-surface border-border p-4">
             {editingIndex === index ? (
               <TriggerWordForm
                 entry={entry}
@@ -152,7 +155,7 @@ const TriggerWordsEditor: React.FC = () => {
                       </Button>
                       <Button
                         onClick={() => handleDelete(index)}
-                        variant="danger"
+                        variant="destructive"
                         size="sm"
                         className="h-8 w-10"
                       >
@@ -164,7 +167,7 @@ const TriggerWordsEditor: React.FC = () => {
                     {entry.words.map((word, wordIndex) => (
                       <span
                         key={wordIndex}
-                        className="rounded border border-border bg-surface-hover px-2 py-1 text-xs"
+                        className="bg-surface-hover rounded border border-border px-2 py-1 text-xs"
                       >
                         {word}
                       </span>
@@ -185,14 +188,14 @@ const TriggerWordsEditor: React.FC = () => {
 
       {/* Delete Confirmation Dialog */}
       {deleteConfirmIndex !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <Card className="mx-4 w-full max-w-sm border-border bg-surface shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+          <Card className="bg-surface mx-4 w-full max-w-sm border-border shadow-2xl">
             <div className="space-y-4 p-4">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Delete Trigger Word?</h3>
                 <p className="text-sm text-muted-foreground">
                   Are you sure you want to delete the trigger word for{" "}
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-foreground">
                     {triggerWords[deleteConfirmIndex]?.target}
                   </span>
                   ? This action cannot be undone.
@@ -202,7 +205,7 @@ const TriggerWordsEditor: React.FC = () => {
                 <Button onClick={cancelDelete} variant="ghost" size="sm">
                   Cancel
                 </Button>
-                <Button onClick={confirmDelete} variant="danger" size="sm">
+                <Button onClick={confirmDelete} variant="destructive" size="sm">
                   Delete
                 </Button>
               </div>
@@ -263,35 +266,49 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
           <Label className="mb-1 text-xs">Type</Label>
           <Select
             value={entry.type}
-            onChange={(e) =>
+            onValueChange={(e) =>
               onChange({
                 ...entry,
-                type: e.target.value as ExtraDataType,
+                type: e as ExtraDataType,
                 target: "", // Reset target when type changes
               })
             }
           >
-            <option value="embedding">Embedding</option>
-            <option value="lora">LoRA</option>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="embedding">Embedding</SelectItem>
+                <SelectItem value="lora">LoRA</SelectItem>
+              </SelectGroup>
+            </SelectContent>
           </Select>
         </div>
         <div>
           <Label className="mb-1 text-xs">Target</Label>
           <Select
             value={entry.target}
-            onChange={(e) =>
+            onValueChange={(e) =>
               onChange({
                 ...entry,
-                target: e.target.value,
+                target: e,
               })
             }
           >
-            <option value="">Select {entry.type}...</option>
-            {availableTargets.map((target) => (
-              <option key={target} value={target}>
-                {target}
-              </option>
-            ))}
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={`Select ${entry.type}...`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Select {entry.type}</SelectLabel>
+                {availableTargets.map((target) => (
+                  <SelectItem key={target} value={target}>
+                    {target}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
           </Select>
         </div>
       </div>
@@ -314,14 +331,14 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
           {entry.words.map((word, index) => (
             <span
               key={index}
-              className="flex items-center gap-1 rounded border border-border bg-surface-hover px-2 py-1 text-xs"
+              className="bg-surface-hover flex items-center gap-1 rounded border border-border px-2 py-1 text-xs"
             >
               {word}
               <button
                 onClick={() => handleRemoveWord(index)}
                 className="hover:text-red-400"
               >
-                <XMarkIcon className="h-3 w-3" />
+                <XIcon className="h-3 w-3" />
               </button>
             </span>
           ))}
@@ -334,7 +351,7 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
         </Button>
         <Button
           onClick={onSave}
-          variant="primary"
+          variant="default"
           size="sm"
           disabled={!entry.target || entry.words.length === 0}
         >

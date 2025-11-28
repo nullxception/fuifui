@@ -1,6 +1,6 @@
+import { defaultDiffusionParams, defaultSettings } from "server/defaults";
+import type { UserConfig } from "server/types";
 import { create } from "zustand";
-import { defaultDiffusionParams, defaultSettings } from "../../server/defaults";
-import type { UserConfig } from "../../server/types";
 
 interface ConfigState {
   config: UserConfig;

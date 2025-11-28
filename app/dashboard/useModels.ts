@@ -1,5 +1,5 @@
+import type { Models } from "server/types";
 import { create } from "zustand";
-import type { Models } from "../../server/types";
 
 interface ModelsState {
   models: Models;
