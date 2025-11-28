@@ -1,12 +1,18 @@
 import { promises as fs } from "fs";
-import { EMBEDDING_DIR, LORA_DIR, MODEL_DIR, VAE_DIR } from "../constants";
+import {
+  EMBEDDING_DIR,
+  LORA_DIR,
+  MODEL_DIR,
+  UPSCALER_DIR,
+  VAE_DIR,
+} from "../constants";
 import type { DiffusionParams, Models } from "../types";
 import { startDiffusion, stopDiffusion } from "./services/diffusion";
 import { createJob, getActiveJobs, getJob, jobEvents } from "./services/jobs";
 
 const getFileList = async (dir: string): Promise<string[]> => {
   const files = await fs.readdir(dir);
-  return files.filter((file) => file !== "placeholder");
+  return files.filter((file) => !/.placeholder$/.test(file));
 };
 
 export const diffusionModels = async () => {
@@ -16,6 +22,7 @@ export const diffusionModels = async () => {
       embeddings: await getFileList(EMBEDDING_DIR),
       loras: await getFileList(LORA_DIR),
       vaes: await getFileList(VAE_DIR),
+      upscalers: await getFileList(UPSCALER_DIR),
     });
   } catch (error) {
     console.error("Error reading models directory:", error);

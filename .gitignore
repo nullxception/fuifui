@@ -24,9 +24,9 @@ dist-ssr
 *.sw?
 
 # Project specific
-models
+models/**/*.*
+!models/**/.placeholder
 output
 public/upload
 sd
 config.yaml
-!**/placeholder

@@ -16,7 +16,7 @@ export const ModelSelector: React.FC = () => {
 
   return (
     <div className="grid grid-cols-2 gap-2 px-4 pb-4">
-      <div className="space-y-4">
+      <div className="space-y-2 pt-2">
         <Label htmlFor="model-select">Model</Label>
         <Select
           value={store.params.model}
@@ -36,7 +36,8 @@ export const ModelSelector: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="space-y-4">
+
+      <div className="space-y-2 pt-2">
         <Label htmlFor="vae-select">VAE</Label>
         <Select
           value={store.params.vae}
@@ -55,6 +56,34 @@ export const ModelSelector: React.FC = () => {
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {models.vaes.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="upscaleModel-select">Upscaler Model</Label>
+        <Select
+          value={store.params.upscaleModel}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("upscaleModel", "");
+              return;
+            }
+            store.update("upscaleModel", e);
+          }}
+        >
+          <SelectTrigger id="upscaleModel-select" className="w-full">
+            <SelectValue placeholder="Select upscaler" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.upscalers.map((model) => (
                 <SelectItem key={model} value={model}>
                   {model}
                 </SelectItem>

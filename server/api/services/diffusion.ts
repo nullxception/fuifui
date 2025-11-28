@@ -6,6 +6,7 @@ import {
   MODEL_DIR,
   OUTPUT_DIR,
   ROOT_DIR,
+  UPSCALER_DIR,
   VAE_DIR,
 } from "../../constants";
 import type {
@@ -86,7 +87,6 @@ export const startDiffusion = async (
   const outputFilename = `${timestamp}.png`;
   const outputPath = path.join(OUTPUT_DIR, "txt2img", outputFilename);
   const modelPath = path.join(MODEL_DIR, params.model || "");
-  const vaePath = path.join(VAE_DIR, params.vae || "");
 
   // sd at project root or from $PATH
   const project_sd = path.join(ROOT_DIR, "sd");
@@ -127,8 +127,14 @@ export const startDiffusion = async (
     args.push("--clip-skip", params.clipSkip);
   }
 
-  if (params.vae?.length ?? 0 > 0) {
+  if (params.vae.length ?? 0 > 0) {
+    const vaePath = path.join(VAE_DIR, params.vae || "");
     args.push("--vae", vaePath);
+  }
+
+  if (params.upscaleModel.length ?? 0 > 0) {
+    const upscaleModelPath = path.join(UPSCALER_DIR, params.upscaleModel || "");
+    args.push("--upscale-model", upscaleModelPath);
   }
 
   if (params.rng) {

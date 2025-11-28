@@ -7,6 +7,7 @@ export const MODEL_DIR = path.join(ROOT_DIR, "models/checkpoint");
 export const EMBEDDING_DIR = path.join(ROOT_DIR, "models/embedding");
 export const LORA_DIR = path.join(ROOT_DIR, "models/lora");
 export const VAE_DIR = path.join(ROOT_DIR, "models/vae");
+export const UPSCALER_DIR = path.join(ROOT_DIR, "models/upscaler");
 export const OUTPUT_DIR = path.join(ROOT_DIR, "output");
 export const THUMBS_DIR = path.join(ROOT_DIR, "output", ".thumbs");
 export const UPLOAD_DIR = path.join(ROOT_DIR, "public/upload");

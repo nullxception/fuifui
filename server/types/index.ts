@@ -1,6 +1,7 @@
 export interface DiffusionParams {
   model: string;
   vae: string;
+  upscaleModel: string;
   prompt: string;
   negativePrompt: string;
   steps: number;
@@ -62,6 +63,7 @@ export interface Models {
   embeddings: string[];
   loras: string[];
   vaes: string[];
+  upscalers: string[];
 }
 
 export type ExtraDataType = "embedding" | "lora";

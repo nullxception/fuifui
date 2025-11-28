@@ -18,6 +18,7 @@ export const useModels = create<ModelsState>((set) => ({
     embeddings: [],
     loras: [],
     vaes: [],
+    upscalers: [],
   },
   isLoading: false,
   error: null,
