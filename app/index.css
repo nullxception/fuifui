@@ -10,6 +10,9 @@
   body {
     @apply relative m-0 bg-transparent text-foreground;
   }
+  input[type="number"] {
+    @apply [appearance:textfield] text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none;
+  }
 }
 
 .dark {

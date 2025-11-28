@@ -1,5 +1,10 @@
 import { SliderInput } from "@/components/customized/SliderInput";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useDiffusionConfig, useSettings } from "app/stores";
+import { RotateCcwIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { defaultSettings } from "server/defaults";
 
@@ -213,20 +219,24 @@ export const GenerationSettings: React.FC = () => {
           <div className="space-y-4">
             <Label>Seed</Label>
             <div className="flex gap-2">
-              <Input
-                type="number"
-                value={store.params.seed}
-                onChange={(e) => store.update("seed", parseInt(e.target.value))}
-                placeholder="-1 for random"
-              />
-              <button
-                type="button"
-                onClick={() => store.update("seed", -1)}
-                className="px-3 py-2 text-foreground transition-colors"
-                title="Random Seed"
-              >
-                🎲
-              </button>
+              <InputGroup>
+                <InputGroupInput
+                  type="number"
+                  value={store.params.seed}
+                  onChange={(e) =>
+                    store.update("seed", parseInt(e.target.value))
+                  }
+                  placeholder="-1 for random"
+                />
+                <InputGroupButton
+                  type="button"
+                  onClick={() => store.update("seed", -1)}
+                  className="mr-2"
+                  title="Random Seed"
+                >
+                  <RotateCcwIcon />
+                </InputGroupButton>
+              </InputGroup>
             </div>
           </div>
 

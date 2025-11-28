@@ -49,7 +49,7 @@ export const ModelSelector: React.FC = () => {
           }}
         >
           <SelectTrigger id="vae-select" className="w-full">
-            <SelectValue placeholder="Select a model" />
+            <SelectValue placeholder="Select VAE" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

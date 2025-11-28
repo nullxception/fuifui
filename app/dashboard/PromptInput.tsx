@@ -33,7 +33,7 @@ const ExtraSelector: React.FC<{
       }
     }}
   >
-    <SelectTrigger className="w-full">
+    <SelectTrigger className="w-full" indicator="plus">
       <SelectValue
         placeholder={`Add ${type === "lora" ? "LoRA" : "Embedding"}`}
       />
