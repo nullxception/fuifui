@@ -61,11 +61,11 @@ export default function ImageLightbox() {
   return (
     <>
       <div
-        className="fixed inset-0 z-100 flex animate-in items-center justify-center backdrop-blur-lg duration-200 fade-in"
+        className="fixed inset-0 z-100 flex items-center justify-center backdrop-blur-lg duration-200 fade-in"
         onClick={close}
       >
         <div
-          className="flex h-screen w-screen max-w-7xl flex-col overflow-hidden rounded-xl border border-border bg-background/50 shadow-2xl md:flex-row lg:w-[95vw]"
+          className="flex h-full w-screen max-w-7xl flex-col overflow-hidden bg-background/50 shadow-2xl md:h-screen md:flex-row lg:w-[95vw] lg:rounded-xl"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-background">
