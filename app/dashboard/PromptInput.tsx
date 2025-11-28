@@ -24,29 +24,34 @@ const ExtraSelector: React.FC<{
   onAddExtra: (filename: string) => void;
   extras: string[];
   type: ExtraDataType;
-}> = ({ onAddExtra, extras, type }) => (
-  <Select
-    onValueChange={(e) => {
-      if (e) {
-        onAddExtra(e);
-        e = "";
-      }
-    }}
-  >
-    <SelectTrigger className="w-full" indicator="plus">
-      <SelectValue
-        placeholder={`Add ${type === "lora" ? "LoRA" : "Embedding"}`}
-      />
-    </SelectTrigger>
-    <SelectContent>
-      {extras.map((extra) => (
-        <SelectItem key={extra} value={extra}>
-          {extra.replace(".safetensors", "")}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-);
+}> = ({ onAddExtra, extras, type }) => {
+  const [value, setValue] = useState("");
+  return (
+    <Select
+      value={value}
+      onValueChange={(e) => {
+        if (e) {
+          onAddExtra(e);
+          // reset value after selecting
+          setTimeout(() => setValue(""));
+        }
+      }}
+    >
+      <SelectTrigger className="w-full" indicator="plus">
+        <SelectValue
+          placeholder={`Add ${type === "lora" ? "LoRA" : "Embedding"}`}
+        />
+      </SelectTrigger>
+      <SelectContent>
+        {extras.map((extra) => (
+          <SelectItem key={extra} value={extra}>
+            {extra.replace(".safetensors", "")}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
 
 const autoResize = (el: HTMLTextAreaElement, cb: () => void) => {
   requestAnimationFrame(() => {
