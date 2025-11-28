@@ -3,6 +3,10 @@ import type { AppSettings, DiffusionParams } from "./types";
 export const defaultDiffusionParams: DiffusionParams = {
   model: "",
   vae: "",
+  upscaleModel: "",
+  clipL: "",
+  clipG: "",
+  t5xxl: "",
   prompt: "",
   negativePrompt: "",
   steps: 20,

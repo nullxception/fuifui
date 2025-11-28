@@ -6,6 +6,7 @@ import {
   MODEL_DIR,
   OUTPUT_DIR,
   ROOT_DIR,
+  TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
 } from "../../constants";
@@ -135,6 +136,20 @@ export const startDiffusion = async (
   if (params.upscaleModel.length ?? 0 > 0) {
     const upscaleModelPath = path.join(UPSCALER_DIR, params.upscaleModel || "");
     args.push("--upscale-model", upscaleModelPath);
+  }
+
+  if (params.clipL.length ?? 0 > 0) {
+    const clipLPath = path.join(TEXT_ENCODER_DIR, params.clipL || "");
+    args.push("--upscale-model", clipLPath);
+  }
+
+  if (params.clipG.length ?? 0 > 0) {
+    const clipGPath = path.join(TEXT_ENCODER_DIR, params.clipG || "");
+    args.push("--upscale-model", clipGPath);
+  }
+  if (params.t5xxl.length ?? 0 > 0) {
+    const t5xxlPath = path.join(TEXT_ENCODER_DIR, params.t5xxl || "");
+    args.push("--t5xxl", t5xxlPath);
   }
 
   if (params.rng) {

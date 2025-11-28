@@ -19,6 +19,7 @@ export const useModels = create<ModelsState>((set) => ({
     loras: [],
     vaes: [],
     upscalers: [],
+    textEncoders: [],
   },
   isLoading: false,
   error: null,

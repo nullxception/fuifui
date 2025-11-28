@@ -3,6 +3,7 @@ import {
   EMBEDDING_DIR,
   LORA_DIR,
   MODEL_DIR,
+  TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
 } from "../constants";
@@ -23,6 +24,7 @@ export const diffusionModels = async () => {
       loras: await getFileList(LORA_DIR),
       vaes: await getFileList(VAE_DIR),
       upscalers: await getFileList(UPSCALER_DIR),
+      textEncoders: await getFileList(TEXT_ENCODER_DIR),
     });
   } catch (error) {
     console.error("Error reading models directory:", error);

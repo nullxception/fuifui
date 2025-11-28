@@ -66,7 +66,91 @@ export const ModelSelector: React.FC = () => {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="upscaleModel-select">Upscaler Model</Label>
+        <Label htmlFor="clip-l-select">Clip-L</Label>
+        <Select
+          value={store.params.clipL}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("clipL", "");
+              return;
+            }
+            store.update("clipL", e);
+          }}
+        >
+          <SelectTrigger id="clip-l-select" className="w-full">
+            <SelectValue placeholder="Select Clip-L" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.textEncoders.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="clip-g-select">Clip-G</Label>
+        <Select
+          value={store.params.clipG}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("clipG", "");
+              return;
+            }
+            store.update("clipG", e);
+          }}
+        >
+          <SelectTrigger id="clip-g-select" className="w-full">
+            <SelectValue placeholder="Select Clip-G" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.textEncoders.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="t5xxl-select">T5 XXL</Label>
+        <Select
+          value={store.params.t5xxl}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("t5xxl", "");
+              return;
+            }
+            store.update("t5xxl", e);
+          }}
+        >
+          <SelectTrigger id="t5xxl-select" className="w-full">
+            <SelectValue placeholder="Select T5 XXL" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.textEncoders.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="upscaleModel-select">Upscaler</Label>
         <Select
           value={store.params.upscaleModel}
           onValueChange={(e) => {
@@ -78,7 +162,7 @@ export const ModelSelector: React.FC = () => {
           }}
         >
           <SelectTrigger id="upscaleModel-select" className="w-full">
-            <SelectValue placeholder="Select upscaler" />
+            <SelectValue placeholder="Select Upscaler" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
