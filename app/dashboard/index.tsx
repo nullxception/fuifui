@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CircleStopIcon, ZapIcon } from "lucide-react";
+import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { DiffusionParams, DiffusionResult, LogData } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
@@ -184,6 +184,7 @@ export default function TextToImage() {
                 onClick={() => setOutputTab("image")}
                 className="w-1/4"
               >
+                <ImageIcon />
                 Image
               </Button>
               <Button
@@ -192,6 +193,7 @@ export default function TextToImage() {
                 onClick={() => setOutputTab("console")}
                 className="w-1/4"
               >
+                <TerminalIcon />
                 Console
               </Button>
             </div>
@@ -214,12 +216,12 @@ export default function TextToImage() {
             >
               {isProcessing ? (
                 <>
-                  <CircleStopIcon className="mr-2 h-5 w-5 animate-pulse" />
+                  <CircleStopIcon className="animate-pulse" />
                   Stop Generation
                 </>
               ) : (
                 <>
-                  <ZapIcon className="mr-2 h-5 w-5" />
+                  <ZapIcon />
                   Generate
                 </>
               )}

@@ -41,7 +41,7 @@ export const Header = () => {
             onClick={() => setShowSettings(true)}
             title="Settings"
           >
-            <SettingsIcon className="h-5 w-5" />
+            <SettingsIcon />
           </Button>
         </nav>
       </div>

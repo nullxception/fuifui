@@ -93,7 +93,7 @@ const TriggerWordsEditor: React.FC = () => {
           size="sm"
           disabled={newEntry !== null}
         >
-          <PlusIcon className="mr-1 h-4 w-4" />
+          <PlusIcon />
           Add Entry
         </Button>
       </div>
@@ -151,7 +151,7 @@ const TriggerWordsEditor: React.FC = () => {
                         size="sm"
                         className="h-8 w-10"
                       >
-                        <PencilIcon className="h-8 w-8" />
+                        <PencilIcon />
                       </Button>
                       <Button
                         onClick={() => handleDelete(index)}
@@ -159,7 +159,7 @@ const TriggerWordsEditor: React.FC = () => {
                         size="sm"
                         className="h-8 w-10"
                       >
-                        <TrashIcon className="h-8 w-8" />
+                        <TrashIcon />
                       </Button>
                     </div>
                   </div>
@@ -324,7 +324,7 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
             className="flex-1"
           />
           <Button onClick={handleAddWord} variant="secondary" size="sm">
-            <PlusIcon className="h-4 w-4" />
+            <PlusIcon />
           </Button>
         </div>
         <div className="flex flex-wrap gap-1">

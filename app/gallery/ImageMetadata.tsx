@@ -106,19 +106,15 @@ export default function ImageMetadata({
           </div>
           <div className="space-y-2 space-x-2">
             <Button onClick={onRemove} size="sm" variant="destructive">
-              <TrashIcon className="mr-2 h-4" /> Delete
+              <TrashIcon /> Delete
             </Button>
             {metadata && (
               <Button onClick={handleRemake} size="sm" variant="default">
-                <RefreshCcwIcon className="mr-2 h-4" /> Remake
+                <RefreshCcwIcon /> Remake
               </Button>
             )}
-            <Button
-              onClick={() => saveImage(image)}
-              size="sm"
-              variant="secondary"
-            >
-              <DownloadIcon className="mr-2 h-4" /> Download
+            <Button onClick={() => saveImage(image)} variant="outline">
+              <DownloadIcon /> Download
             </Button>
           </div>
           {metadata ? (

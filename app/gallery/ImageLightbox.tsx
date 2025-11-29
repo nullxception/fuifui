@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import {
+  ArrowLeft,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleAlertIcon,
   InfoIcon,
+  Trash2Icon,
   XIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -102,21 +104,22 @@ export default function ImageLightbox() {
             )}
             <Button
               variant="ghost"
+              size="icon-lg"
               className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
               onClick={(e) => {
                 e.stopPropagation();
                 showMetadata((v) => !v);
               }}
             >
-              <InfoIcon className="h-6 w-6 text-foreground" />
+              <InfoIcon className="text-foreground" />
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-lg"
               className="absolute top-5 right-5 z-110 text-foreground/70 hover:bg-foreground/10 hover:text-foreground md:left-5"
               onClick={close}
             >
-              <XIcon className="h-6 w-6" />
+              <XIcon />
             </Button>
           </div>
 
@@ -142,18 +145,20 @@ export default function ImageLightbox() {
             </p>
             <div className="flex justify-center gap-2 bg-background/40 p-4">
               <Button
-                variant="destructive"
-                className="w-1/2"
-                onClick={onRemove}
-              >
-                Remove
-              </Button>
-              <Button
                 variant="outline"
                 className="w-1/2"
                 onClick={() => showRemoveDialog(false)}
               >
+                <ArrowLeft />
                 Go back
+              </Button>
+              <Button
+                variant="destructive"
+                className="w-1/2"
+                onClick={onRemove}
+              >
+                <Trash2Icon />
+                Remove
               </Button>
             </div>
           </Card>
