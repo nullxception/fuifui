@@ -23,7 +23,6 @@ export async function getDataFromImage(filePath: string): Promise<Image> {
 
     return {
       url: `/output/txt2img/${filename}`,
-      name: filename,
       mtime: stats.mtime.getTime(),
       metadata,
     };

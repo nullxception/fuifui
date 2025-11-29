@@ -10,10 +10,10 @@ const saveImage = async (image: Image) => {
     const response = await fetch(image.url);
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
-
+    const url = response.url;
     const link = document.createElement("a");
     link.href = blobUrl;
-    link.download = image.name;
+    link.download = url.substring(url.lastIndexOf("/") + 1);
     link.click();
 
     URL.revokeObjectURL(blobUrl);

@@ -86,7 +86,6 @@ export interface UserConfig {
 
 export interface Image {
   url: string;
-  name: string;
   mtime: number;
   metadata: Record<string, unknown>;
 }
