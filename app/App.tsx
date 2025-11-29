@@ -1,6 +1,5 @@
 import { BackgroundLayer } from "./components/customized/BackgroundLayer";
 import { Header } from "./components/customized/Header";
-import { Layout } from "./components/customized/Layout";
 import { ThemeProvider } from "./components/theme-provider";
 import TextToImage from "./dashboard";
 import Gallery from "./gallery";
@@ -14,12 +13,12 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
       <BackgroundLayer />
-      <Layout>
+      <div className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-auto font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground">
         <Header />
         {activeTab === "gallery" ? <Gallery /> : <TextToImage />}
         <SettingsPopup />
         <ImageLightbox />
-      </Layout>
+      </div>
     </ThemeProvider>
   );
 }

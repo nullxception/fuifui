@@ -118,7 +118,7 @@ export default function Gallery() {
   }
 
   return (
-    <main className="scrollbar-thin flex-1 overflow-y-auto scrollbar-thumb-secondary scrollbar-track-transparent">
+    <main className="grow">
       <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
         {images.map((image, index) => (
           <GalleryItem
