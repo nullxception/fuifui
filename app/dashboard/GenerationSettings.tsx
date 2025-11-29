@@ -1,5 +1,4 @@
 import { SliderInput } from "@/components/customized/SliderInput";
-import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupButton,
@@ -200,21 +199,15 @@ export const GenerationSettings: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-4">
-            <Label>Clip Skip</Label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                min={-1}
-                max={2}
-                value={store.params.clipSkip}
-                onChange={(e) =>
-                  store.update("clipSkip", parseInt(e.target.value))
-                }
-                placeholder="default: -1"
-              />
-            </div>
-          </div>
+          <SliderInput
+            label={`CLIP Skip`}
+            min={-1}
+            max={2}
+            step={1}
+            valueDisplay={store.params.clipSkip}
+            value={store.params.clipSkip}
+            onChange={(e) => store.update("clipSkip", e)}
+          />
 
           <div className="space-y-4">
             <Label>Seed</Label>

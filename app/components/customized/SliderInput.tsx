@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Slider as SliderPrimitive } from "radix-ui";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
@@ -24,6 +25,17 @@ export const SliderInput: React.FC<SliderProps> = ({
   value,
   onChange,
 }) => {
+  const [sliderValue, setSliderValue] = useState(value);
+
+  const handleSliderChange = (value: number) => {
+    setSliderValue(value);
+  };
+
+  useEffect(() => {
+    onChange(sliderValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sliderValue]);
+
   return (
     <div className="w-full space-y-4">
       {(label || valueDisplay) && (
@@ -33,19 +45,19 @@ export const SliderInput: React.FC<SliderProps> = ({
             type="number"
             value={value}
             step={step}
-            onChange={(e) => onChange(e.target.valueAsNumber)}
+            onChange={(e) => handleSliderChange(e.target.valueAsNumber)}
             className="bg-surface/70 flex h-8 w-20 border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       )}
       <div className="relative flex w-full flex-col items-center">
         <SliderPrimitive.Root
-          defaultValue={[value]}
+          defaultValue={[sliderValue]}
           min={min}
           max={max}
           step={step}
-          value={[value]}
-          onValueChange={(e) => onChange(e[0] || value)}
+          value={[sliderValue]}
+          onValueChange={(e) => handleSliderChange(e[0] || 0)}
           className={`relative flex w-full touch-none items-center pb-2 select-none ${className}`}
         >
           <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
