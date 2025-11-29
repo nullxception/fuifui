@@ -46,6 +46,19 @@ export default function TextToImage() {
     });
 
     eventSource.addEventListener("error", (event) => {
+      try {
+        const ev = event as MessageEvent;
+        if (ev.data) {
+          const error = JSON.parse(ev.data);
+          addLog({
+            type: "stderr",
+            timestamp: Date.now(),
+            message: error.message,
+          });
+        }
+      } catch {
+        /* empty */
+      }
       console.error("Diffusion error:", event);
       eventSource.close();
       eventSourceRef.current = null;
@@ -125,13 +138,6 @@ export default function TextToImage() {
     } catch (error) {
       console.error("Error stopping diffusion:", error);
     }
-
-    // Close the event source
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-    setJobId("");
   };
 
   const handleDiffusion = () => {

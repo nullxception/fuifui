@@ -39,8 +39,7 @@ export interface Job {
   createdAt: number;
   startedAt?: number;
   completedAt?: number;
-  result?: DiffusionComplete;
-  error?: DiffusionError;
+  result?: DiffusionComplete | DiffusionError;
   logs: LogData[];
 }
 

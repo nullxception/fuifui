@@ -7,7 +7,12 @@ import {
   UPSCALER_DIR,
   VAE_DIR,
 } from "../constants";
-import type { DiffusionParams, Models } from "../types";
+import type {
+  DiffusionComplete,
+  DiffusionError,
+  DiffusionParams,
+  Models,
+} from "../types";
 import { startDiffusion, stopDiffusion } from "./services/diffusion";
 import { createJob, getActiveJobs, getJob, jobEvents } from "./services/jobs";
 
@@ -52,30 +57,19 @@ export const diffusionStart = async (req: Request) => {
 
 export const diffusionStop = async (req: Request) => {
   const { jobId } = await req.json();
-  const job = getJob(jobId);
 
-  if (!job) {
-    return Response.json({ error: "Job not found" }, { status: 404 });
-  }
-
-  if (stopDiffusion(jobId)) {
-    return Response.json({
-      success: true,
-      message: "Diffusion stopped",
-    });
-  } else {
-    return Response.json(
-      { error: "No diffusion process running" },
-      { status: 400 },
-    );
-  }
+  stopDiffusion(jobId);
+  return Response.json({
+    success: true,
+    message: "Diffusion stopped",
+  });
 };
 
 export const diffusionProgress: Bun.Serve.Handler<
-  Bun.BunRequest<"/api/progress/:id">,
+  Bun.BunRequest<"/api/jobs/:id">,
   Bun.Server<undefined>,
   Response
-> = async (req: Bun.BunRequest<"/api/progress/:id">) => {
+> = async (req: Bun.BunRequest<"/api/jobs/:id">) => {
   const jobId = req.params.id;
 
   if (!jobId) {
@@ -110,9 +104,10 @@ export const diffusionProgress: Bun.Serve.Handler<
 
       // Send current result/error if job is done
       if (job.result) {
-        sendEvent("complete", job.result);
-      } else if (job.error) {
-        sendEvent("error", job.error);
+        sendEvent(
+          Object.keys(job.result).includes("success") ? "completed" : "error",
+          job.result,
+        );
       }
 
       // Subscribe to new logs
@@ -124,25 +119,25 @@ export const diffusionProgress: Bun.Serve.Handler<
 
       const onComplete = ({
         jobId: id,
-        result,
+        data,
       }: {
         jobId: string;
-        result: unknown;
+        data: DiffusionComplete;
       }) => {
         if (id === jobId) {
-          sendEvent("complete", result);
+          sendEvent("complete", data);
         }
       };
 
       const onError = ({
         jobId: id,
-        error,
+        data,
       }: {
         jobId: string;
-        error: unknown;
+        data: DiffusionError;
       }) => {
         if (id === jobId) {
-          sendEvent("error", error);
+          sendEvent("error", data);
         }
       };
 

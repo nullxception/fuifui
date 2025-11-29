@@ -1,4 +1,4 @@
-import { file, spawn, type Subprocess } from "bun";
+import { file, spawn } from "bun";
 import path from "path";
 import {
   EMBEDDING_DIR,
@@ -10,59 +10,17 @@ import {
   UPSCALER_DIR,
   VAE_DIR,
 } from "../../constants";
-import type {
-  DiffusionComplete,
-  DiffusionError,
-  DiffusionParams,
-  LogData,
-} from "../../types";
-import {
-  addJobLog,
-  getJob,
-  setJobError,
-  setJobResult,
-  updateJobStatus,
-} from "./jobs";
+import type { DiffusionParams, LogData } from "../../types";
+import { activeProcesses, addJobLog, getJob, updateJobStatus } from "./jobs";
 
-const activeProcesses = new Map<string, Subprocess>();
-
-/**
- * Gets the current active Subprocess for a given job ID.
- * @param jobId Optional job ID.
- * @returns The active Subprocess or null.
- */
-export const getCurrentProcess = (jobId?: string): Subprocess | null => {
+export const stopDiffusion = (jobId?: string) => {
   if (jobId) {
-    return activeProcesses.get(jobId) || null;
+    updateJobStatus({ id: jobId, status: "cancelled" });
   }
-  return activeProcesses.size > 0
-    ? Array.from(activeProcesses.values())[0] || null
-    : null;
-};
 
-/**
- * Stops the diffusion process for a given job ID or all processes.
- * @param jobId Optional job ID.
- * @returns True if a process was stopped, false otherwise.
- */
-export const stopDiffusion = (jobId?: string): boolean => {
-  if (jobId) {
-    const process = activeProcesses.get(jobId);
-    if (process) {
-      process.kill();
-      activeProcesses.delete(jobId);
-      updateJobStatus(jobId, "cancelled");
-      return true;
-    }
-  } else {
-    for (const [id, process] of activeProcesses.entries()) {
-      process.kill();
-      updateJobStatus(id, "cancelled");
-    }
-    activeProcesses.clear();
-    return true;
+  for (const [id] of activeProcesses.entries()) {
+    updateJobStatus({ id: id, status: "cancelled" });
   }
-  return false;
 };
 
 const printableArgs = (args: (string | number)[]) => {
@@ -196,7 +154,7 @@ export const startDiffusion = async (
     } else {
       console.log(log);
     }
-    addJobLog(jobId, data);
+    addJobLog(jobId, data, params);
   };
 
   sendLog(
@@ -210,6 +168,7 @@ export const startDiffusion = async (
     stdout: "pipe",
     stderr: "pipe",
   });
+  updateJobStatus({ id: jobId, status: "running", process: sdProcess });
 
   // Check for errors related to process creation
   if (sdProcess.exitCode != null) {
@@ -221,16 +180,16 @@ export const startDiffusion = async (
       "stderr",
       `Failed to spawn process immediately with code: ${sdProcess.exitCode}`,
     );
-    const errorData: DiffusionError = {
-      error: "Process spawn failed",
-      code: sdProcess.exitCode || undefined,
-    };
-    setJobError(jobId, errorData);
+    updateJobStatus({
+      id: jobId,
+      status: "failed",
+      data: {
+        error: "Process spawn failed",
+        code: sdProcess.exitCode || undefined,
+      },
+    });
     return;
   }
-
-  activeProcesses.set(jobId, sdProcess);
-  updateJobStatus(jobId, "running");
 
   const textDecoder = new TextDecoder();
   const stdoutReader = sdProcess.stdout.getReader();
@@ -272,23 +231,31 @@ export const startDiffusion = async (
     // Wait for all stream reading to finish
     await Promise.allSettled([stdoutPromise, stderrPromise]);
 
-    console.log(`child process exited with code ${code}`);
-    activeProcesses.delete(jobId);
     if (code === 0) {
       sendLog(
         "stdout",
         `Diffusion completed successfully! Image saved as: ${outputFilename}`,
       );
-      const completeData: DiffusionComplete = {
-        success: true,
-        imageUrl: `/output/txt2img/${outputFilename}`,
-      };
-      setJobResult(jobId, completeData);
+      updateJobStatus({
+        id: jobId,
+        status: "completed",
+        data: {
+          success: true,
+          imageUrl: `/output/txt2img/${outputFilename}`,
+        },
+      });
     } else {
       const job = getJob(jobId);
       if (job?.status !== "cancelled") {
         sendLog("stderr", `Diffusion failed with exit code: ${code}`);
-        setJobError(jobId, { error: "Diffusion failed", code });
+        updateJobStatus({
+          id: jobId,
+          status: "failed",
+          data: {
+            error: "Diffusion failed",
+            code,
+          },
+        });
       }
     }
   } catch (error) {
@@ -296,7 +263,14 @@ export const startDiffusion = async (
     if (job?.status !== "cancelled") {
       const msg = error instanceof Error ? error.message : String(error);
       sendLog("stderr", `Process error: ${msg}`);
-      setJobError(jobId, { error: "Process error", message: msg });
+      updateJobStatus({
+        id: jobId,
+        status: "failed",
+        data: {
+          error: "Process error",
+          message: msg,
+        },
+      });
     }
   }
 };

@@ -1,4 +1,4 @@
-import { randomUUIDv7 } from "bun";
+import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
 import type {
   DiffusionComplete,
@@ -10,12 +10,12 @@ import type {
 } from "../../types/index";
 
 export const jobEvents = new EventEmitter();
-
+export const activeProcesses = new Map<string, Subprocess>();
 const jobs = new Map<string, Job>();
 
-export const createJob = (params: DiffusionParams): Job => {
+export const createJob = (params: DiffusionParams, id?: string): Job => {
   const job: Job = {
-    id: randomUUIDv7(),
+    id: id ?? randomUUIDv7(),
     status: "pending",
     params,
     createdAt: Date.now(),
@@ -30,8 +30,19 @@ export const getJob = (id: string): Job | undefined => {
   return jobs.get(id);
 };
 
-export const updateJobStatus = (id: string, status: JobStatus): void => {
+export function updateJobStatus({
+  id,
+  status,
+  process = null,
+  data,
+}: {
+  id: string;
+  status: JobStatus;
+  process?: Subprocess | null;
+  data?: DiffusionComplete | DiffusionError;
+}) {
   const job = jobs.get(id);
+
   if (job) {
     job.status = status;
     if (status === "running" && !job.startedAt) {
@@ -42,39 +53,52 @@ export const updateJobStatus = (id: string, status: JobStatus): void => {
     ) {
       job.completedAt = Date.now();
     }
+    if (status === "completed") {
+      job.result = data;
+      jobEvents.emit("complete", { jobId: id, data });
+    } else if (status === "failed") {
+      job.result = data;
+      jobEvents.emit("error", { jobId: id, data });
+    }
   }
-};
 
-export const setJobResult = (id: string, result: DiffusionComplete): void => {
-  const job = jobs.get(id);
-  if (job) {
-    job.result = result;
-    job.status = "completed";
-    job.completedAt = Date.now();
-    jobEvents.emit("complete", { jobId: id, result });
+  if (status === "running" && process) {
+    activeProcesses.set(id, process);
   }
-};
 
-export const setJobError = (id: string, error: DiffusionError): void => {
-  const job = jobs.get(id);
-  if (job) {
-    job.error = error;
-    job.status = "failed";
-    job.completedAt = Date.now();
-    jobEvents.emit("error", { jobId: id, error });
+  if (["completed", "failed", "cancelled"].includes(status)) {
+    const process = activeProcesses.get(id);
+    if (process) {
+      if (!process.killed) {
+        console.log(`closing job ${id}`);
+        process.kill();
+        process.kill("SIGTERM");
+        process.kill("SIGKILL");
+      }
+      activeProcesses.delete(id);
+    }
   }
-};
-
-export const addJobLog = (id: string, log: LogData): void => {
-  const job = jobs.get(id);
-  if (job) {
-    job.logs.push(log);
-    jobEvents.emit("log", { jobId: id, log });
+  if (job && status === "cancelled") {
+    job.result = {
+      error: "cancelled",
+      message: `Job ${id} has been cancelled`,
+    };
+    jobEvents.emit("error", { jobId: id, data: job.result });
   }
-};
+}
 
-export const deleteJob = (id: string): boolean => {
-  return jobs.delete(id);
+export const addJobLog = (
+  id: string,
+  log: LogData,
+  params?: DiffusionParams,
+): void => {
+  let job = jobs.get(id);
+  if (!job && params) {
+    job = createJob(params, id);
+  }
+
+  job?.logs.push(log);
+  jobEvents.emit("log", { jobId: id, log });
 };
 
 export const getAllJobs = (): Job[] => {
