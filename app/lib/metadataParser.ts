@@ -84,12 +84,18 @@ export const optimizePrompt = (text: string): string => {
   const others: string[] = [];
 
   for (const p of unique) {
-    if (p.startsWith("<lora:")) loras.push(p);
-    else if (p.includes("embedding:")) embeds.push(p);
-    else others.push(p);
+    if (p.startsWith("<lora:")) {
+      loras.push(p);
+    } else if (p.includes("embedding:")) {
+      embeds.push(p);
+    } else {
+      others.push(p);
+    }
   }
 
-  return [...loras, ...embeds, ...others].join(", ");
+  return [...loras, ...embeds, ...others]
+    .join(", ")
+    .replace(/(\()\s+|\s+(\))/g, (_, open, close) => open || close);
 };
 
 export const parseDiffusionParams = (
