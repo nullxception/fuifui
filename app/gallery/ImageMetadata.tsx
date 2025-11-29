@@ -87,7 +87,7 @@ export default function ImageMetadata({
   return (
     <>
       <div
-        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-6 overflow-y-auto border-l border-border p-6 backdrop-blur-sm md:h-full md:w-[400px] ${className}`}
+        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-6 overflow-y-auto border-l border-border p-6 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-[400px] ${className}`}
       >
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-foreground">Details</h3>
