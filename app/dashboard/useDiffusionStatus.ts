@@ -7,10 +7,8 @@ interface DiffusionState {
   logs: LogEntry[];
 
   setImage: (image: Image | null) => void;
-  setLogs: (logs: LogEntry[]) => void;
   addLog: (log: LogEntry) => void;
   clearLogs: () => void;
-  reset: () => void;
 }
 
 export const useDiffusionStatus = create<DiffusionState>()(
@@ -19,9 +17,7 @@ export const useDiffusionStatus = create<DiffusionState>()(
     logs: [],
 
     setImage: (image) => set({ image: image }),
-    setLogs: (logs) => set({ logs }),
     addLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
     clearLogs: () => set({ logs: [] }),
-    reset: () => set({ image: null, logs: [] }),
   })),
 );
