@@ -4,6 +4,7 @@ import { Layout } from "./components/customized/Layout";
 import { ThemeProvider } from "./components/theme-provider";
 import TextToImage from "./dashboard";
 import Gallery from "./gallery";
+import ImageLightbox from "./gallery/ImageLightbox";
 import SettingsPopup from "./settings/SettingsPopup";
 import { useAppStore } from "./stores";
 
@@ -19,6 +20,7 @@ export default function App() {
           {activeTab === "gallery" ? <Gallery /> : <TextToImage />}
         </main>
         <SettingsPopup />
+        <ImageLightbox />
       </Layout>
     </ThemeProvider>
   );

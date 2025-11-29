@@ -3,7 +3,6 @@ import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
 import { useShallow } from "zustand/react/shallow";
-import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
 
 function useElementWidth<T extends HTMLElement>() {
@@ -137,7 +136,6 @@ export default function Gallery() {
           )}
           <Footer className="col-start-1 sm:col-end-3 md:col-end-4 lg:col-end-5" />
         </div>
-        <ImageLightbox />
       </div>
     </>
   );

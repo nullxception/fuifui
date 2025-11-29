@@ -7,12 +7,7 @@ import {
   UPSCALER_DIR,
   VAE_DIR,
 } from "../constants";
-import type {
-  DiffusionComplete,
-  DiffusionError,
-  DiffusionParams,
-  Models,
-} from "../types";
+import type { DiffusionParams, DiffusionResult, Models } from "../types";
 import { startDiffusion, stopDiffusion } from "./services/diffusion";
 import { createJob, getActiveJobs, getJob, jobEvents } from "./services/jobs";
 
@@ -122,7 +117,7 @@ export const diffusionProgress: Bun.Serve.Handler<
         data,
       }: {
         jobId: string;
-        data: DiffusionComplete;
+        data: DiffusionResult;
       }) => {
         if (id === jobId) {
           sendEvent("complete", data);
@@ -134,7 +129,7 @@ export const diffusionProgress: Bun.Serve.Handler<
         data,
       }: {
         jobId: string;
-        data: DiffusionError;
+        data: DiffusionResult;
       }) => {
         if (id === jobId) {
           sendEvent("error", data);

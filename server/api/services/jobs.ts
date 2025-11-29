@@ -1,9 +1,8 @@
 import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
 import type {
-  DiffusionComplete,
-  DiffusionError,
   DiffusionParams,
+  DiffusionResult,
   Job,
   JobStatus,
   LogData,
@@ -39,7 +38,7 @@ export function updateJobStatus({
   id: string;
   status: JobStatus;
   process?: Subprocess | null;
-  data?: DiffusionComplete | DiffusionError;
+  data?: DiffusionResult;
 }) {
   const job = jobs.get(id);
 

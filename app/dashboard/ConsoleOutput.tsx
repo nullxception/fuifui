@@ -1,19 +1,13 @@
 import React, { useEffect, useMemo, useRef } from "react";
-
-interface ConsoleOutputProps {
-  logs: Array<{
-    type: "stdout" | "stderr";
-    message: string;
-    timestamp: number;
-  }>;
-}
+import { useDiffusionStatus } from "./useDiffusionStatus";
 
 const formatTime = (timestamp: number) => {
   return new Date(timestamp).toLocaleTimeString();
 };
 
-const ConsoleOutput: React.FC<ConsoleOutputProps> = ({ logs }) => {
+const ConsoleOutput: React.FC = () => {
   const consoleRef = useRef<HTMLDivElement>(null);
+  const { logs } = useDiffusionStatus();
 
   useEffect(() => {
     if (consoleRef.current) {

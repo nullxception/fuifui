@@ -1,15 +1,16 @@
+import { useGallery } from "@/stores";
 import { ImageIcon } from "lucide-react";
 import React from "react";
+import type { Image } from "server/types";
 
 interface ImageDisplayProps {
-  imageUrl: string | null;
+  image: Image | null;
   isProcessing: boolean;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({
-  imageUrl,
-  isProcessing,
-}) => {
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
+  const { setSelectedImage } = useGallery();
+
   return (
     <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
       {isProcessing ? (
@@ -19,11 +20,12 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
             Generating image...
           </p>
         </div>
-      ) : imageUrl ? (
+      ) : image ? (
         <img
-          src={imageUrl}
+          src={image.url}
           alt="Generated output"
           className="h-full w-full object-contain"
+          onClick={() => setSelectedImage(image)}
         />
       ) : (
         <div className="p-8 text-center">

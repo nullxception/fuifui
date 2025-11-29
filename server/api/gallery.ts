@@ -4,6 +4,35 @@ import path from "path";
 import { IMAGE_EXT, OUTPUT_DIR, ROOT_DIR } from "../constants";
 import type { Image } from "../types";
 
+export async function getDataFromImage(filePath: string): Promise<Image> {
+  try {
+    const file = path.join(ROOT_DIR, filePath);
+    const stats = await fs.stat(file);
+    const filename = path.basename(file);
+
+    let metadata = {};
+    try {
+      metadata = await exifr.parse(file, {
+        userComment: true,
+        xmp: true,
+        icc: false,
+      });
+    } catch (e) {
+      console.warn(`Failed to parse metadata for ${filename}`, e);
+    }
+
+    return {
+      url: `/output/txt2img/${filename}`,
+      name: filename,
+      mtime: stats.mtime.getTime(),
+      metadata,
+    };
+  } catch (error) {
+    console.error(`Error reading ${filePath}`, error);
+    throw new Error(`Failed to read ${filePath} metadata`);
+  }
+}
+
 const list = async (limit: number, offset: number): Promise<Image[]> => {
   try {
     const dir = path.join(OUTPUT_DIR, "txt2img");

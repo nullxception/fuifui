@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { CircleStopIcon, ZapIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { DiffusionParams } from "server/types";
+import type { DiffusionParams, DiffusionResult, LogData } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
 import {
   useAppStore,
   useDiffusionConfig,
   useDiffusionStatus,
+  useGallery,
   useModels,
 } from "../stores";
 import ConsoleOutput from "./ConsoleOutput";
@@ -15,11 +16,12 @@ import ImageDisplay from "./ImageDisplay";
 
 export default function TextToImage() {
   const { outputTab, jobId, setOutputTab, setJobId } = useAppStore();
-  const { imageUrl, logs, setImageUrl, addLog, clearLogs } =
-    useDiffusionStatus();
+  const { image, setImage, addLog, clearLogs } = useDiffusionStatus();
   const { fetchModels } = useModels();
   const store = useDiffusionConfig();
   const eventSourceRef = useRef<EventSource | null>(null);
+  const isProcessing = jobId.length > 1;
+  const { fetchImages } = useGallery();
 
   const connectToJob = (id: string) => {
     if (eventSourceRef.current) {
@@ -30,36 +32,48 @@ export default function TextToImage() {
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
-      const logData = JSON.parse(event.data);
-      addLog(logData);
+      try {
+        const log: LogData = JSON.parse(event.data);
+        addLog({
+          message: log.message,
+          type: log.type,
+          timestamp: event.timeStamp,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     };
 
     eventSource.addEventListener("complete", (event) => {
-      const data = JSON.parse(event.data);
-      if (data.success) {
-        setImageUrl(`${data.imageUrl}?t=${Date.now()}`);
+      try {
+        const result: DiffusionResult = JSON.parse(event.data);
+        if (result.image && result.image.url.length > 0) {
+          setImage(result.image);
+          fetchImages(false);
+        }
+        eventSource.close();
+        eventSourceRef.current = null;
+        setJobId("");
+        setOutputTab("image");
+      } catch (e) {
+        console.error(e);
       }
-      eventSource.close();
-      eventSourceRef.current = null;
-      setJobId("");
-      setOutputTab("image");
     });
 
     eventSource.addEventListener("error", (event) => {
       try {
         const ev = event as MessageEvent;
         if (ev.data) {
-          const error = JSON.parse(ev.data);
+          const error: DiffusionResult = JSON.parse(ev.data);
           addLog({
             type: "stderr",
             timestamp: Date.now(),
-            message: error.message,
+            message: error.message ?? "unknown error",
           });
         }
-      } catch {
-        /* empty */
+      } catch (e) {
+        console.error(e);
       }
-      console.error("Diffusion error:", event);
       eventSource.close();
       eventSourceRef.current = null;
       setJobId("");
@@ -183,12 +197,9 @@ export default function TextToImage() {
 
           <div className="relative min-h-0 w-full flex-1">
             {outputTab === "image" ? (
-              <ImageDisplay
-                imageUrl={imageUrl}
-                isProcessing={jobId.length > 1}
-              />
+              <ImageDisplay image={image} isProcessing={isProcessing} />
             ) : (
-              <ConsoleOutput logs={logs} />
+              <ConsoleOutput />
             )}
           </div>
         </div>
@@ -196,11 +207,11 @@ export default function TextToImage() {
         <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border bg-background/20 p-2 backdrop-blur-sm">
           <Button
             onClick={handleDiffusion}
-            variant={jobId.length > 1 ? "destructive" : "default"}
+            variant={isProcessing ? "destructive" : "default"}
             size="lg"
             className="w-full rounded-xl"
           >
-            {jobId.length > 1 ? (
+            {isProcessing ? (
               <>
                 <CircleStopIcon className="mr-2 h-5 w-5 animate-pulse" />
                 Stop Generation

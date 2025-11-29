@@ -10,7 +10,8 @@ import {
   UPSCALER_DIR,
   VAE_DIR,
 } from "../../constants";
-import type { DiffusionParams, LogData } from "../../types";
+import type { DiffusionParams } from "../../types";
+import { getDataFromImage as getImageData } from "../gallery";
 import { activeProcesses, addJobLog, getJob, updateJobStatus } from "./jobs";
 
 export const stopDiffusion = (jobId?: string) => {
@@ -142,19 +143,14 @@ export const startDiffusion = async (
     args.push("--force-sdxl-vae-conv-scale");
   }
 
-  const sendLog = (type: string, message: string) => {
+  const sendLog = (type: "stdout" | "stderr", message: string) => {
     const log = message.trim().replaceAll(ROOT_DIR + path.sep, "");
-    const data: LogData = {
-      type,
-      message: log,
-      timestamp: Date.now(),
-    };
     if (type === "stderr") {
       console.error(log);
     } else {
       console.log(log);
     }
-    addJobLog(jobId, data, params);
+    addJobLog(jobId, { type, message: log }, params);
   };
 
   sendLog(
@@ -240,8 +236,7 @@ export const startDiffusion = async (
         id: jobId,
         status: "completed",
         data: {
-          success: true,
-          imageUrl: `/output/txt2img/${outputFilename}`,
+          image: await getImageData(`output/txt2img/${outputFilename}`),
         },
       });
     } else {

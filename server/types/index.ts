@@ -39,23 +39,18 @@ export interface Job {
   createdAt: number;
   startedAt?: number;
   completedAt?: number;
-  result?: DiffusionComplete | DiffusionError;
+  result?: DiffusionResult;
   logs: LogData[];
 }
 
 export interface LogData {
-  type: string;
+  type: "stdout" | "stderr";
   message: string;
-  timestamp: number;
 }
 
-export interface DiffusionComplete {
-  success: true;
-  imageUrl: string;
-}
-
-export interface DiffusionError {
-  error: string;
+export interface DiffusionResult {
+  image?: Image;
+  error?: string;
   code?: number;
   message?: string;
 }
