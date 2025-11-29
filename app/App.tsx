@@ -16,9 +16,7 @@ export default function App() {
       <BackgroundLayer />
       <Layout>
         <Header />
-        <main className="container mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col lg:overflow-hidden">
-          {activeTab === "gallery" ? <Gallery /> : <TextToImage />}
-        </main>
+        {activeTab === "gallery" ? <Gallery /> : <TextToImage />}
         <SettingsPopup />
         <ImageLightbox />
       </Layout>

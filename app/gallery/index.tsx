@@ -118,25 +118,23 @@ export default function Gallery() {
   }
 
   return (
-    <>
-      <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto p-2 scrollbar-thumb-secondary scrollbar-track-transparent">
-        <div className="grid grid-cols-[repeat(2,1fr)] gap-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
-          {images.map((image, index) => (
-            <GalleryItem
-              key={index}
-              onClick={() => setSelectedImage(image)}
-              image={image}
-            />
-          ))}
-          <div ref={observerTarget} className="col-span-full h-10 w-full" />
-          {isLoadingMore && (
-            <div className="col-span-full flex justify-center p-4">
-              <span className="text-foreground">Loading more...</span>
-            </div>
-          )}
-          <Footer className="col-start-1 sm:col-end-3 md:col-end-4 lg:col-end-5" />
-        </div>
+    <main className="scrollbar-thin flex-1 overflow-y-auto scrollbar-thumb-secondary scrollbar-track-transparent">
+      <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
+        {images.map((image, index) => (
+          <GalleryItem
+            key={index}
+            onClick={() => setSelectedImage(image)}
+            image={image}
+          />
+        ))}
+        <div ref={observerTarget} className="col-span-full h-10 w-full" />
+        {isLoadingMore && (
+          <div className="col-span-full flex justify-center p-4">
+            <span className="text-foreground">Loading more...</span>
+          </div>
+        )}
+        <Footer className="col-span-full flex justify-center p-4" />
       </div>
-    </>
+    </main>
   );
 }
