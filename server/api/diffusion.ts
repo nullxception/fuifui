@@ -1,12 +1,12 @@
 import { promises as fs } from "fs";
 import {
+  CHECKPOINT_DIR,
   EMBEDDING_DIR,
   LORA_DIR,
-  MODEL_DIR,
   TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
-} from "../constants";
+} from "../dirs";
 import type { DiffusionParams, DiffusionResult, Models } from "../types";
 import { startDiffusion, stopDiffusion } from "./services/diffusion";
 import { createJob, getActiveJobs, getJob, jobEvents } from "./services/jobs";
@@ -19,7 +19,7 @@ const getFileList = async (dir: string): Promise<string[]> => {
 export const diffusionModels = async () => {
   try {
     return Response.json(<Models>{
-      checkpoints: await getFileList(MODEL_DIR),
+      checkpoints: await getFileList(CHECKPOINT_DIR),
       embeddings: await getFileList(EMBEDDING_DIR),
       loras: await getFileList(LORA_DIR),
       vaes: await getFileList(VAE_DIR),

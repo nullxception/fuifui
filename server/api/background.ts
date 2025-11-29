@@ -1,6 +1,6 @@
 import path from "path";
 import sharp from "sharp";
-import { UPLOAD_DIR } from "../constants";
+import { UPLOAD_DIR } from "../dirs";
 
 const process = async (
   file: File,

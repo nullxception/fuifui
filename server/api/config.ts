@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { CONFIG_PATH } from "../constants";
+import { CONFIG_PATH } from "../dirs";
 import type { UserConfig } from "../types";
 
 export const readConf = async () => {

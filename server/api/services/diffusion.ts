@@ -1,15 +1,15 @@
 import { file, spawn } from "bun";
 import path from "path";
 import {
+  CHECKPOINT_DIR,
   EMBEDDING_DIR,
   LORA_DIR,
-  MODEL_DIR,
   OUTPUT_DIR,
   ROOT_DIR,
   TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
-} from "../../constants";
+} from "../../dirs";
 import type { DiffusionParams } from "../../types";
 import { getDataFromImage as getImageData } from "../gallery";
 import { activeProcesses, addJobLog, getJob, updateJobStatus } from "./jobs";
@@ -46,7 +46,7 @@ export const startDiffusion = async (
   const timestamp = Date.now();
   const outputFilename = `${timestamp}.png`;
   const outputPath = path.join(OUTPUT_DIR, "txt2img", outputFilename);
-  const modelPath = path.join(MODEL_DIR, params.model || "");
+  const modelPath = path.join(CHECKPOINT_DIR, params.model || "");
 
   // sd at project root or from $PATH
   const project_sd = path.join(ROOT_DIR, "sd");

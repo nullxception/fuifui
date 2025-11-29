@@ -30,3 +30,4 @@ output
 public/upload
 sd
 config.yaml
+.env

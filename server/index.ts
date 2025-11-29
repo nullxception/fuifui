@@ -12,19 +12,18 @@ import {
 import { listImages, removeImages } from "./api/gallery";
 import { stopDiffusion } from "./api/services/diffusion";
 import system from "./api/system";
-import { PORT } from "./constants";
-import { ensureDirectories } from "./directories";
+import { ensureDirectories } from "./dirs";
+
+const PORT = process.env.PORT || 5141;
 
 await ensureDirectories();
 
-// Cleanup function to terminate all active jobs
 const cleanup = () => {
   console.log("Terminating all active jobs...");
   stopDiffusion();
   process.exit(0);
 };
 
-// Register signal handlers for graceful shutdown
 process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);
 process.on("SIGQUIT", cleanup);
@@ -38,7 +37,7 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 Bun.serve({
-  port: process.env.PORT || PORT,
+  port: PORT,
   idleTimeout: 0, // Disable timeout for long-running diffusion processes
   development: process.env.NODE_ENV !== "production" && {
     hmr: true,

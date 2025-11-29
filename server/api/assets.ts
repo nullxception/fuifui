@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import sharp from "sharp";
-import { ROOT_DIR, THUMBS_DIR } from "../constants";
+import { PUBLIC_DIR, ROOT_DIR, THUMBS_DIR } from "../dirs";
 
 const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
   const pathname = url.pathname;
@@ -29,7 +29,7 @@ const serveStatic = async (req: Request): Promise<Response> => {
 
   // Serve static files from public directory (user-uploaded images)
   if (pathname.startsWith("/upload/")) {
-    const filepath = path.join(ROOT_DIR, "public", pathname);
+    const filepath = path.join(PUBLIC_DIR, pathname);
     return new Response(Bun.file(filepath));
   }
 

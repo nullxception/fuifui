@@ -1,8 +1,10 @@
 import exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
-import { IMAGE_EXT, OUTPUT_DIR, ROOT_DIR } from "../constants";
+import { OUTPUT_DIR, ROOT_DIR } from "../dirs";
 import type { Image } from "../types";
+
+export const IMAGE_EXT = [".png", ".jpg", ".jpeg", ".webp"];
 
 export async function getDataFromImage(filePath: string): Promise<Image> {
   try {
