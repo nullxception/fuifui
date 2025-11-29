@@ -204,7 +204,6 @@ export const GenerationSettings: React.FC = () => {
             min={-1}
             max={2}
             step={1}
-            valueDisplay={store.params.clipSkip}
             value={store.params.clipSkip}
             onChange={(e) => store.update("clipSkip", e)}
           />

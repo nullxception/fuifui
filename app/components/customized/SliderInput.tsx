@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { Slider as SliderPrimitive } from "radix-ui";
-import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
@@ -25,16 +24,9 @@ export const SliderInput: React.FC<SliderProps> = ({
   value,
   onChange,
 }) => {
-  const [sliderValue, setSliderValue] = useState(value);
-
   const handleSliderChange = (value: number) => {
-    setSliderValue(value);
+    onChange(value);
   };
-
-  useEffect(() => {
-    onChange(sliderValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sliderValue]);
 
   return (
     <div className="w-full space-y-4">
@@ -52,12 +44,12 @@ export const SliderInput: React.FC<SliderProps> = ({
       )}
       <div className="relative flex w-full flex-col items-center">
         <SliderPrimitive.Root
-          defaultValue={[sliderValue]}
           min={min}
+          defaultValue={[value]}
           max={max}
           step={step}
-          value={[sliderValue]}
-          onValueChange={(e) => handleSliderChange(e[0] || 0)}
+          value={[value]}
+          onValueChange={(e) => onChange(e[0] || 0)}
           className={`relative flex w-full touch-none items-center pb-2 select-none ${className}`}
         >
           <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
