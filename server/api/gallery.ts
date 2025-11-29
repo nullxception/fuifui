@@ -97,6 +97,18 @@ const remove = async (images: string[]): Promise<void> => {
       img = path.join(ROOT_DIR, img);
       console.log(`removing ${img}`);
       await Bun.file(img).delete();
+      const filename = path.basename(img);
+
+      const dir = path.join(OUTPUT_DIR, ".thumbs");
+      const files = await fs.readdir(dir);
+
+      files
+        .filter((file) => file.startsWith(filename))
+        .forEach(async (it) => {
+          const thumb = path.join(dir, it);
+          console.log(`thumbnails: removing ${thumb}`);
+          await Bun.file(thumb).delete();
+        });
     }
   } catch {
     throw new Error(`Image(s) not found`);
