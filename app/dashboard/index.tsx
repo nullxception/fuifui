@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { DiffusionParams, DiffusionResult, LogData } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
 import {
@@ -14,6 +14,37 @@ import ConsoleOutput from "./ConsoleOutput";
 import ControlPanel from "./ControlPanel";
 import ImageDisplay from "./ImageDisplay";
 
+const handleStop = async (jobId: string) => {
+  try {
+    // Call the stop API endpoint
+    await fetch(`/api/jobs/stop`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ jobId }),
+    });
+  } catch (error) {
+    console.error("Error stopping diffusion:", error);
+  }
+};
+
+const checkActiveJobs = async (onComplete: (id: string) => void) => {
+  try {
+    const response = await fetch("/api/jobs");
+    if (response.ok) {
+      const jobs = await response.json();
+      if (Array.isArray(jobs) && jobs.length > 0) {
+        // Connect to the most recent job
+        const lastJobId = jobs[jobs.length - 1];
+        onComplete(lastJobId);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to check active jobs:", error);
+  }
+};
+
 export default function TextToImage() {
   const { outputTab, jobId, setOutputTab, setJobId } = useAppStore();
   const { image, setImage, addLog, clearLogs } = useDiffusionStatus();
@@ -23,92 +54,80 @@ export default function TextToImage() {
   const isProcessing = jobId.length > 1;
   const { fetchImages } = useGallery();
 
-  const connectToJob = (id: string) => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-
-    const eventSource = new EventSource(`/api/jobs/${id}`);
-    eventSourceRef.current = eventSource;
-
-    eventSource.onmessage = (event) => {
-      try {
-        const log: LogData = JSON.parse(event.data);
-        addLog({
-          message: log.message,
-          type: log.type,
-          timestamp: event.timeStamp,
-        });
-      } catch (e) {
-        console.error(e);
+  const connectToJob = useCallback(
+    (id: string) => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
       }
-    };
 
-    eventSource.addEventListener("complete", (event) => {
-      try {
-        const result: DiffusionResult = JSON.parse(event.data);
-        if (result.image && result.image.url.length > 0) {
-          setImage(result.image);
-          fetchImages(false);
+      const eventSource = new EventSource(`/api/jobs/${id}`);
+      eventSourceRef.current = eventSource;
+      setJobId(id);
+
+      eventSource.onmessage = (event) => {
+        try {
+          const log: LogData = JSON.parse(event.data);
+          addLog({
+            message: log.message,
+            type: log.type,
+            timestamp: event.timeStamp,
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      eventSource.addEventListener("complete", (event) => {
+        try {
+          const result: DiffusionResult = JSON.parse(event.data);
+          if (result.image && result.image.url.length > 0) {
+            setImage(result.image);
+            fetchImages(false);
+          }
+          eventSource.close();
+          eventSourceRef.current = null;
+          setJobId("");
+          setOutputTab("image");
+        } catch (e) {
+          console.error(e);
+        }
+      });
+
+      eventSource.addEventListener("error", (event) => {
+        try {
+          const ev = event as MessageEvent;
+          if (ev.data) {
+            const error: DiffusionResult = JSON.parse(ev.data);
+            addLog({
+              type: "stderr",
+              timestamp: Date.now(),
+              message: error.message ?? "unknown error",
+            });
+          }
+        } catch (e) {
+          console.error(e);
         }
         eventSource.close();
         eventSourceRef.current = null;
         setJobId("");
-        setOutputTab("image");
-      } catch (e) {
-        console.error(e);
-      }
-    });
+      });
 
-    eventSource.addEventListener("error", (event) => {
-      try {
-        const ev = event as MessageEvent;
-        if (ev.data) {
-          const error: DiffusionResult = JSON.parse(ev.data);
-          addLog({
-            type: "stderr",
-            timestamp: Date.now(),
-            message: error.message ?? "unknown error",
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      eventSource.close();
-      eventSourceRef.current = null;
-      setJobId("");
-    });
+      eventSource.onerror = () => {
+        eventSource.close();
+        eventSourceRef.current = null;
+        setJobId("");
+      };
 
-    eventSource.onerror = () => {
-      eventSource.close();
-      eventSourceRef.current = null;
-      setJobId("");
-    };
-
-    setOutputTab("console");
-  };
+      setOutputTab("console");
+    },
+    [addLog, fetchImages, setImage, setJobId, setOutputTab],
+  );
 
   useEffect(() => {
-    const checkActiveJobs = async () => {
-      try {
-        const response = await fetch("/api/jobs");
-        if (response.ok) {
-          const jobs = await response.json();
-          if (Array.isArray(jobs) && jobs.length > 0) {
-            // Connect to the most recent job
-            const lastJobId = jobs[jobs.length - 1];
-            setJobId(lastJobId);
-            connectToJob(lastJobId);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to check active jobs:", error);
-      }
-    };
-
-    checkActiveJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    checkActiveJobs((id: string) => {
+      connectToJob(id);
+    });
+  }, [connectToJob]);
 
   const startDiffusion = async (params: DiffusionParams) => {
     clearLogs();
@@ -130,7 +149,6 @@ export default function TextToImage() {
       const resp = await response.json();
 
       // Then, start streaming from /api/jobs/:id
-      setJobId(resp.jobId);
       connectToJob(resp.jobId);
     } catch (error) {
       console.error("Error generating image:", error);
@@ -139,24 +157,9 @@ export default function TextToImage() {
     }
   };
 
-  const handleStop = async () => {
-    try {
-      // Call the stop API endpoint
-      await fetch(`/api/jobs/stop`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ jobId }),
-      });
-    } catch (error) {
-      console.error("Error stopping diffusion:", error);
-    }
-  };
-
   const handleDiffusion = () => {
     if (jobId.length > 1) {
-      handleStop();
+      handleStop(jobId);
     } else {
       store.updateAll({
         prompt: optimizePrompt(store.params.prompt),

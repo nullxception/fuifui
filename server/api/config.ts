@@ -26,8 +26,7 @@ type Valuable<T> = {
   [K in keyof T as T[K] extends null | undefined ? never : K]: T[K];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-function getValuable<T extends {}, V = Valuable<T>>(obj: T): V {
+function getValuable<T extends object, V = Valuable<T>>(obj: T): V {
   return Object.fromEntries(
     Object.entries(obj).filter(
       ([, v]) =>

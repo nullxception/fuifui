@@ -20,4 +20,9 @@ export default defineConfig([
     },
   },
   eslintConfigPrettier,
+  {
+    rules: {
+      "no-control-regex": "off",
+    },
+  },
 ]);

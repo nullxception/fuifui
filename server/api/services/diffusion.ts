@@ -198,7 +198,6 @@ export const startDiffusion = async (
       if (done) break;
       const data = textDecoder.decode(value);
       data
-        // eslint-disable-next-line no-control-regex
         .split(/\n|\x1b\[K.*/)
         .map((line) => line.trim())
         .filter((line) => line.length > 1)
