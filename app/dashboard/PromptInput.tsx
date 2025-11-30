@@ -16,7 +16,8 @@ import React, {
 } from "react";
 import type { ExtraDataType } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
-import { useDiffusionConfig, useModels, useTriggerWords } from "../stores";
+import { useModels, useTriggerWords } from "../stores";
+import { usePromptState } from "./usePromptState";
 
 type PromptType = "prompt" | "negativePrompt";
 
@@ -63,9 +64,13 @@ const autoResize = (el: HTMLTextAreaElement, cb: () => void) => {
 
 const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   const { models } = useModels();
-  const store = useDiffusionConfig();
-  const prompt =
-    type === "prompt" ? store.params.prompt : store.params.negativePrompt;
+  const {
+    value: prompt,
+    isSaving,
+    hasUnsavedChanges,
+    updatePrompt,
+    forceSave,
+  } = usePromptState(type);
   const ref = useRef<HTMLTextAreaElement>(null);
   const { triggerWords } = useTriggerWords();
   const [start, setStart] = useState(0);
@@ -97,7 +102,8 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
       ? `${prefix}, ${triggerWordsText}`
       : prefix;
 
-    store.update(type, optimizePrompt(`${textToAdd}, ${prompt}`));
+    const newPrompt = optimizePrompt(`${textToAdd}, ${prompt}`);
+    updatePrompt(newPrompt);
   };
 
   useEffect(() => {
@@ -117,13 +123,29 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
     <div
       className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/20" : "bg-pink-500/20"}`}
     >
-      <Label className="pb-2">{title}</Label>
+      <div className="flex items-center justify-between">
+        <Label className="pb-2">{title}</Label>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {hasUnsavedChanges && !isSaving && (
+            <span className="text-orange-500">Unsaved</span>
+          )}
+          {isSaving && (
+            <span className="flex items-center gap-1 text-blue-500">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500"></span>
+              Saving...
+            </span>
+          )}
+        </div>
+      </div>
       <Textarea
         ref={ref}
         value={prompt}
         onChange={(e) => {
-          store.update(type, e.target.value);
+          updatePrompt(e.target.value);
           updateCaret();
+        }}
+        onBlur={() => {
+          forceSave();
         }}
         className={`scrollbar-none ${
           type === "prompt"
