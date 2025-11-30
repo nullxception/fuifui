@@ -33,6 +33,9 @@ export default function ImageLightbox() {
   const [shouldShowRemoveDialog, showRemoveDialog] = useState(false);
 
   const close = useCallback(() => {
+    if (window.innerWidth < 1024) {
+      showMetadata(false);
+    }
     setSelectedImage(null);
   }, [setSelectedImage]);
 
@@ -55,6 +58,9 @@ export default function ImageLightbox() {
   const parsedMetadata = parseDiffusionParams(selectedImage.metadata);
 
   const onRemove = () => {
+    if (window.innerWidth < 1024) {
+      showMetadata(false);
+    }
     showRemoveDialog(false);
     close();
     removeImages([selectedImage.url]);
