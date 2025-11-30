@@ -66,8 +66,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   const { models } = useModels();
   const {
     value: prompt,
-    isSaving,
-    hasUnsavedChanges,
+    changed: changed,
     updatePrompt,
     forceSave,
   } = usePromptState(type);
@@ -120,18 +119,17 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   }, [updateCaret, prompt]);
 
   return (
-    <div
-      className={`space-y-2 p-4 ${type === "prompt" ? "bg-blue-500/20" : "bg-pink-500/20"}`}
-    >
+    <div className="space-y-2 px-4">
       <div className="flex items-center justify-between">
-        <Label className="pb-2">{title}</Label>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {hasUnsavedChanges && !isSaving && (
-            <span className="text-orange-500">Unsaved</span>
-          )}
-          {isSaving && (
-            <span className="flex items-center gap-1 text-blue-500">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500"></span>
+        <Label
+          className={`pb-2 ${type === "prompt" ? "text-blue-500" : "text-pink-500"}`}
+        >
+          {title}
+        </Label>
+        <div className="flex items-center gap-2 text-xs">
+          {changed && (
+            <span className="flex items-center gap-1 text-foreground/90">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-foreground"></span>
               Saving...
             </span>
           )}
@@ -177,7 +175,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
 
 export const PromptInput: React.FC = () => {
   return (
-    <div>
+    <div className="flex flex-col space-y-4">
       <Prompt type="prompt" />
       <Prompt type="negativePrompt" />
     </div>

@@ -5,8 +5,7 @@ type PromptType = "prompt" | "negativePrompt";
 
 interface PromptState {
   value: string;
-  isSaving: boolean;
-  hasUnsavedChanges: boolean;
+  changed: boolean;
 }
 
 const DEBOUNCE_DELAY = 500;
@@ -18,18 +17,16 @@ export const usePromptState = (type: PromptType) => {
 
   const [state, setState] = useState<PromptState>(() => ({
     value: storeValue,
-    isSaving: false,
-    hasUnsavedChanges: false,
+    changed: false,
   }));
 
   const debounceTimerRef = useRef<number>(null);
 
   // Only update if user isn't actively editing and values are different
-  if (!state.hasUnsavedChanges && state.value !== storeValue) {
+  if (!state.changed && state.value !== storeValue) {
     setState({
       value: storeValue,
-      isSaving: false,
-      hasUnsavedChanges: false,
+      changed: false,
     });
   }
 
@@ -44,18 +41,14 @@ export const usePromptState = (type: PromptType) => {
 
   const saveToStore = useCallback(
     async (value: string) => {
-      setState((prev) => ({ ...prev, isSaving: true }));
-
       try {
         store.update(type, value);
         setState((prev) => ({
           ...prev,
-          isSaving: false,
-          hasUnsavedChanges: false,
+          changed: false,
         }));
       } catch (error) {
         console.error("Failed to save prompt:", error);
-        setState((prev) => ({ ...prev, isSaving: false }));
       }
     },
     [store, type],
@@ -67,7 +60,7 @@ export const usePromptState = (type: PromptType) => {
         clearTimeout(debounceTimerRef.current);
       }
 
-      setState((prev) => ({ ...prev, hasUnsavedChanges: true }));
+      setState((prev) => ({ ...prev, changed: true }));
 
       debounceTimerRef.current = window.setTimeout(() => {
         saveToStore(value);
@@ -95,8 +88,7 @@ export const usePromptState = (type: PromptType) => {
 
   return {
     value: state.value,
-    isSaving: state.isSaving,
-    hasUnsavedChanges: state.hasUnsavedChanges,
+    changed: state.changed,
     updatePrompt,
     forceSave,
   };

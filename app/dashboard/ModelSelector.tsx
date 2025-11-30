@@ -15,7 +15,7 @@ export const ModelSelector: React.FC = () => {
   const store = useDiffusionConfig();
 
   return (
-    <div className="grid grid-cols-2 gap-2 px-4 pb-4">
+    <div className="grid grid-cols-2 gap-2 px-4">
       <div className="space-y-2 pt-2">
         <Label htmlFor="model-select">Model</Label>
         <Select
