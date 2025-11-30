@@ -4,7 +4,7 @@ import React from "react";
 import type { Image } from "server/types";
 
 interface ImageDisplayProps {
-  image: Image | null;
+  image?: Image;
   isProcessing: boolean;
 }
 

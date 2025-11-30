@@ -80,6 +80,7 @@ export function updateJobStatus({
   if (job && status === "cancelled") {
     job.result = {
       error: "cancelled",
+      timestamp: Date.now(),
       message: `Job ${id} has been cancelled`,
     };
     jobEvents.emit("error", { jobId: id, data: job.result });
@@ -97,7 +98,7 @@ export const addJobLog = (
   }
 
   job?.logs.push(log);
-  jobEvents.emit("log", { jobId: id, log });
+  jobEvents.emit("log", { jobId: id, data: log });
 };
 
 export const getAllJobs = (): Job[] => {

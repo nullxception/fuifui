@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { useDiffusionStatus } from "./useDiffusionStatus";
+import { useDiffusionJobs } from "./useDiffusionJobs";
 
 const formatTime = (timestamp: number) => {
   return new Date(timestamp).toLocaleTimeString();
@@ -7,7 +7,7 @@ const formatTime = (timestamp: number) => {
 
 const ConsoleOutput: React.FC = () => {
   const consoleRef = useRef<HTMLDivElement>(null);
-  const { logs } = useDiffusionStatus();
+  const { logs } = useDiffusionJobs();
 
   useEffect(() => {
     if (consoleRef.current) {

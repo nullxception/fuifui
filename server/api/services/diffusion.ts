@@ -150,7 +150,7 @@ export const startDiffusion = async (
     } else {
       console.log(log);
     }
-    addJobLog(jobId, { type, message: log }, params);
+    addJobLog(jobId, { type, message: log, timestamp: Date.now() }, params);
   };
 
   sendLog(
@@ -181,6 +181,8 @@ export const startDiffusion = async (
       status: "failed",
       data: {
         error: "Process spawn failed",
+        timestamp: Date.now(),
+
         code: sdProcess.exitCode || undefined,
       },
     });
@@ -236,6 +238,7 @@ export const startDiffusion = async (
         status: "completed",
         data: {
           image: await getImageData(`output/txt2img/${outputFilename}`),
+          timestamp: Date.now(),
         },
       });
     } else {
@@ -247,6 +250,8 @@ export const startDiffusion = async (
           status: "failed",
           data: {
             error: "Diffusion failed",
+            timestamp: Date.now(),
+
             code,
           },
         });
@@ -262,6 +267,7 @@ export const startDiffusion = async (
         status: "failed",
         data: {
           error: "Process error",
+          timestamp: Date.now(),
           message: msg,
         },
       });

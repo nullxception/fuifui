@@ -45,10 +45,12 @@ export interface Job {
 
 export interface LogData {
   type: "stdout" | "stderr";
+  timestamp: number;
   message: string;
 }
 
 export interface DiffusionResult {
+  timestamp: number;
   image?: Image;
   error?: string;
   code?: number;

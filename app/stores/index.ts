@@ -1,5 +1,5 @@
 export { useDiffusionConfig } from "../dashboard/useDiffusionConfig";
-export { useDiffusionStatus } from "../dashboard/useDiffusionStatus";
+export { useDiffusionJobs } from "../dashboard/useDiffusionJobs";
 export { useModels } from "../dashboard/useModels";
 export { useGallery } from "../gallery/useGallery";
 export { useSettings } from "../settings/useSettings";

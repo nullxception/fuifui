@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 import type { Image } from "server/types";
 import type { ParsedMetadata } from "../lib/metadataParser";
-import { useAppStore, useDiffusionConfig, useDiffusionStatus } from "../stores";
+import { useAppStore, useDiffusionConfig, useDiffusionJobs } from "../stores";
 
 const saveImage = async (image: Image) => {
   try {
@@ -62,7 +62,7 @@ export default function ImageMetadata({
 }: ImageMetadataProps) {
   const { setActiveTab } = useAppStore();
   const store = useDiffusionConfig();
-  const { setImage } = useDiffusionStatus();
+  const { setImage } = useDiffusionJobs();
 
   const handleRemake = () => {
     if (!metadata) return;
