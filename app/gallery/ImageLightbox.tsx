@@ -78,7 +78,7 @@ export default function ImageLightbox() {
             />
             {hasPrev && (
               <div
-                className={`absolute top-0 left-0 z-110 h-full w-1/6 cursor-pointer from-transparent to-background/50 select-none hover:-bg-linear-90`}
+                className={`absolute top-0 left-0 z-110 h-full w-1/3 cursor-pointer from-transparent to-background/35 select-none hover:-bg-linear-90`}
                 onClick={(e) => {
                   e.stopPropagation();
                   navigateImage("prev");
@@ -91,7 +91,7 @@ export default function ImageLightbox() {
             )}
             {hasNext && (
               <div
-                className={`absolute top-0 right-0 z-110 h-full w-1/6 cursor-pointer from-background/50 to-transparent select-none hover:-bg-linear-90`}
+                className={`absolute top-0 right-0 z-110 h-full w-1/3 cursor-pointer from-background/30 to-transparent select-none hover:-bg-linear-90`}
                 onClick={(e) => {
                   e.stopPropagation();
                   navigateImage("next");
