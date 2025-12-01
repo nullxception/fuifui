@@ -27,7 +27,7 @@ interface ImageMetadataProps {
   image: Image;
   metadata: ParsedMetadata | null;
   onRemove: () => void;
-  closeLightbox: () => void;
+  showMetadata: (value: boolean) => void;
   className: string;
 }
 
@@ -58,7 +58,7 @@ export default function ImageMetadata({
   image,
   metadata,
   onRemove,
-  closeLightbox,
+  showMetadata,
   className = "",
 }: ImageMetadataProps) {
   const [, navigate] = useLocation();
@@ -83,7 +83,7 @@ export default function ImageMetadata({
     });
 
     // Navigate back to generate tab
-    closeLightbox();
+    showMetadata(false);
     setImage(image);
     setOutputTab("image");
     navigate("/");

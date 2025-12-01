@@ -50,13 +50,17 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     if (window.innerWidth < 1024) {
       showMetadata(false);
     }
-    navigate("/gallery");
-  }, [navigate]);
+    const stack = history.state?.stack || 1;
+    history.go(0 - stack);
+  }, []);
 
   const navigateImage = useCallback(
     (direction: "prev" | "next") => {
       const newId = getIdOf(direction);
-      navigate(`/gallery/${newId}`);
+      const stack = history.state?.stack || 1;
+      navigate(`/gallery/${newId}`, {
+        state: { stack: stack + 1 },
+      });
     },
     [getIdOf, navigate],
   );
@@ -155,7 +159,7 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
             image={image}
             metadata={parsedMetadata}
             onRemove={() => showRemoveDialog(true)}
-            closeLightbox={close}
+            showMetadata={showMetadata}
             className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}
           />
         </div>
