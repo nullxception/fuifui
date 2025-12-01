@@ -4,7 +4,7 @@ import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 import type { Image } from "server/types";
 import { useLocation } from "wouter";
 import type { ParsedMetadata } from "../lib/metadataParser";
-import { useDiffusionConfig, useDiffusionStatus } from "../stores";
+import { useAppStore, useDiffusionConfig, useDiffusionStatus } from "../stores";
 
 const saveImage = async (image: Image) => {
   try {
@@ -62,7 +62,7 @@ export default function ImageMetadata({
   className = "",
 }: ImageMetadataProps) {
   const [, navigate] = useLocation();
-
+  const { setOutputTab } = useAppStore();
   const store = useDiffusionConfig();
   const { setImage } = useDiffusionStatus();
 
@@ -85,6 +85,7 @@ export default function ImageMetadata({
     // Navigate back to generate tab
     closeLightbox();
     setImage(image);
+    setOutputTab("image");
     navigate("/");
   };
 
