@@ -8,23 +8,24 @@ export const IMAGE_EXT = [".png", ".jpg", ".jpeg", ".webp"];
 
 export async function getDataFromImage(filePath: string): Promise<Image> {
   try {
-    const file = path.join(ROOT_DIR, filePath);
-    const stats = await fs.stat(file);
-    const filename = path.basename(file);
+    const rfile = path.join(ROOT_DIR, filePath);
+    const stats = await fs.stat(rfile);
+    const file = path.parse(rfile);
 
     let metadata = {};
     try {
-      metadata = await exifr.parse(file, {
+      metadata = await exifr.parse(rfile, {
         userComment: true,
         xmp: true,
         icc: false,
       });
     } catch (e) {
-      console.warn(`Failed to parse metadata for ${filename}`, e);
+      console.warn(`Failed to parse metadata for ${file.name}`, e);
     }
 
     return {
-      url: `/output/txt2img/${filename}`,
+      name: file.name,
+      url: `/output/txt2img/${file.base}`,
       mtime: stats.mtime.getTime(),
       metadata,
     };
@@ -75,7 +76,7 @@ const list = async (limit: number, offset: number): Promise<Image[]> => {
 
         return {
           url: `/output/txt2img/${filename}`,
-          name: filename,
+          name: path.parse(filename).name,
           mtime,
           metadata,
         };

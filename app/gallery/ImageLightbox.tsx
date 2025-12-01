@@ -11,20 +11,34 @@ import {
   XIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import { parseDiffusionParams } from "../lib/metadataParser";
 import ImageMetadata from "./ImageMetadata";
 import { useGallery } from "./useGallery";
 
-export default function ImageLightbox() {
-  const { selectedImage, hasPrev, hasNext } = useGallery(
+interface ImageLightboxProps {
+  id: string;
+}
+
+export default function ImageLightbox({ id }: ImageLightboxProps) {
+  const [, navigate] = useLocation();
+  const {
+    image: image,
+    hasPrev,
+    hasNext,
+  } = useGallery(
     useShallow((state) => ({
-      selectedImage: state.selectedImage,
+      image: state.image,
       hasPrev: state.hasPrev,
       hasNext: state.hasNext,
     })),
   );
-  const { setSelectedImage, navigateImage, removeImages } = useGallery();
+  const { getIdOf, removeImages, openImageById } = useGallery();
+
+  useEffect(() => {
+    openImageById(id);
+  }, [openImageById, id]);
 
   const [shouldShowMetadata, showMetadata] = useState(() => {
     return window.innerWidth >= 1024; // lg breakpoint
@@ -36,13 +50,21 @@ export default function ImageLightbox() {
     if (window.innerWidth < 1024) {
       showMetadata(false);
     }
-    setSelectedImage(null);
-  }, [setSelectedImage]);
+    navigate("/gallery");
+  }, [navigate]);
+
+  const navigateImage = useCallback(
+    (direction: "prev" | "next") => {
+      const newId = getIdOf(direction);
+      navigate(`/gallery/${newId}`);
+    },
+    [getIdOf, navigate],
+  );
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedImage) return;
+      if (!image) return;
 
       if (e.key === "Escape") close();
       if (e.key === "ArrowRight") navigateImage("next");
@@ -51,11 +73,11 @@ export default function ImageLightbox() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedImage, setSelectedImage, navigateImage, close]);
+  }, [image, navigateImage, close]);
 
-  if (!selectedImage) return null;
+  if (!image) return null;
 
-  const parsedMetadata = parseDiffusionParams(selectedImage.metadata);
+  const parsedMetadata = parseDiffusionParams(image.metadata);
 
   const onRemove = () => {
     if (window.innerWidth < 1024) {
@@ -63,7 +85,7 @@ export default function ImageLightbox() {
     }
     showRemoveDialog(false);
     close();
-    removeImages([selectedImage.url]);
+    removeImages([image.url]);
   };
 
   return (
@@ -78,7 +100,7 @@ export default function ImageLightbox() {
         >
           <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-background">
             <img
-              src={selectedImage.url}
+              src={image.url}
               alt="Full size"
               className="max-h-full max-w-full grow object-contain shadow-lg"
             />
@@ -130,7 +152,7 @@ export default function ImageLightbox() {
           </div>
 
           <ImageMetadata
-            image={selectedImage}
+            image={image}
             metadata={parsedMetadata}
             onRemove={() => showRemoveDialog(true)}
             closeLightbox={close}

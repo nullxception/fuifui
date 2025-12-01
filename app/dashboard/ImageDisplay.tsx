@@ -1,7 +1,7 @@
-import { useGallery } from "@/stores";
 import { ImageIcon } from "lucide-react";
 import React from "react";
 import type { Image } from "server/types";
+import { useLocation } from "wouter";
 
 interface ImageDisplayProps {
   image: Image | null;
@@ -9,7 +9,7 @@ interface ImageDisplayProps {
 }
 
 const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
-  const { setSelectedImage } = useGallery();
+  const [, navigate] = useLocation();
 
   return (
     <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
@@ -25,7 +25,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
           src={image.url}
           alt="Generated output"
           className="h-full w-full object-contain"
-          onClick={() => setSelectedImage(image)}
+          onClick={() => navigate(`/gallery/${image.name}`)}
         />
       ) : (
         <div className="p-8 text-center">

@@ -2,7 +2,9 @@ import { Footer } from "@/components/customized/Footer";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
+import { useLocation, useRoute } from "wouter";
 import { useShallow } from "zustand/react/shallow";
+import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
 
 function useElementWidth<T extends HTMLElement>() {
@@ -69,9 +71,11 @@ export default function Gallery() {
       isLoading: state.isLoading,
     })),
   );
-  const { fetchImages, setSelectedImage } = useGallery();
+  const { fetchImages } = useGallery();
   const isLoadingMore = isLoading && images.length > 0;
   const observerTarget = useRef(null);
+  const [, navigate] = useLocation();
+  const [match, params] = useRoute("/gallery/:id");
 
   useEffect(() => {
     fetchImages(false);
@@ -118,23 +122,26 @@ export default function Gallery() {
   }
 
   return (
-    <main className="grow">
-      <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
-        {images.map((image, index) => (
-          <GalleryItem
-            key={index}
-            onClick={() => setSelectedImage(image)}
-            image={image}
-          />
-        ))}
-        <div ref={observerTarget} className="col-span-full h-10 w-full" />
-        {isLoadingMore && (
-          <div className="col-span-full flex justify-center p-4">
-            <span className="text-foreground">Loading more...</span>
-          </div>
-        )}
-        <Footer className="col-span-full flex justify-center p-4" />
-      </div>
-    </main>
+    <>
+      <main className="grow">
+        <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
+          {images.map((image, index) => (
+            <GalleryItem
+              key={index}
+              onClick={() => navigate(`/gallery/${image.name}`)}
+              image={image}
+            />
+          ))}
+          <div ref={observerTarget} className="col-span-full h-10 w-full" />
+          {isLoadingMore && (
+            <div className="col-span-full flex justify-center p-4">
+              <span className="text-foreground">Loading more...</span>
+            </div>
+          )}
+          <Footer className="col-span-full flex justify-center p-4" />
+        </div>
+      </main>
+      {match && <ImageLightbox id={params.id} />}
+    </>
   );
 }

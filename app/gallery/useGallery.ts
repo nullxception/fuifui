@@ -3,15 +3,15 @@ import { create } from "zustand";
 
 interface GalleryState {
   images: Image[];
-  selectedImage: Image | null;
+  image: Image | null;
   isLoading: boolean;
   offset: number;
   hasMore: boolean;
   hasPrev: boolean;
   hasNext: boolean;
 
-  setSelectedImage: (image: Image | null) => void;
-  navigateImage: (direction: "next" | "prev") => void;
+  openImageById: (imageId: string) => void;
+  getIdOf: (direction: "next" | "prev") => string | undefined;
   fetchImages: (isLoadMore?: boolean) => Promise<void>;
   removeImages: (urls: string[]) => Promise<void>;
 }
@@ -20,25 +20,23 @@ const LIMIT = 20;
 
 export const useGallery = create<GalleryState>((set, get) => ({
   images: [],
-  selectedImage: null,
+  image: null,
   isLoading: false,
   offset: 0,
   hasMore: true,
   hasPrev: false,
   hasNext: true,
 
-  setSelectedImage: (image) => {
+  openImageById: (imageId) => {
+    const index = get().images.findLastIndex((i) => i.name === imageId);
     set({
-      selectedImage: image,
-      hasPrev: image ? get().images.indexOf(image) > 0 : false,
-      hasNext: image
-        ? get().images.indexOf(image) < get().images.length - 1
-        : false,
+      image: get().images[index],
+      hasPrev: index > 0,
+      hasNext: index < get().images.length - 1,
     });
   },
-  navigateImage: (direction) => {
-    const { images, selectedImage, hasPrev, hasNext, hasMore, fetchImages } =
-      get();
+  getIdOf: (direction) => {
+    const { images, image, hasPrev, hasNext, hasMore, fetchImages } = get();
 
     if (
       (direction === "next" && !hasNext) ||
@@ -47,9 +45,9 @@ export const useGallery = create<GalleryState>((set, get) => ({
       return;
     }
 
-    if (!selectedImage || images.length === 0) return;
+    if (!image || images.length === 0) return;
 
-    const currentIndex = images.indexOf(selectedImage);
+    const currentIndex = images.indexOf(image);
     let newIndex;
     if (direction === "next") {
       newIndex = (currentIndex + 1) % images.length;
@@ -57,7 +55,7 @@ export const useGallery = create<GalleryState>((set, get) => ({
       newIndex = (currentIndex - 1 + images.length) % images.length;
     }
     set({
-      selectedImage: images[newIndex],
+      image: images[newIndex],
       hasPrev: newIndex > 0,
       hasNext: newIndex < images.length - 1,
     });
@@ -65,6 +63,7 @@ export const useGallery = create<GalleryState>((set, get) => ({
     if (direction === "next" && newIndex === images.length - 1 && hasMore) {
       fetchImages(true);
     }
+    return images[newIndex]?.name;
   },
   fetchImages: async (isLoadMore = false) => {
     const { isLoading, offset } = get();
@@ -101,14 +100,12 @@ export const useGallery = create<GalleryState>((set, get) => ({
 
       set((state) => {
         const newImages = state.images.filter((img) => !urls.includes(img.url));
-        const newSelectedImage =
-          state.selectedImage && urls.includes(state.selectedImage.url)
-            ? null
-            : state.selectedImage;
+        const newImage =
+          state.image && urls.includes(state.image.url) ? null : state.image;
 
         return {
           images: newImages,
-          selectedImage: newSelectedImage,
+          image: newImage,
           offset: Math.max(0, state.offset - urls.length),
         };
       });
