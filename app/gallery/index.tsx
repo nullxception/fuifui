@@ -2,9 +2,8 @@ import { Footer } from "@/components/customized/Footer";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
-import { useLocation, useRoute } from "wouter";
+import { useLocation } from "wouter";
 import { useShallow } from "zustand/react/shallow";
-import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
 
 function useElementWidth<T extends HTMLElement>() {
@@ -75,7 +74,6 @@ export default function Gallery() {
   const isLoadingMore = isLoading && images.length > 0;
   const observerTarget = useRef(null);
   const [, navigate] = useLocation();
-  const [match, params] = useRoute("/gallery/:id");
 
   useEffect(() => {
     fetchImages(false);
@@ -141,7 +139,6 @@ export default function Gallery() {
           <Footer className="col-span-full flex justify-center p-4" />
         </div>
       </main>
-      {match && <ImageLightbox id={params.id} />}
     </>
   );
 }
