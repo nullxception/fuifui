@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 import type { Image } from "server/types";
+import { useLocation } from "wouter";
 import type { ParsedMetadata } from "../lib/metadataParser";
-import { useAppStore, useDiffusionConfig, useDiffusionStatus } from "../stores";
+import { useDiffusionConfig, useDiffusionStatus } from "../stores";
 
 const saveImage = async (image: Image) => {
   try {
@@ -60,7 +61,8 @@ export default function ImageMetadata({
   closeLightbox,
   className = "",
 }: ImageMetadataProps) {
-  const { setActiveTab } = useAppStore();
+  const [, navigate] = useLocation();
+
   const store = useDiffusionConfig();
   const { setImage } = useDiffusionStatus();
 
@@ -82,8 +84,8 @@ export default function ImageMetadata({
 
     // Navigate back to generate tab
     closeLightbox();
-    setActiveTab("generate");
     setImage(image);
+    navigate("/");
   };
 
   return (
