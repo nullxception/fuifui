@@ -1,7 +1,7 @@
 import { ImageIcon } from "lucide-react";
 import React from "react";
 import type { Image } from "server/types";
-import { useLocation } from "wouter";
+import { Link } from "wouter";
 
 interface ImageDisplayProps {
   image: Image | null;
@@ -9,8 +9,6 @@ interface ImageDisplayProps {
 }
 
 const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
-  const [, navigate] = useLocation();
-
   return (
     <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
       {isProcessing ? (
@@ -21,14 +19,17 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
           </p>
         </div>
       ) : image ? (
-        <img
-          src={image.url}
-          alt="Generated output"
-          className="h-full w-full object-contain"
-          onClick={() =>
-            navigate(`/gallery/${image.name}`, { state: { from: "/" } })
-          }
-        />
+        <Link
+          href={`/gallery/${image.name}`}
+          state={{ from: "/" }}
+          className="h-full w-full"
+        >
+          <img
+            src={image.url}
+            alt="Generated output"
+            className="h-full w-full object-contain"
+          />
+        </Link>
       ) : (
         <div className="p-8 text-center">
           <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-background text-foreground">

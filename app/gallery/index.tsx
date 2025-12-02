@@ -2,7 +2,7 @@ import { Footer } from "@/components/customized/Footer";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
-import { Route, useLocation } from "wouter";
+import { Link, Route } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
@@ -29,10 +29,9 @@ function useElementWidth<T extends HTMLElement>() {
 
 interface GalleryItemProps {
   image: Image;
-  onClick: () => void;
 }
 
-function GalleryItem({ image, onClick }: GalleryItemProps) {
+function GalleryItem({ image }: GalleryItemProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
 
   // derive appropriate thumbnail size based on real width
@@ -47,7 +46,6 @@ function GalleryItem({ image, onClick }: GalleryItemProps) {
     <div
       ref={ref}
       className="group bg-surface relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border border-border transition-colors hover:border-primary/50"
-      onClick={onClick}
     >
       {width > 1 ? (
         <img
@@ -74,7 +72,6 @@ export default function Gallery() {
   const { fetchImages } = useGallery();
   const isLoadingMore = isLoading && images.length > 0;
   const observerTarget = useRef(null);
-  const [, navigate] = useLocation();
 
   useEffect(() => {
     fetchImages(false);
@@ -125,13 +122,13 @@ export default function Gallery() {
       <main className="grow">
         <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
           {images.map((image, index) => (
-            <GalleryItem
+            <Link
               key={index}
-              onClick={() =>
-                navigate(`/${image.name}`, { state: { from: "/gallery" } })
-              }
-              image={image}
-            />
+              href={`/${image.name}`}
+              state={{ from: "/gallery" }}
+            >
+              <GalleryItem image={image} />
+            </Link>
           ))}
           <div ref={observerTarget} className="col-span-full h-10 w-full" />
           {isLoadingMore && (
