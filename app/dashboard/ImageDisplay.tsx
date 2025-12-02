@@ -25,7 +25,9 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
           src={image.url}
           alt="Generated output"
           className="h-full w-full object-contain"
-          onClick={() => navigate(`/gallery/${image.name}`)}
+          onClick={() =>
+            navigate(`/gallery/${image.name}`, { state: { from: "/" } })
+          }
         />
       ) : (
         <div className="p-8 text-center">

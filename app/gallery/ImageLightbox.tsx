@@ -50,19 +50,25 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     if (window.innerWidth < 1024) {
       showMetadata(false);
     }
-    const stack = history.state?.stack || 1;
-    history.go(0 - stack);
-  }, []);
+    if (history.state?.from?.startsWith("/")) {
+      // was from other image/page, let's just go back
+      const stack = history.state?.stack || 1;
+      history.go(0 - stack);
+    } else {
+      // it was from direct url, navigate to gallery page
+      navigate("~/gallery", { replace: true });
+    }
+  }, [navigate]);
 
   const navigateImage = useCallback(
     (direction: "prev" | "next") => {
       const newId = getIdOf(direction);
       const stack = history.state?.stack || 1;
       navigate(`/${newId}`, {
-        state: { stack: stack + 1 },
+        state: { stack: stack + 1, from: `/gallery/${id}` },
       });
     },
-    [getIdOf, navigate],
+    [getIdOf, navigate, id],
   );
 
   // Handle keyboard navigation

@@ -127,7 +127,9 @@ export default function Gallery() {
           {images.map((image, index) => (
             <GalleryItem
               key={index}
-              onClick={() => navigate(`/${image.name}`)}
+              onClick={() =>
+                navigate(`/${image.name}`, { state: { from: "/gallery" } })
+              }
               image={image}
             />
           ))}
