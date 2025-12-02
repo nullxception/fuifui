@@ -2,7 +2,7 @@ import { Footer } from "@/components/customized/Footer";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
-import { Link, Route } from "wouter";
+import { Link, Route, useRoute } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
@@ -72,6 +72,16 @@ export default function Gallery() {
   const { fetchImages } = useGallery();
   const isLoadingMore = isLoading && images.length > 0;
   const observerTarget = useRef(null);
+  const [appScrollTop, setAppScrollTop] = useState(0);
+  const [match] = useRoute("/gallery");
+
+  useEffect(() => {
+    const app = document.querySelector("#app");
+    if (match && app && appScrollTop > 0) {
+      // scroll saved scrollTop after going back from /gallery/:id
+      app.scrollTop = appScrollTop;
+    }
+  }, [match, appScrollTop]);
 
   useEffect(() => {
     fetchImages(false);
@@ -126,6 +136,10 @@ export default function Gallery() {
               key={index}
               href={`/${image.name}`}
               state={{ from: "/gallery" }}
+              onClick={() => {
+                const app = document.querySelector("#app");
+                setAppScrollTop(app?.scrollTop ?? 0);
+              }}
             >
               <GalleryItem image={image} />
             </Link>

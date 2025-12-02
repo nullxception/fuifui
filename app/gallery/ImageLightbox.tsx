@@ -101,7 +101,7 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
   return (
     <>
       <div
-        className="fixed inset-0 z-100 flex items-center justify-center backdrop-blur-lg duration-200 fade-in"
+        className="lightbox fixed inset-0 z-100 flex items-center justify-center backdrop-blur-lg duration-200 fade-in"
         onClick={close}
       >
         <div

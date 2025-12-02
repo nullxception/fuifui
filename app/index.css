@@ -48,3 +48,7 @@
     animation: none !important;
   }
 }
+
+.app:has(.lightbox) {
+  overflow-y: hidden;
+}
