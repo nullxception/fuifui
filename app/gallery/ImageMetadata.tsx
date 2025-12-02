@@ -4,7 +4,7 @@ import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 import type { Image } from "server/types";
 import { useLocation } from "wouter";
 import type { ParsedMetadata } from "../lib/metadataParser";
-import { useAppStore, useDiffusionConfig, useDiffusionStatus } from "../stores";
+import { useAppStore, useDiffusionConfig, useDiffusionJob } from "../stores";
 
 const saveImage = async (image: Image) => {
   try {
@@ -64,7 +64,7 @@ export default function ImageMetadata({
   const [, navigate] = useLocation();
   const { setOutputTab } = useAppStore();
   const store = useDiffusionConfig();
-  const { setImage } = useDiffusionStatus();
+  const { setImage } = useDiffusionJob();
 
   const handleRemake = () => {
     if (!metadata) return;
