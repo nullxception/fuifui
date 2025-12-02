@@ -86,7 +86,7 @@ export default function ImageMetadata({
     showMetadata(false);
     setImage(image);
     setOutputTab("image");
-    navigate("/");
+    navigate("~/");
   };
 
   return (

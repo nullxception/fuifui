@@ -58,7 +58,7 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     (direction: "prev" | "next") => {
       const newId = getIdOf(direction);
       const stack = history.state?.stack || 1;
-      navigate(`/gallery/${newId}`, {
+      navigate(`/${newId}`, {
         state: { stack: stack + 1 },
       });
     },
