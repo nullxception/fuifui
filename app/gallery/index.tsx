@@ -49,7 +49,7 @@ function GalleryItem({ image }: GalleryItemProps) {
     >
       {width > 1 ? (
         <img
-          src={`${image.url}?size=${size}`}
+          src={`${image.url}?width=${size}`}
           alt=""
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

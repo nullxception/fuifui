@@ -1,7 +1,7 @@
 import exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
-import { OUTPUT_DIR, ROOT_DIR } from "../dirs";
+import { OUTPUT_DIR, ROOT_DIR, THUMBS_DIR } from "../dirs";
 import type { Image } from "../types";
 
 export const IMAGE_EXT = [".png", ".jpg", ".jpeg", ".webp"];
@@ -102,13 +102,12 @@ const remove = async (images: string[]): Promise<void> => {
       await Bun.file(img).delete();
       const filename = path.basename(img);
 
-      const dir = path.join(OUTPUT_DIR, ".thumbs");
-      const files = await fs.readdir(dir);
+      const files = await fs.readdir(THUMBS_DIR);
 
       files
         .filter((file) => file.startsWith(filename))
         .forEach(async (it) => {
-          const thumb = path.join(dir, it);
+          const thumb = path.join(THUMBS_DIR, it);
           console.log(`thumbnails: removing ${thumb}`);
           await Bun.file(thumb).delete();
         });

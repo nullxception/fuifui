@@ -34,6 +34,19 @@ const printableArgs = (args: (string | number)[]) => {
     .join(" ");
 };
 
+const pad = (num: number) => String(num).padStart(2, "0");
+
+const filename = (timestamp: number) => {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  const second = pad(date.getSeconds());
+  return `${year}${month}${day}-${hour}${minute}${second}`;
+};
+
 /**
  * Starts the diffusion process in the background.
  * @param jobId The unique job ID.
@@ -44,7 +57,7 @@ export const startDiffusion = async (
   params: DiffusionParams,
 ) => {
   const timestamp = Date.now();
-  const outputFilename = `${timestamp}.png`;
+  const outputFilename = `${filename(timestamp)}.png`;
   const outputPath = path.join(OUTPUT_DIR, "txt2img", outputFilename);
   const modelPath = path.join(CHECKPOINT_DIR, params.model || "");
 

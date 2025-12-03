@@ -9,7 +9,7 @@ const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
   const pathname = url.pathname;
   const filepath = path.join(ROOT_DIR, pathname);
   let thumb = path.parse(pathname).name;
-  thumb = `${thumb}--${size}.webp`;
+  thumb = `${thumb}--${size}.jpg`;
   thumb = path.join(THUMBS_DIR, thumb);
 
   if (await fs.exists(thumb)) {
@@ -18,11 +18,10 @@ const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
     });
   }
 
-  const buf = await sharp(filepath)
+  await sharp(filepath)
     .resize(size, null, { fit: "inside" })
-    .webp({ quality: 70 })
-    .toBuffer();
-  await Bun.write(thumb, buf);
+    .jpeg({ quality: 80, progressive: true })
+    .toFile(thumb);
 
   return new Response(Bun.file(thumb), {
     headers: { "Cache-Control": assetsCacheControl },
@@ -44,10 +43,10 @@ const serveStatic = async (req: Request): Promise<Response> => {
   // Serve output images
   if (pathname.startsWith("/output/")) {
     const filepath = path.join(ROOT_DIR, pathname);
-    const size = Number(url.searchParams.get("size")) || 0;
-    if (size > 0) {
+    const width = Number(url.searchParams.get("width")) || 0;
+    if (width > 0) {
       // looks like we're getting thumbnail request
-      return await serveThumbnail(url, size);
+      return await serveThumbnail(url, width);
     }
 
     return new Response(Bun.file(filepath), {

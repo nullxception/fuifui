@@ -94,11 +94,6 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     window.innerWidth > parsedMetadata.width
       ? parsedMetadata.width
       : window.innerWidth;
-  const height =
-    window.innerHeight > parsedMetadata.height
-      ? parsedMetadata.height
-      : window.innerHeight;
-  const previewSize = width > height ? width : height;
 
   return (
     <>
@@ -108,8 +103,8 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
       >
         <div className="relative flex flex-1 items-center justify-center overflow-hidden">
           <img
-            src={`${image.url}?size=${previewSize}`}
-            alt="Full size"
+            src={`${image.url}?width=${width}`}
+            alt="preview"
             className="h-full w-full object-contain select-none"
           />
           <div
