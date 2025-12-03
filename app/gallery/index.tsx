@@ -1,12 +1,12 @@
 import { Footer } from "@/components/customized/Footer";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import type { Image } from "server/types";
 import { Link, Route, useRoute } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
-
 function useElementWidth<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [width, setWidth] = useState(0);
@@ -130,28 +130,35 @@ export default function Gallery() {
   return (
     <>
       <main className="grow">
-        <div className="container mx-auto grid max-w-screen-2xl flex-1 grid-cols-[repeat(2,1fr)] flex-col gap-2 overflow-y-auto p-2 [masonry-auto-flow:next] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)]">
-          {images.map((image, index) => (
-            <Link
-              key={index}
-              href={`/${image.name}`}
-              state={{ from: "~/gallery" }}
-              onClick={() => {
-                const app = document.querySelector("#app");
-                setAppScrollTop(app?.scrollTop ?? 0);
-              }}
-            >
-              <GalleryItem image={image} />
-            </Link>
-          ))}
-          <div ref={observerTarget} className="col-span-full h-10 w-full" />
-          {isLoadingMore && (
-            <div className="col-span-full flex justify-center p-4">
-              <span className="text-foreground">Loading more...</span>
-            </div>
-          )}
-          <Footer className="col-span-full flex justify-center p-4" />
-        </div>
+        <ResponsiveMasonry
+          columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
+          gutterBreakPoints={{ 350: "6px", 720: "12px" }}
+          className="mx-auto max-w-screen-2xl"
+        >
+          <Masonry>
+            {images.map((image, index) => (
+              <Link
+                key={index}
+                href={`/${image.name}`}
+                state={{ from: "~/gallery" }}
+                onClick={() => {
+                  const app = document.querySelector("#app");
+                  setAppScrollTop(app?.scrollTop ?? 0);
+                }}
+                className="w-full"
+              >
+                <GalleryItem image={image} />
+              </Link>
+            ))}
+          </Masonry>
+        </ResponsiveMasonry>
+        <div ref={observerTarget} className="col-span-full h-10 w-full" />
+        {isLoadingMore && (
+          <div className="col-span-full flex justify-center p-4">
+            <span className="text-foreground">Loading more...</span>
+          </div>
+        )}
+        <Footer className="col-span-full flex justify-center p-4" />
       </main>
       <Route path="/:id">{(params) => <ImageLightbox id={params.id} />}</Route>
     </>
