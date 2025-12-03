@@ -50,25 +50,17 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     if (window.innerWidth < 1024) {
       showMetadata(false);
     }
-    if (history.state?.from?.startsWith("/")) {
-      // was from other image/page, let's just go back
-      const stack = history.state?.stack || 1;
-      history.go(0 - stack);
-    } else {
-      // it was from direct url, navigate to gallery page
-      navigate("~/gallery", { replace: true });
-    }
+    navigate(history.state?.from || "~/gallery", { replace: true });
   }, [navigate]);
 
   const navigateImage = useCallback(
     (direction: "prev" | "next") => {
       const newId = getIdOf(direction);
-      const stack = history.state?.stack || 1;
       navigate(`/${newId}`, {
-        state: { stack: stack + 1, from: `/gallery/${id}` },
+        state: { from: history.state?.from || "~/gallery" },
       });
     },
-    [getIdOf, navigate, id],
+    [getIdOf, navigate],
   );
 
   // Handle keyboard navigation
@@ -101,74 +93,69 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
   return (
     <>
       <div
-        className="lightbox fixed inset-0 z-100 flex items-center justify-center backdrop-blur-lg duration-200 fade-in"
-        onClick={close}
+        className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="flex h-full w-screen max-w-7xl flex-col overflow-hidden bg-background/50 shadow-2xl md:h-screen md:flex-row lg:w-[95vw] lg:rounded-xl"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-background">
-            <img
-              src={image.url}
-              alt="Full size"
-              className="max-h-full max-w-full grow object-contain shadow-lg"
-            />
-            {hasPrev && (
-              <div
-                className={`absolute top-0 left-0 z-110 h-full w-1/3 cursor-pointer from-transparent to-background/35 select-none hover:-bg-linear-90`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateImage("prev");
-                }}
-              >
-                <ChevronLeftIcon
-                  className={`absolute top-1/2 left-4 z-110 h-8 w-8 -translate-y-1/2 rounded-full text-foreground/70`}
-                />
-              </div>
-            )}
-            {hasNext && (
-              <div
-                className={`absolute top-0 right-0 z-110 h-full w-1/3 cursor-pointer from-background/30 to-transparent select-none hover:-bg-linear-90`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateImage("next");
-                }}
-              >
-                <ChevronRightIcon
-                  className={`absolute top-1/2 right-4 z-110 h-8 w-8 -translate-y-1/2 text-foreground/70`}
-                />
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden select-none">
+          <img
+            src={image.url}
+            alt="Full size"
+            className="max-h-full object-contain select-none"
+          />
+          {hasPrev && (
+            <div
+              className={`absolute top-1/2 left-0 z-110 h-full w-1/3 -translate-y-1/2 cursor-pointer from-transparent to-background/35 select-none hover:-bg-linear-90`}
               onClick={(e) => {
                 e.stopPropagation();
-                showMetadata((v) => !v);
+                navigateImage("prev");
               }}
             >
-              <InfoIcon className="text-foreground" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              className="absolute top-5 right-5 z-110 text-foreground/70 hover:bg-foreground/10 hover:text-foreground md:left-5"
-              onClick={close}
+              <ChevronLeftIcon
+                className={`absolute top-1/2 left-4 z-110 h-8 w-8 -translate-y-1/2 rounded-full text-foreground/70`}
+              />
+            </div>
+          )}
+          {hasNext && (
+            <div
+              className={`absolute top-1/2 right-0 z-110 h-full w-1/3 -translate-y-1/2 cursor-pointer from-background/35 to-transparent select-none hover:-bg-linear-90`}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateImage("next");
+              }}
             >
-              <XIcon />
-            </Button>
-          </div>
-
-          <ImageMetadata
-            image={image}
-            metadata={parsedMetadata}
-            onRemove={() => showRemoveDialog(true)}
-            showMetadata={showMetadata}
-            className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}
-          />
+              <ChevronRightIcon
+                className={`absolute top-1/2 right-4 z-110 h-8 w-8 -translate-y-1/2 text-foreground/70`}
+              />
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
+            onClick={(e) => {
+              e.stopPropagation();
+              showMetadata((v) => !v);
+            }}
+          >
+            <InfoIcon className="text-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="absolute top-5 left-5 z-110 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+            onClick={close}
+          >
+            <XIcon />
+          </Button>
         </div>
+
+        <ImageMetadata
+          image={image}
+          metadata={parsedMetadata}
+          onRemove={() => showRemoveDialog(true)}
+          showMetadata={showMetadata}
+          className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}
+        />
       </div>
       {shouldShowRemoveDialog && (
         <>

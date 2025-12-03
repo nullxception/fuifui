@@ -21,7 +21,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
       ) : image ? (
         <Link
           href={`/gallery/${image.name}`}
-          state={{ from: "/" }}
+          state={{ from: "~/" }}
           className="h-full w-full"
         >
           <img

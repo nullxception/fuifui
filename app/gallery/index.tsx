@@ -135,7 +135,7 @@ export default function Gallery() {
             <Link
               key={index}
               href={`/${image.name}`}
-              state={{ from: "/gallery" }}
+              state={{ from: "~/gallery" }}
               onClick={() => {
                 const app = document.querySelector("#app");
                 setAppScrollTop(app?.scrollTop ?? 0);
