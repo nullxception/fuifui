@@ -13,7 +13,8 @@ export const UPSCALER_DIR = path.join(MODELS_DIR, "upscaler");
 export const TEXT_ENCODER_DIR = path.join(MODELS_DIR, "textencoder");
 
 export const OUTPUT_DIR = path.join(ROOT_DIR, "output");
-export const THUMBS_DIR = path.join(ROOT_DIR, ".thumbs");
+export const THUMBS_DIR =
+  process.env.FUIFUI_THUMBNAILS_DIR || path.join(ROOT_DIR, ".thumbs");
 export const PUBLIC_DIR = path.join(ROOT_DIR, "public");
 export const UPLOAD_DIR = path.join(PUBLIC_DIR, "upload");
 export const CONFIG_PATH = path.join(ROOT_DIR, "config.yaml");
