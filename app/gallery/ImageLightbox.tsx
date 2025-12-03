@@ -104,51 +104,49 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     <>
       <div
         className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
-        onClick={(e) => e.stopPropagation()}
+        onClick={close}
       >
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden select-none">
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden">
           <img
             src={`${image.url}?size=${previewSize}`}
             alt="Full size"
-            className="max-h-full object-contain select-none"
+            className="h-full w-full object-contain select-none"
           />
-          {hasPrev && (
-            <div
-              className={`absolute top-1/2 left-0 z-110 h-full w-1/3 -translate-y-1/2 cursor-pointer from-transparent to-background/35 select-none hover:-bg-linear-90`}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage("prev");
-              }}
-            >
-              <ChevronLeftIcon
-                className={`absolute top-1/2 left-4 z-110 h-8 w-8 -translate-y-1/2 rounded-full text-foreground/70`}
-              />
-            </div>
-          )}
-          {hasNext && (
-            <div
-              className={`absolute top-1/2 right-0 z-110 h-full w-1/3 -translate-y-1/2 cursor-pointer from-background/35 to-transparent select-none hover:-bg-linear-90`}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage("next");
-              }}
-            >
-              <ChevronRightIcon
-                className={`absolute top-1/2 right-4 z-110 h-8 w-8 -translate-y-1/2 text-foreground/70`}
-              />
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
+          <div
+            className={`absolute top-1/2 left-0 z-110 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-transparent to-background/35 select-none hover:-bg-linear-90`}
             onClick={(e) => {
               e.stopPropagation();
-              showMetadata((v) => !v);
+              if (hasPrev) navigateImage("prev");
             }}
           >
-            <InfoIcon className="text-foreground" />
-          </Button>
+            {hasPrev && (
+              <ChevronLeftIcon className={`h-8 w-8 text-foreground/70`} />
+            )}
+          </div>
+          <div
+            className={`absolute top-1/2 right-0 z-110 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-background/35 to-transparent select-none hover:-bg-linear-90`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasNext) navigateImage("next");
+            }}
+          >
+            {hasNext && (
+              <ChevronRightIcon className={`h-8 w-8 text-foreground/70`} />
+            )}
+          </div>
+          {!shouldShowMetadata && (
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              className="absolute right-5 bottom-5 z-110 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
+              onClick={(e) => {
+                e.stopPropagation();
+                showMetadata(true);
+              }}
+            >
+              <InfoIcon className="text-foreground" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon-lg"
@@ -164,7 +162,7 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
           metadata={parsedMetadata}
           onRemove={() => showRemoveDialog(true)}
           showMetadata={showMetadata}
-          className={`${shouldShowMetadata ? "block" : "hidden"} lg:block`}
+          className={`${shouldShowMetadata ? "block" : "hidden"}`}
         />
       </div>
       {shouldShowRemoveDialog && (

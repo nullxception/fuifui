@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { DownloadIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  DownloadIcon,
+  RefreshCcwIcon,
+  TrashIcon,
+} from "lucide-react";
 import type { Image } from "server/types";
 import { useLocation } from "wouter";
 import type { ParsedMetadata } from "../lib/metadataParser";
@@ -92,10 +97,22 @@ export default function ImageMetadata({
   return (
     <>
       <div
-        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-6 overflow-y-auto border-l border-border p-6 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-[400px] ${className}`}
+        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-2 overflow-y-auto border-l border-border p-4 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-[400px] lg:p-6 ${className}`}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-foreground">Details</h3>
+          <h3 className="p-0 text-xl font-bold text-foreground">Details</h3>
+
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
+            onClick={() => {
+              showMetadata(false);
+            }}
+          >
+            <ChevronDownIcon className="text-foreground" />
+          </Button>
         </div>
 
         <div className="space-y-4">

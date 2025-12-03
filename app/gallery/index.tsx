@@ -129,7 +129,7 @@ export default function Gallery() {
 
   return (
     <>
-      <main className="grow">
+      <main className="grow p-2">
         <ResponsiveMasonry
           columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
           gutterBreakPoints={{ 350: "6px", 720: "12px" }}
