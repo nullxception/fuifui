@@ -8,8 +8,8 @@ const assetsCacheControl = "public, max-age=31536000, immutable";
 const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
   const pathname = url.pathname;
   const filepath = path.join(ROOT_DIR, pathname);
-  let thumb = path.basename(pathname);
-  thumb = `${thumb}.cache-${size}.webp`;
+  let thumb = path.parse(pathname).name;
+  thumb = `${thumb}--${size}.webp`;
   thumb = path.join(THUMBS_DIR, thumb);
 
   if (await fs.exists(thumb)) {
@@ -45,7 +45,7 @@ const serveStatic = async (req: Request): Promise<Response> => {
   if (pathname.startsWith("/output/")) {
     const filepath = path.join(ROOT_DIR, pathname);
     const size = Number(url.searchParams.get("size")) || 0;
-    if (size >= 126 && size <= 512) {
+    if (size > 0) {
       // looks like we're getting thumbnail request
       return await serveThumbnail(url, size);
     }

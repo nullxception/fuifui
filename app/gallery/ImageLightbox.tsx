@@ -90,6 +90,16 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
     removeImages([image.url]);
   };
 
+  const width =
+    window.innerWidth > parsedMetadata.width
+      ? parsedMetadata.width
+      : window.innerWidth;
+  const height =
+    window.innerHeight > parsedMetadata.height
+      ? parsedMetadata.height
+      : window.innerHeight;
+  const previewSize = width > height ? width : height;
+
   return (
     <>
       <div
@@ -98,7 +108,7 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
       >
         <div className="relative flex flex-1 items-center justify-center overflow-hidden select-none">
           <img
-            src={image.url}
+            src={`${image.url}?size=${previewSize}`}
             alt="Full size"
             className="max-h-full object-contain select-none"
           />
