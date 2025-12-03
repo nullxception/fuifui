@@ -2,6 +2,8 @@
 
 A simple, modern txt2img web UI for [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp).
 
+![preview](.github/preview.webp)
+
 ## Prerequisites
 
 - **[Bun](https://bun.sh/)** as a runtime and package manager.
