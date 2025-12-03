@@ -101,11 +101,12 @@ export default function ImageLightbox({ id }: ImageLightboxProps) {
         className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
         onClick={close}
       >
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+        <div className="relative flex flex-1 items-stretch justify-center overflow-hidden">
           <img
             src={`${image.url}?width=${width}`}
             alt="preview"
-            className="h-full w-full object-contain select-none"
+            className="object-contain select-none"
+            onClick={(e) => e.stopPropagation()}
           />
           <div
             className={`absolute top-1/2 left-0 z-110 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-transparent to-background/35 select-none hover:-bg-linear-90`}
