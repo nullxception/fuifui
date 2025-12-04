@@ -13,9 +13,8 @@ export default function App() {
       <div className="app scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-auto font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground">
         <Header />
         <Switch>
-          <Route path="/gallery" nest>
-            <Route component={Gallery} />
-          </Route>
+          <Route path="/gallery/:id" component={Gallery} />
+          <Route path="/gallery" component={Gallery} />
           <Route component={TextToImage} />
         </Switch>
         <SettingsPopup />

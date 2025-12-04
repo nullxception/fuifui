@@ -3,7 +3,7 @@ import { ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import type { Image } from "server/types";
-import { Link, Route, useRoute } from "wouter";
+import { Link, useRoute } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import ImageLightbox from "./ImageLightbox";
 import { useGallery } from "./useGallery";
@@ -110,6 +110,8 @@ export default function Gallery() {
     };
   }, [hasMore, isLoading, fetchImages]);
 
+  const [, params] = useRoute("/gallery/:id");
+
   if (images.length === 0 && !isLoadingMore) {
     return (
       <>
@@ -139,7 +141,7 @@ export default function Gallery() {
             {images.map((image, index) => (
               <Link
                 key={index}
-                href={`/${image.name}`}
+                href={`~/gallery/${image.name}`}
                 state={{ from: "~/gallery" }}
                 onClick={() => {
                   const app = document.querySelector("#app");
@@ -160,7 +162,7 @@ export default function Gallery() {
         )}
         <Footer className="col-span-full flex justify-center p-4" />
       </main>
-      <Route path="/:id">{(params) => <ImageLightbox id={params.id} />}</Route>
+      {params?.id && <ImageLightbox />}
     </>
   );
 }

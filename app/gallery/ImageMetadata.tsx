@@ -8,7 +8,10 @@ import {
 } from "lucide-react";
 import type { Image } from "server/types";
 import { useLocation } from "wouter";
-import type { ParsedMetadata } from "../lib/metadataParser";
+import {
+  parseDiffusionParams,
+  type ParsedMetadata,
+} from "../lib/metadataParser";
 import { useAppStore, useDiffusionConfig, useDiffusionJob } from "../stores";
 
 const saveImage = async (image: Image) => {
@@ -30,7 +33,6 @@ const saveImage = async (image: Image) => {
 
 interface ImageMetadataProps {
   image: Image;
-  metadata: ParsedMetadata | null;
   onRemove: () => void;
   showMetadata: (value: boolean) => void;
   className: string;
@@ -61,7 +63,6 @@ function MetadataChip({
 
 export default function ImageMetadata({
   image,
-  metadata,
   onRemove,
   showMetadata,
   className = "",
@@ -70,6 +71,7 @@ export default function ImageMetadata({
   const { setOutputTab } = useAppStore();
   const store = useDiffusionConfig();
   const { setImage } = useDiffusionJob();
+  const metadata = parseDiffusionParams(image.metadata);
 
   const handleRemake = () => {
     if (!metadata) return;
