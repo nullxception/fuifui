@@ -9,13 +9,12 @@ import ImageDisplay from "./ImageDisplay";
 
 export default function TextToImage() {
   const { outputTab, setOutputTab } = useAppStore();
-  const { image, isProcessing, start, stop, checkActiveJobs } =
-    useDiffusionJob();
+  const { image, isProcessing, start, stop, checkJobs } = useDiffusionJob();
   const store = useDiffusionConfig();
 
   useEffect(() => {
-    checkActiveJobs();
-  }, [checkActiveJobs]);
+    checkJobs();
+  }, [checkJobs]);
 
   const handleDiffusion = () => {
     if (isProcessing) {

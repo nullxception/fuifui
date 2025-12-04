@@ -10,7 +10,7 @@ import {
 } from "../dirs";
 import type { DiffusionParams, DiffusionResult, Models } from "../types";
 import { startDiffusion, stopDiffusion } from "./services/diffusion";
-import { createJob, getActiveJobs, getJob, jobEvents } from "./services/jobs";
+import { createJob, getAllJobs, getJob, jobEvents } from "./services/jobs";
 
 const getFileList = async (dir: string): Promise<string[]> => {
   const files = await fs.readdir(dir);
@@ -168,6 +168,6 @@ export const diffusionProgress: Bun.Serve.Handler<
 };
 
 export const diffusionJobs = async () => {
-  const jobs = getActiveJobs().map((job) => job.id);
+  const jobs = getAllJobs().map((job) => ({ ...job, logs: [], params: {} }));
   return Response.json(jobs);
 };

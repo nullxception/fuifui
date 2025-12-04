@@ -3,6 +3,7 @@ import type {
   DiffusionParams,
   DiffusionResult,
   Image,
+  Job,
   LogData,
 } from "server/types";
 import { create } from "zustand";
@@ -16,12 +17,13 @@ interface DiffusionState {
   logs: LogEntry[];
 
   setImage: (image: Image | null) => void;
+  postResult: (result: DiffusionResult) => void;
   addLog: (log: LogEntry) => void;
   clearLogs: () => void;
   connectToJob: (id: string) => void;
   start: (params: DiffusionParams) => Promise<void>;
   stop: () => Promise<void>;
-  checkActiveJobs: () => Promise<void>;
+  checkJobs: () => Promise<void>;
 }
 
 let eventSource: EventSource | null = null;
@@ -35,20 +37,28 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
   setImage: (image) => set({ image: image }),
   addLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
   clearLogs: () => set({ logs: [] }),
+  postResult: (result) => {
+    const { setOutputTab } = useAppStore.getState();
+    const { images, fetchImages } = useGallery.getState();
+    if (result.image && result.image.url.length > 0) {
+      set({ image: result.image });
+      if (!images.includes(result.image)) {
+        fetchImages(false);
+      }
+    }
+    set({ jobId: "", isProcessing: false });
+    setOutputTab("image");
+  },
   connectToJob: (id: string) => {
     if (eventSource) {
       eventSource.close();
     }
 
     const es = new EventSource(`/api/jobs/${id}`);
-    eventSource = es;
-
-    set({ jobId: id, isProcessing: true });
-
-    const { addLog, setImage } = get();
+    const { addLog, postResult } = get();
     const { setOutputTab } = useAppStore.getState();
-    const { fetchImages } = useGallery.getState();
-
+    eventSource = es;
+    set({ jobId: id, isProcessing: true });
     setOutputTab("console");
 
     es.onmessage = (event) => {
@@ -67,14 +77,9 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
     es.addEventListener("complete", (event) => {
       try {
         const result: DiffusionResult = JSON.parse(event.data);
-        if (result.image && result.image.url.length > 0) {
-          setImage(result.image);
-          fetchImages(false);
-        }
+        postResult(result);
         es.close();
         eventSource = null;
-        set({ jobId: "", isProcessing: false });
-        setOutputTab("image");
       } catch (e) {
         console.error(e);
       }
@@ -107,7 +112,8 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
   },
 
   start: async (params: DiffusionParams) => {
-    get().clearLogs();
+    const { connectToJob, clearLogs } = get();
+    clearLogs();
 
     try {
       const response = await fetch("/api/txt2img", {
@@ -123,7 +129,7 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
       }
 
       const resp = await response.json();
-      get().connectToJob(resp.jobId);
+      connectToJob(resp.jobId);
     } catch (error) {
       console.error("Error generating image:", error);
       alert("Failed to generate image. Check console for details.");
@@ -148,15 +154,22 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
     }
   },
 
-  checkActiveJobs: async () => {
+  checkJobs: async () => {
     try {
+      const { connectToJob, postResult } = get();
       const response = await fetch("/api/jobs");
-      if (response.ok) {
-        const jobs = await response.json();
-        if (Array.isArray(jobs) && jobs.length > 0) {
-          const lastJobId = jobs[jobs.length - 1];
-          get().connectToJob(lastJobId);
-        }
+      if (!response.ok) return;
+
+      const jobs: Partial<Job>[] = await response.json();
+      if (jobs.length == 0) return;
+
+      const last = jobs[jobs.length - 1];
+      const isRunning =
+        last?.status === "pending" || last?.status === "running";
+      if (last?.id && isRunning) {
+        connectToJob(last.id);
+      } else if (last?.status === "completed" && last?.result) {
+        postResult(last.result);
       }
     } catch (error) {
       console.error("Failed to check active jobs:", error);
