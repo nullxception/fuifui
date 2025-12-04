@@ -67,16 +67,6 @@ export const startDiffusion = async (
   const sd = (await file(project_sd).exists()) ? project_sd : "sd";
 
   const args = [
-    "-m",
-    modelPath,
-    "--lora-model-dir",
-    LORA_DIR,
-    "--embd-dir",
-    EMBEDDING_DIR,
-    "-p",
-    params.prompt || "",
-    "-n",
-    params.negativePrompt || "",
     "--steps",
     params.steps || "20",
     "--cfg-scale",
@@ -86,7 +76,7 @@ export const startDiffusion = async (
     "-W",
     params.width || "512",
     "-H",
-    params.height || "768",
+    params.height || "512",
     "--sampling-method",
     params.samplingMethod || "euler_a",
     "--scheduler",
@@ -95,7 +85,28 @@ export const startDiffusion = async (
     outputPath,
   ];
 
-  console.log(params);
+  if (params.modelType === "standalone") {
+    args.push("--diffusion-model", modelPath);
+  } else if (params.modelType === "full") {
+    args.push("-m", modelPath);
+  }
+
+  if (params.prompt.length > 0) {
+    args.push("-p", params.prompt);
+  }
+
+  if (params.prompt.length > 0) {
+    args.push("-n", params.negativePrompt);
+  }
+
+  const allPrompts = params.prompt + params.negativePrompt;
+  if (allPrompts.includes("embedding:")) {
+    args.push("--embd-dir", EMBEDDING_DIR);
+  }
+
+  if (allPrompts.includes("lora:")) {
+    args.push("--lora-model-dir", LORA_DIR);
+  }
 
   if (params.clipSkip) {
     args.push("--clip-skip", params.clipSkip);

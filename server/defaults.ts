@@ -2,6 +2,7 @@ import type { AppSettings, DiffusionParams } from "./types";
 
 export const defaultDiffusionParams: DiffusionParams = {
   model: "",
+  modelType: "full",
   vae: "",
   upscaleModel: "",
   clipL: "",

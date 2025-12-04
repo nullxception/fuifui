@@ -1,5 +1,8 @@
+export type DiffusionModelType = "standalone" | "full";
+
 export interface DiffusionParams {
   model: string;
+  modelType: DiffusionModelType;
   vae: string;
   upscaleModel: string;
   clipL: string;

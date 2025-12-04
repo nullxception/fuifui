@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import React from "react";
 import { useDiffusionConfig, useModels } from "../stores";
-
 export const ModelSelector: React.FC = () => {
   const { models } = useModels();
   const store = useDiffusionConfig();
@@ -32,6 +31,28 @@ export const ModelSelector: React.FC = () => {
                   {model}
                 </SelectItem>
               ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="model-select">Type</Label>
+        <Select
+          value={store.params.modelType}
+          onValueChange={(e) => store.update("modelType", e)}
+        >
+          <SelectTrigger id="model-select" className="w-full">
+            <SelectValue placeholder="Select a model type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem key="standalone" value="standalone">
+                Standalone Model
+              </SelectItem>
+              <SelectItem key="full" value="full">
+                Full Model
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
