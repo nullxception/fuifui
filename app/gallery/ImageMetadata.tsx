@@ -55,7 +55,9 @@ function MetadataChip({
         {metakey.split(/(?=[A-Z])/).join(" ")}
       </Label>
       <p className="text-gray truncate font-mono text-xs whitespace-pre-wrap">
-        {metadata[metakey].toString()}
+        {Array.isArray(metadata[metakey])
+          ? metadata[metakey].map((x) => <div>{x}</div>)
+          : (metadata[metakey]?.toString() ?? "")}
       </p>
     </div>
   );
@@ -87,6 +89,7 @@ export default function ImageMetadata({
       samplingMethod: metadata.samplingMethod,
       scheduler: metadata.scheduler,
       model: metadata.model,
+      vae: metadata.vae,
     });
 
     // Navigate back to generate tab
@@ -154,6 +157,16 @@ export default function ImageMetadata({
               <MetadataChip
                 data={metadata}
                 metakey="model"
+                className="text-purple-400"
+              />
+              <MetadataChip
+                data={metadata}
+                metakey="vae"
+                className="text-purple-400"
+              />
+              <MetadataChip
+                data={metadata}
+                metakey="textEncoders"
                 className="text-purple-400"
               />
               <div className="grid grid-cols-2 gap-3">

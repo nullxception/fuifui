@@ -13,6 +13,8 @@ export interface ParsedMetadata {
   samplingMethod: string;
   scheduler: string;
   version: string;
+  vae?: string;
+  textEncoders?: string[];
 }
 
 const emptyMetadata: ParsedMetadata = {
@@ -147,7 +149,6 @@ export const parseDiffusionParams = (
         isNegative = true;
         continue;
       }
-
       if (line.startsWith("Steps: ")) {
         isParams = true;
         isNegative = false; // End of negative prompt section
@@ -163,7 +164,19 @@ export const parseDiffusionParams = (
                 data.version = v;
                 break;
               case "model":
+              case "unet":
                 data.model = v;
+                break;
+              case "vae":
+                data.vae = v;
+                break;
+              case "te":
+                if (data.textEncoders?.includes(v)) {
+                  break;
+                }
+                data.textEncoders = data.textEncoders
+                  ? [...data.textEncoders, v]
+                  : [v];
                 break;
               case "cfgScale":
                 data.cfgScale = parseFloat(v);
