@@ -17,6 +17,9 @@ export const useDiffusionConfig = () => {
     ) => {
       setDiffusion((prev) => ({ ...prev, [key]: value }));
     },
+    unset: (key: keyof DiffusionParams) => {
+      setDiffusion((prev) => ({ ...prev, [key]: undefined }));
+    },
     updateAll: (partial: Partial<DiffusionParams>) => {
       setDiffusion((prev) => ({ ...prev, ...partial }));
     },

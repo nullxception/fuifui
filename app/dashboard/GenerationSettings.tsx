@@ -94,13 +94,20 @@ export const GenerationSettings: React.FC = () => {
           <Label>Sampling Method</Label>
           <Select
             value={store.params.samplingMethod}
-            onValueChange={(e) => store.update("samplingMethod", e)}
+            onValueChange={(e) => {
+              if (e === "unset") {
+                store.unset("samplingMethod");
+                return;
+              }
+              store.update("samplingMethod", e);
+            }}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={`Sampling method`} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
+                <SelectItem value="unset">unset</SelectItem>
                 {samplingMethods.map((method) => (
                   <SelectItem key={method} value={method}>
                     {method}
@@ -115,13 +122,20 @@ export const GenerationSettings: React.FC = () => {
           <Label>Scheduler</Label>
           <Select
             value={store.params.scheduler}
-            onValueChange={(e) => store.update("scheduler", e)}
+            onValueChange={(e) => {
+              if (e === "unset") {
+                store.unset("scheduler");
+                return;
+              }
+              store.update("scheduler", e);
+            }}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={`Scheduler`} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
+                <SelectItem value="unset">unset</SelectItem>
                 {schedulers.map((sched) => (
                   <SelectItem key={sched} value={sched}>
                     {sched}

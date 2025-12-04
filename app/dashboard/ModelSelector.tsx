@@ -65,7 +65,7 @@ export const ModelSelector = () => {
           value={store.params.weightType}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("weightType", "");
+              store.unset("weightType");
               return;
             }
             store.update("weightType", e);
@@ -93,7 +93,7 @@ export const ModelSelector = () => {
           value={store.params.vae}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("vae", "");
+              store.unset("vae");
               return;
             }
             store.update("vae", e);
@@ -121,7 +121,7 @@ export const ModelSelector = () => {
           value={store.params.clipL}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("clipL", "");
+              store.unset("clipL");
               return;
             }
             store.update("clipL", e);
@@ -149,7 +149,7 @@ export const ModelSelector = () => {
           value={store.params.clipG}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("clipG", "");
+              store.unset("clipG");
               return;
             }
             store.update("clipG", e);
@@ -177,7 +177,7 @@ export const ModelSelector = () => {
           value={store.params.t5xxl}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("t5xxl", "");
+              store.unset("t5xxl");
               return;
             }
             store.update("t5xxl", e);
@@ -205,7 +205,7 @@ export const ModelSelector = () => {
           value={store.params.upscaleModel}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("upscaleModel", "");
+              store.unset("upscaleModel");
               return;
             }
             store.update("upscaleModel", e);
@@ -233,7 +233,7 @@ export const ModelSelector = () => {
           value={store.params.llm}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.update("llm", "");
+              store.unset("llm");
               return;
             }
             store.update("llm", e);

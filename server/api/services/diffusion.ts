@@ -48,6 +48,11 @@ const filename = (timestamp: number) => {
   return `${year}${month}${day}-${hour}${minute}${second}`;
 };
 
+const hasValue = (value: string | undefined) => {
+  if (typeof value !== "string") return false;
+  return value?.trim()?.length ?? 0 > 0;
+};
+
 /**
  * Starts the diffusion process in the background.
  * @param jobId The unique job ID.
@@ -77,10 +82,6 @@ export const startDiffusion = async (
     params.width || "512",
     "-H",
     params.height || "512",
-    "--sampling-method",
-    params.samplingMethod || "euler_a",
-    "--scheduler",
-    params.scheduler || "karras",
     "-o",
     outputPath,
   ];
@@ -95,11 +96,11 @@ export const startDiffusion = async (
     args.push("--type", params.weightType);
   }
 
-  if (params.prompt.length > 0) {
+  if (hasValue(params.prompt)) {
     args.push("-p", params.prompt);
   }
 
-  if (params.prompt.length > 0) {
+  if (hasValue(params.negativePrompt)) {
     args.push("-n", params.negativePrompt);
   }
 
@@ -112,34 +113,42 @@ export const startDiffusion = async (
     args.push("--lora-model-dir", LORA_DIR);
   }
 
+  if (hasValue(params.samplingMethod)) {
+    args.push("--sampling-method", params.samplingMethod ?? "euler");
+  }
+
+  if (hasValue(params.scheduler)) {
+    args.push("--scheduler", params.scheduler ?? "discrete");
+  }
+
   if (params.clipSkip) {
     args.push("--clip-skip", params.clipSkip);
   }
 
-  if (params.vae.length ?? 0 > 0) {
+  if (hasValue(params.vae)) {
     const vaePath = path.join(VAE_DIR, params.vae || "");
     args.push("--vae", vaePath);
   }
 
-  if (params.upscaleModel.length ?? 0 > 0) {
+  if (hasValue(params.upscaleModel)) {
     const upscaleModelPath = path.join(UPSCALER_DIR, params.upscaleModel || "");
     args.push("--upscale-model", upscaleModelPath);
   }
 
-  if (params.clipL.length ?? 0 > 0) {
+  if (hasValue(params.clipL)) {
     const clipLPath = path.join(TEXT_ENCODER_DIR, params.clipL || "");
     args.push("--upscale-model", clipLPath);
   }
 
-  if (params.clipG.length ?? 0 > 0) {
+  if (hasValue(params.clipG)) {
     const clipGPath = path.join(TEXT_ENCODER_DIR, params.clipG || "");
     args.push("--upscale-model", clipGPath);
   }
-  if (params.t5xxl.length ?? 0 > 0) {
+  if (hasValue(params.t5xxl)) {
     const t5xxlPath = path.join(TEXT_ENCODER_DIR, params.t5xxl || "");
     args.push("--t5xxl", t5xxlPath);
   }
-  if (params.llm.length ?? 0 > 0) {
+  if (hasValue(params.llm)) {
     const llmPath = path.join(LLM_DIR, params.llm || "");
     args.push("--llm", llmPath);
   }
