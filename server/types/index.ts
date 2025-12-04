@@ -5,6 +5,7 @@ export interface DiffusionParams {
   clipL: string;
   clipG: string;
   t5xxl: string;
+  llm: string;
   prompt: string;
   negativePrompt: string;
   steps: number;
@@ -62,6 +63,7 @@ export interface Models {
   vaes: string[];
   upscalers: string[];
   textEncoders: string[];
+  llms: string[];
 }
 
 export type ExtraDataType = "embedding" | "lora";

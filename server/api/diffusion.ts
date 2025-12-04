@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
+  LLM_DIR,
   LORA_DIR,
   TEXT_ENCODER_DIR,
   UPSCALER_DIR,
@@ -24,6 +25,7 @@ export const diffusionModels = async () => {
       loras: await getFileList(LORA_DIR),
       vaes: await getFileList(VAE_DIR),
       upscalers: await getFileList(UPSCALER_DIR),
+      llms: await getFileList(LLM_DIR),
       textEncoders: await getFileList(TEXT_ENCODER_DIR),
     });
   } catch (error) {

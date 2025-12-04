@@ -11,6 +11,7 @@ export const LORA_DIR = path.join(MODELS_DIR, "lora");
 export const VAE_DIR = path.join(MODELS_DIR, "vae");
 export const UPSCALER_DIR = path.join(MODELS_DIR, "upscaler");
 export const TEXT_ENCODER_DIR = path.join(MODELS_DIR, "textencoder");
+export const LLM_DIR = path.join(MODELS_DIR, "llm");
 
 export const OUTPUT_DIR = path.join(ROOT_DIR, "output");
 export const THUMBS_DIR =
@@ -27,6 +28,7 @@ export const ensureDirectories = async () => {
     VAE_DIR,
     UPSCALER_DIR,
     TEXT_ENCODER_DIR,
+    LLM_DIR,
     OUTPUT_DIR,
     THUMBS_DIR,
     UPLOAD_DIR,

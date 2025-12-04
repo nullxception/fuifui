@@ -3,6 +3,7 @@ import path from "path";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
+  LLM_DIR,
   LORA_DIR,
   OUTPUT_DIR,
   ROOT_DIR,
@@ -123,7 +124,10 @@ export const startDiffusion = async (
     const t5xxlPath = path.join(TEXT_ENCODER_DIR, params.t5xxl || "");
     args.push("--t5xxl", t5xxlPath);
   }
-
+  if (params.llm.length ?? 0 > 0) {
+    const llmPath = path.join(LLM_DIR, params.llm || "");
+    args.push("--llm", llmPath);
+  }
   if (params.rng) {
     args.push("--rng", params.rng);
   }

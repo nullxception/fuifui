@@ -176,6 +176,34 @@ export const ModelSelector: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="llm-select">LLM</Label>
+        <Select
+          value={store.params.llm}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("llm", "");
+              return;
+            }
+            store.update("llm", e);
+          }}
+        >
+          <SelectTrigger id="llm-select" className="w-full">
+            <SelectValue placeholder="Select LLM" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.llms.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 };

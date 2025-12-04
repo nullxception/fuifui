@@ -7,6 +7,7 @@ export const defaultDiffusionParams: DiffusionParams = {
   clipL: "",
   clipG: "",
   t5xxl: "",
+  llm: "",
   prompt: "",
   negativePrompt: "",
   steps: 20,
