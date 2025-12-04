@@ -15,7 +15,7 @@ export const ModelSelector = () => {
   const store = useDiffusionConfig();
 
   return (
-    <div className="grid grid-cols-2 gap-2 px-4">
+    <div className="grid grid-cols-2 gap-2 px-4 md:grid-cols-3">
       <div className="space-y-2 pt-2">
         <Label htmlFor="model-select">Model</Label>
         <Select
@@ -72,7 +72,7 @@ export const ModelSelector = () => {
           }}
         >
           <SelectTrigger id="model-select" className="w-full">
-            <SelectValue placeholder="Select a model type" />
+            <SelectValue placeholder="Select weight type" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -116,7 +116,7 @@ export const ModelSelector = () => {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="clip-l-select">Clip-L</Label>
+        <Label htmlFor="clip-l-select">CLIP-L</Label>
         <Select
           value={store.params.clipL}
           onValueChange={(e) => {
@@ -128,7 +128,7 @@ export const ModelSelector = () => {
           }}
         >
           <SelectTrigger id="clip-l-select" className="w-full">
-            <SelectValue placeholder="Select Clip-L" />
+            <SelectValue placeholder="Select CLIP-L" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -144,7 +144,7 @@ export const ModelSelector = () => {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="clip-g-select">Clip-G</Label>
+        <Label htmlFor="clip-g-select">CLIP-G</Label>
         <Select
           value={store.params.clipG}
           onValueChange={(e) => {
@@ -156,7 +156,7 @@ export const ModelSelector = () => {
           }}
         >
           <SelectTrigger id="clip-g-select" className="w-full">
-            <SelectValue placeholder="Select Clip-G" />
+            <SelectValue placeholder="Select CLIP-G" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -200,34 +200,6 @@ export const ModelSelector = () => {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="upscaleModel-select">Upscaler</Label>
-        <Select
-          value={store.params.upscaleModel}
-          onValueChange={(e) => {
-            if (e === "unset") {
-              store.unset("upscaleModel");
-              return;
-            }
-            store.update("upscaleModel", e);
-          }}
-        >
-          <SelectTrigger id="upscaleModel-select" className="w-full">
-            <SelectValue placeholder="Select Upscaler" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="unset">unset</SelectItem>
-              {models.upscalers.map((model) => (
-                <SelectItem key={model} value={model}>
-                  {model}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2 pt-2">
         <Label htmlFor="llm-select">LLM</Label>
         <Select
           value={store.params.llm}
@@ -246,6 +218,34 @@ export const ModelSelector = () => {
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {models.llms.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="upscaleModel-select">Upscaler</Label>
+        <Select
+          value={store.params.upscaleModel}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.unset("upscaleModel");
+              return;
+            }
+            store.update("upscaleModel", e);
+          }}
+        >
+          <SelectTrigger id="upscaleModel-select" className="w-full">
+            <SelectValue placeholder="Select Upscaler" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {models.upscalers.map((model) => (
                 <SelectItem key={model} value={model}>
                   {model}
                 </SelectItem>

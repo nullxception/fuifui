@@ -122,7 +122,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
     <div className="space-y-2 px-4">
       <div className="flex items-center justify-between">
         <Label
-          className={`pb-2 ${type === "prompt" ? "text-blue-500" : "text-pink-500"}`}
+          className={`${type === "prompt" ? "text-blue-500" : "text-pink-500"}`}
         >
           {title}
         </Label>

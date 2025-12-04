@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useDiffusionConfig, useSettings } from "app/stores";
-import { RotateCcwIcon } from "lucide-react";
+import { DicesIcon, RotateCcwIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { defaultSettings } from "server/defaults";
 
@@ -188,29 +188,25 @@ export const GenerationSettings: React.FC = () => {
           </Select>
         </div>
 
-        <div className="space-y-4">
-          <SliderInput
-            label="Width"
-            valueDisplay={store.params.width}
-            min={128}
-            step={64}
-            max={maxSliderWidth}
-            value={store.params.width}
-            onChange={(e) => store.update("width", e)}
-          />
-        </div>
+        <SliderInput
+          label="Width"
+          valueDisplay={store.params.width}
+          min={128}
+          step={64}
+          max={maxSliderWidth}
+          value={store.params.width}
+          onChange={(e) => store.update("width", e)}
+        />
 
-        <div className="space-y-4">
-          <SliderInput
-            label="Height"
-            valueDisplay={store.params.height}
-            min={128}
-            step={64}
-            max={maxSliderHeight}
-            value={store.params.height}
-            onChange={(e) => store.update("height", e)}
-          />
-        </div>
+        <SliderInput
+          label="Height"
+          valueDisplay={store.params.height}
+          min={128}
+          step={64}
+          max={maxSliderHeight}
+          value={store.params.height}
+          onChange={(e) => store.update("height", e)}
+        />
 
         <SliderInput
           label={`CLIP Skip`}
@@ -221,28 +217,6 @@ export const GenerationSettings: React.FC = () => {
           onChange={(e) => store.update("clipSkip", e)}
         />
 
-        <div className="space-y-4">
-          <Label>Seed</Label>
-          <div className="flex gap-2">
-            <InputGroup>
-              <InputGroupInput
-                type="number"
-                value={store.params.seed}
-                onChange={(e) => store.update("seed", parseInt(e.target.value))}
-                placeholder="-1 for random"
-              />
-              <InputGroupButton
-                type="button"
-                onClick={() => store.update("seed", -1)}
-                className="mr-2"
-                title="Random Seed"
-              >
-                <RotateCcwIcon />
-              </InputGroupButton>
-            </InputGroup>
-          </div>
-        </div>
-
         <SliderInput
           label={`Threads ${store.params.threads < 0 ? ": Auto" : ""}`}
           min={-1}
@@ -251,6 +225,35 @@ export const GenerationSettings: React.FC = () => {
           onChange={(e) => store.update("threads", e)}
         />
 
+        <div className="flex gap-4">
+          <Label>Seed</Label>
+          <InputGroup>
+            <InputGroupButton
+              type="button"
+              onClick={() =>
+                store.update("seed", Math.floor(Math.random() * 9999999 + 1))
+              }
+              className="mr-2"
+              title="Random Seed"
+            >
+              <DicesIcon />
+            </InputGroupButton>
+            <InputGroupInput
+              type="number"
+              value={store.params.seed}
+              onChange={(e) => store.update("seed", parseInt(e.target.value))}
+              placeholder="-1 for random"
+            />
+            <InputGroupButton
+              type="button"
+              onClick={() => store.update("seed", -1)}
+              className="mr-2"
+              title="Random Seed"
+            >
+              <RotateCcwIcon />
+            </InputGroupButton>
+          </InputGroup>
+        </div>
         <div className="flex items-center justify-between py-2">
           <Label htmlFor="diffusionFa" className="cursor-pointer">
             Flash Attention

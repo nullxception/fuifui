@@ -38,7 +38,7 @@ export const SliderInput: React.FC<SliderProps> = ({
             value={value}
             step={step}
             onChange={(e) => handleSliderChange(e.target.valueAsNumber)}
-            className="bg-surface/70 flex h-8 w-20 border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-surface/70 flex h-6 w-16 border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       )}
