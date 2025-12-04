@@ -7,9 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import React from "react";
+import { GGML_WEIGHTS_TYPE } from "server/types/ggml";
 import { useDiffusionConfig, useModels } from "../stores";
-export const ModelSelector: React.FC = () => {
+
+export const ModelSelector = () => {
   const { models } = useModels();
   const store = useDiffusionConfig();
 
@@ -37,12 +38,12 @@ export const ModelSelector: React.FC = () => {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="model-select">Type</Label>
+        <Label htmlFor="modelType-select">Model Type</Label>
         <Select
           value={store.params.modelType}
           onValueChange={(e) => store.update("modelType", e)}
         >
-          <SelectTrigger id="model-select" className="w-full">
+          <SelectTrigger id="modelType-select" className="w-full">
             <SelectValue placeholder="Select a model type" />
           </SelectTrigger>
           <SelectContent>
@@ -53,6 +54,34 @@ export const ModelSelector: React.FC = () => {
               <SelectItem key="full" value="full">
                 Full Model
               </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="weightType-select">Weight Type</Label>
+        <Select
+          value={store.params.weightType}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.update("weightType", "");
+              return;
+            }
+            store.update("weightType", e);
+          }}
+        >
+          <SelectTrigger id="model-select" className="w-full">
+            <SelectValue placeholder="Select a model type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {GGML_WEIGHTS_TYPE.map((it) => (
+                <SelectItem key={it} value={it}>
+                  {it}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>

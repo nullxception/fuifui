@@ -91,6 +91,10 @@ export const startDiffusion = async (
     args.push("-m", modelPath);
   }
 
+  if (params.weightType) {
+    args.push("--type", params.weightType);
+  }
+
   if (params.prompt.length > 0) {
     args.push("-p", params.prompt);
   }

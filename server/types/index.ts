@@ -1,8 +1,11 @@
+import type { GGMLWeightType } from "./ggml";
+
 export type DiffusionModelType = "standalone" | "full";
 
 export interface DiffusionParams {
   model: string;
   modelType: DiffusionModelType;
+  weightType?: GGMLWeightType;
   vae: string;
   upscaleModel: string;
   clipL: string;
