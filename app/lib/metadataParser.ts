@@ -9,6 +9,7 @@ export interface ParsedMetadata {
   model: string;
   steps: number;
   cfgScale: number;
+  seed: number;
   rng: string;
   samplingMethod: string;
   scheduler: string;
@@ -28,6 +29,7 @@ const emptyMetadata: ParsedMetadata = {
   model: "",
   steps: -1,
   cfgScale: -1,
+  seed: -1,
   rng: "",
   samplingMethod: "",
   scheduler: "",
@@ -101,10 +103,10 @@ export const optimizePrompt = (text: string): string => {
 };
 
 export const parseDiffusionParams = (
-  metadata: Record<string, unknown>,
+  metadata?: Record<string, unknown>,
 ): ParsedMetadata => {
   if (!metadata) return emptyMetadata;
-  const data = emptyMetadata;
+  const data: ParsedMetadata = Object.create(emptyMetadata);
 
   // Try to find the parameters string. It's often in 'parameters' or 'UserComment'
   // based on how stable-diffusion.cpp or other tools save it.
@@ -209,6 +211,9 @@ export const parseDiffusionParams = (
               }
               case "rng":
                 data.rng = v;
+                break;
+              case "seed":
+                data.seed = Number(v);
                 break;
               case "guidance":
               case "eta":

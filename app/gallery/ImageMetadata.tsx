@@ -47,6 +47,14 @@ function MetadataChip({
   metakey: keyof ParsedMetadata;
   className?: string;
 }) {
+  const value = metadata[metakey];
+  if (
+    typeof value === "undefined" ||
+    (Array.isArray(value) && value.length < 1) ||
+    (typeof value === "string" && value.trim().length < 1)
+  )
+    return null;
+
   return (
     <div className="rounded border border-border/50 bg-background/50 p-2">
       <Label
@@ -55,9 +63,9 @@ function MetadataChip({
         {metakey.split(/(?=[A-Z])/).join(" ")}
       </Label>
       <p className="text-gray truncate font-mono text-xs whitespace-pre-wrap">
-        {Array.isArray(metadata[metakey])
-          ? metadata[metakey].map((x) => <div>{x}</div>)
-          : (metadata[metakey]?.toString() ?? "")}
+        {Array.isArray(value)
+          ? value.map((v, i) => <div key={i}>{v}</div>)
+          : value?.toString()?.trim()}
       </p>
     </div>
   );
@@ -181,11 +189,12 @@ export default function ImageMetadata({
                 )}
                 <MetadataChip data={metadata} metakey="steps" />
                 <MetadataChip data={metadata} metakey="cfgScale" />
+                <MetadataChip data={metadata} metakey="seed" />
                 <MetadataChip data={metadata} metakey="rng" />
                 <MetadataChip data={metadata} metakey="samplingMethod" />
                 <MetadataChip data={metadata} metakey="scheduler" />
+                <MetadataChip data={metadata} metakey="version" />
               </div>
-              <MetadataChip data={metadata} metakey="version" />
             </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">
