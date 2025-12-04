@@ -87,17 +87,7 @@ export default function ImageLightbox() {
   });
 
   const index = images.findLastIndex((i) => i.name === id);
-
-  const getAdjacentImages = useCallback(() => {
-    if (images.length === 0) return { prevImage: null, nextImage: null };
-    const prevImage = index > 0 ? images[index - 1] : null;
-    const nextImage = index < images.length - 1 ? images[index + 1] : null;
-    return { prevImage, nextImage };
-  }, [index, images]);
-
   const image = images[index];
-  const { prevImage, nextImage } = getAdjacentImages();
-
   const close = useCallback(() => {
     if (window.innerWidth < 1024) {
       showMetadata(false);
@@ -193,29 +183,11 @@ export default function ImageLightbox() {
               }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              {prevImage && (
-                <img
-                  src={`${prevImage.url}`}
-                  alt="previous"
-                  className="absolute right-full mr-4 h-full w-full object-contain opacity-50 select-none"
-                  style={{ pointerEvents: "none" }}
-                />
-              )}
-
               {image && (
                 <img
                   src={`${image.url}`}
                   alt="preview"
                   className="h-full w-full object-contain"
-                  style={{ pointerEvents: "none" }}
-                />
-              )}
-
-              {nextImage && (
-                <img
-                  src={`${nextImage.url}`}
-                  alt="next"
-                  className="absolute left-full ml-4 h-full w-full object-contain opacity-50 select-none"
                   style={{ pointerEvents: "none" }}
                 />
               )}
