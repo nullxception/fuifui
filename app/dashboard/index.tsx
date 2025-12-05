@@ -18,18 +18,17 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     const { outputTab, setOutputTab } = useAppStore();
     const { image, isProcessing, start, stop, checkJobs } = useDiffusionJob();
     const store = useDiffusionConfig();
-    const { models, fetchModels } = useModels();
+    const { models } = useModels();
 
     useEffect(() => {
       checkJobs();
-      fetchModels();
-    }, [checkJobs, fetchModels]);
+    }, [checkJobs]);
 
-    const handleDiffusion = () => {
+    const handleDiffusion = async () => {
       if (isProcessing) {
         stop();
       } else {
-        store.updateAll({
+        await store.updateAll({
           prompt: optimizePrompt(store.params.prompt, models),
           negativePrompt: optimizePrompt(store.params.negativePrompt, models),
         });

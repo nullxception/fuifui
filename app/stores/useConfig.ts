@@ -16,10 +16,10 @@ export function useConfig<T>(key: keyof UserConfig, fallback: T) {
     if (!isLoading) loadConfig();
   }, [isLoading, loadConfig]);
 
-  const setValue = (v: T | ((prev: T) => T)) => {
+  async function setValue(v: T | ((prev: T) => T)) {
     const actual = v instanceof Function ? v(value) : v;
-    setKey(key, actual);
-  };
+    await setKey(key, actual);
+  }
 
   return [value, setValue] as const;
 }

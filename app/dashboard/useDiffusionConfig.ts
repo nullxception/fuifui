@@ -11,17 +11,17 @@ export const useDiffusionConfig = () => {
   return {
     params: diffusion,
 
-    update: (
+    async update(
       key: keyof DiffusionParams,
       value: DiffusionParams[keyof DiffusionParams],
-    ) => {
-      setDiffusion((prev) => ({ ...prev, [key]: value }));
+    ) {
+      await setDiffusion((prev) => ({ ...prev, [key]: value }));
     },
-    unset: (key: keyof DiffusionParams) => {
-      setDiffusion((prev) => ({ ...prev, [key]: undefined }));
+    async unset(key: keyof DiffusionParams) {
+      await setDiffusion((prev) => ({ ...prev, [key]: undefined }));
     },
-    updateAll: (partial: Partial<DiffusionParams>) => {
-      setDiffusion((prev) => ({ ...prev, ...partial }));
+    async updateAll(partial: Partial<DiffusionParams>) {
+      await setDiffusion((prev) => ({ ...prev, ...partial }));
     },
   };
 };
