@@ -13,7 +13,7 @@ import { startDiffusion, stopDiffusion } from "./services/diffusion";
 import { createJob, getAllJobs, getJob, jobEvents } from "./services/jobs";
 
 const getFileList = async (dir: string): Promise<string[]> => {
-  const files = await fs.readdir(dir);
+  const files = await fs.readdir(dir, { recursive: true });
   return files.filter((file) => !/.placeholder$/.test(file));
 };
 
