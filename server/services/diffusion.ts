@@ -194,7 +194,7 @@ export const startDiffusion = async (
     } else {
       console.log(log);
     }
-    addJobLog(jobId, { type, message: log }, params);
+    addJobLog(jobId, { type, message: log });
   };
 
   sendLog(

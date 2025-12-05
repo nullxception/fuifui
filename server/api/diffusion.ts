@@ -42,7 +42,7 @@ export const diffusionStart = async (req: Request) => {
       return Response.json({ error: "Model is required" }, { status: 400 });
     }
 
-    const job = createJob(body);
+    const job = createJob();
     startDiffusion(job.id, body);
 
     return Response.json({ jobId: job.id });

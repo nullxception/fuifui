@@ -1,22 +1,15 @@
 import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
-import type {
-  DiffusionParams,
-  DiffusionResult,
-  Job,
-  JobStatus,
-  LogData,
-} from "../types";
+import type { DiffusionResult, Job, JobStatus, LogData } from "../types";
 
 export const jobEvents = new EventEmitter();
 export const activeProcesses = new Map<string, Subprocess>();
 const jobs = new Map<string, Job>();
 
-export const createJob = (params: DiffusionParams, id?: string): Job => {
+export const createJob = (id?: string): Job => {
   const job: Job = {
     id: id ?? randomUUIDv7(),
     status: "pending",
-    params,
     createdAt: Date.now(),
     logs: [],
   };
@@ -86,14 +79,10 @@ export function updateJobStatus({
   }
 }
 
-export const addJobLog = (
-  id: string,
-  log: LogData,
-  params?: DiffusionParams,
-): void => {
+export const addJobLog = (id: string, log: LogData): void => {
   let job = jobs.get(id);
-  if (!job && params) {
-    job = createJob(params, id);
+  if (!job) {
+    job = createJob(id);
   }
 
   job?.logs.push(log);
@@ -102,12 +91,6 @@ export const addJobLog = (
 
 export const getAllJobs = (): Job[] => {
   return Array.from(jobs.values());
-};
-
-export const getActiveJobs = (): Job[] => {
-  return Array.from(jobs.values()).filter(
-    (job) => job.status === "pending" || job.status === "running",
-  );
 };
 
 export const cleanupOldJobs = (maxAge: number = 24 * 60 * 60 * 1000): void => {

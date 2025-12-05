@@ -43,7 +43,6 @@ export type JobStatus =
 export interface Job {
   id: string;
   status: JobStatus;
-  params: DiffusionParams;
   createdAt: number;
   startedAt?: number;
   completedAt?: number;
