@@ -2,6 +2,7 @@ import { AnimatePresence } from "framer-motion";
 import { useRoute } from "wouter";
 import { BackgroundLayer } from "./components/customized/BackgroundLayer";
 import { Header } from "./components/customized/Header";
+import { MobileNav } from "./components/customized/MobileNav";
 import { ThemeProvider } from "./components/theme-provider";
 import TextToImage from "./dashboard";
 import Gallery from "./gallery";
@@ -28,6 +29,7 @@ export default function App() {
           {isIndex && <TextToImage {...AnimationSettings} />}
         </AnimatePresence>
         <SettingsPopup />
+        <MobileNav />
       </div>
     </ThemeProvider>
   );
