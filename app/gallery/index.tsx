@@ -76,6 +76,8 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     const observerTarget = useRef(null);
     const [appScrollTop, setAppScrollTop] = useState(0);
     const [match] = useRoute("/gallery");
+    const [, params] = useRoute("/gallery/:id");
+    const { clearImage } = useGallery();
 
     useEffect(() => {
       const app = document.querySelector("#app");
@@ -111,8 +113,6 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         }
       };
     }, [hasMore, isLoading, fetchImages]);
-
-    const [, params] = useRoute("/gallery/:id");
 
     if (images.length === 0 && !isLoadingMore) {
       return (
@@ -168,7 +168,9 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           )}
           <Footer className="col-span-full flex justify-center p-4" />
         </motion.div>
-        <AnimatePresence>{params?.id && <ImageLightbox />}</AnimatePresence>
+        <AnimatePresence onExitComplete={clearImage}>
+          {params?.id && <ImageLightbox />}
+        </AnimatePresence>
       </>
     );
   },

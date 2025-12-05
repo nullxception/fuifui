@@ -76,59 +76,46 @@ export default function ImageLightbox() {
   });
   const [, navigate] = useLocation();
   const [, params] = useRoute("/gallery/:id");
-  const { images, lastLoadedImage } = useGallery(
+  const { image, hasNext, hasPrev } = useGallery(
     useShallow((state) => ({
-      images: state.images,
-      lastLoadedImage: state.lastLoadedImage,
+      image: state.image,
+      hasNext: state.hasNext,
+      hasPrev: state.hasPrev,
     })),
   );
-  const { removeImages, fetchImages, setLastLoadedImage } = useGallery();
+  const { removeImages, setImage, findNewId } = useGallery();
   const [shouldShowRemoveDialog, showRemoveDialog] = useState(false);
   const isMd = window.innerWidth < 768;
   const [shouldShowMetadata, showMetadata] = useState(!isMd);
+  const id = params?.id;
 
-  const index = images.findLastIndex((i) => i.name === params?.id);
-  const image = images[index] ?? lastLoadedImage;
+  useEffect(() => {
+    if (id && id !== "") setImage(id);
+  }, [id, setImage]);
 
   const close = useCallback(() => {
-    if (image && image !== lastLoadedImage) {
-      setLastLoadedImage(image);
-    }
     setTimeout(() => {
       if (isMd) {
         showMetadata(false);
       }
     }, 300);
     navigate(history.state?.from || "~/gallery", { replace: true });
-  }, [image, isMd, lastLoadedImage, navigate, setLastLoadedImage]);
-
-  const hasNext = index + 1 < images.length;
-  const hasPrev = index != 0;
+  }, [isMd, navigate]);
 
   const goto = useCallback(
     (dest: "prev" | "next") => {
       if ((dest === "next" && !hasNext) || (dest === "prev" && !hasPrev)) {
         return;
       }
-      let newIndex;
-      if (dest === "next") {
-        newIndex = (index + 1) % images.length;
-        // preload more
-        fetchImages(true);
-      } else {
-        newIndex = (index - 1 + images.length) % images.length;
-      }
-
-      const newId = images[newIndex]?.name;
       setPage({
         index: page.index + (dest === "next" ? 1 : -1),
         direction: dest,
       });
-      navigate(`~/gallery/${newId}`, {
+      navigate(`~/gallery/${findNewId(dest)}`, {
         state: { from: history.state?.from || "~/gallery" },
       });
     },
-    [fetchImages, hasNext, hasPrev, index, images, navigate, page.index],
+    [hasNext, hasPrev, findNewId, page.index, navigate],
   );
 
   // Handle keyboard navigation

@@ -2,27 +2,68 @@ import type { Image } from "server/types";
 import { create } from "zustand";
 
 interface GalleryState {
+  image?: Image;
+  index: number;
   images: Image[];
-  isLoading: boolean;
   offset: number;
+  isLoading: boolean;
   hasMore: boolean;
-  lastLoadedImage?: Image;
+  hasNext: boolean;
+  hasPrev: boolean;
 
   fetchImages: (isLoadMore?: boolean) => Promise<void>;
+  setImage: (name: string) => void;
+  clearImage: () => void;
+  findNewId: (dest: "next" | "prev") => string | undefined;
   removeImages: (urls: string[]) => Promise<void>;
-  setLastLoadedImage: (image: Image) => void;
 }
 
 const LIMIT = 20;
 
 export const useGallery = create<GalleryState>((set, get) => ({
-  lastLoadedImage: undefined,
+  image: undefined,
+  index: 0,
   images: [],
-  isLoading: false,
   offset: 0,
+  isLoading: false,
   hasMore: true,
+  hasPrev: false,
+  hasNext: false,
 
-  fetchImages: async (isLoadMore = false) => {
+  findNewId(dest) {
+    const { index, images, fetchImages } = get();
+    let newIndex;
+    if (dest === "next") {
+      // preload more
+      fetchImages(true);
+      newIndex = (index + 1) % images.length;
+    } else {
+      newIndex = (index - 1 + images.length) % images.length;
+    }
+
+    return images[newIndex]?.name;
+  },
+  setImage(name) {
+    const { images } = get();
+    const index = images.findLastIndex((i) => i.name === name);
+
+    set({
+      image: images[index],
+      index: index,
+      hasNext: index + 1 < images.length,
+      hasPrev: index != 0,
+    });
+  },
+  clearImage() {
+    set({
+      image: undefined,
+      index: 0,
+      hasNext: false,
+      hasPrev: false,
+    });
+  },
+
+  async fetchImages(isLoadMore = false) {
     const { isLoading, offset } = get();
     if (isLoading) return;
 
@@ -48,7 +89,7 @@ export const useGallery = create<GalleryState>((set, get) => ({
       set({ isLoading: false });
     }
   },
-  removeImages: async (urls: string[]) => {
+  async removeImages(urls: string[]) {
     try {
       await fetch("/api/images", {
         method: "DELETE",
@@ -66,8 +107,5 @@ export const useGallery = create<GalleryState>((set, get) => ({
     } catch (error) {
       console.error("Failed to remove image:", error);
     }
-  },
-  setLastLoadedImage: (image: Image) => {
-    set({ lastLoadedImage: image });
   },
 }));
