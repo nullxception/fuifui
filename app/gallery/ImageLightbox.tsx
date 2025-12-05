@@ -242,7 +242,7 @@ export default function ImageLightbox() {
           <Button
             variant="ghost"
             size="icon-lg"
-            className="absolute top-5 left-5 z-110 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+            className="absolute bottom-5 left-5 z-110 text-foreground/70 hover:bg-foreground/10 hover:text-foreground md:top-5"
             onClick={close}
           >
             <XIcon />
