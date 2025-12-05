@@ -1,3 +1,5 @@
+import type { Models } from "server/types";
+
 export interface ParsedMetadata {
   prompt: string;
   negativePrompt: string;
@@ -65,7 +67,47 @@ export const splitSmart = (t: string): string[] => {
   return result;
 };
 
-export const optimizePrompt = (text: string): string => {
+function fixLoraPath(text: string, models?: Models): string {
+  if (!models?.loras.length) {
+    return text;
+  }
+
+  const validLoras = new Set(
+    models.loras.map((x) => x.replace(/\.(safetensors|ckpt)$/, "")),
+  );
+
+  const loraRegex = /<lora:(.*?):[^>]*>/;
+  const match = text.match(loraRegex);
+
+  if (!match) {
+    return text;
+  }
+
+  const [, currentPath] = match;
+
+  if (currentPath && validLoras.has(currentPath)) {
+    return text;
+  }
+
+  const filename = currentPath?.split("/").at(-1);
+
+  if (!filename) {
+    return text;
+  }
+
+  const properPath = models.loras
+    .map((x) => x.replace(/\.(safetensors|ckpt)$/, ""))
+    .find((validPath) => validPath.endsWith(filename));
+
+  if (properPath) {
+    const newTag = `<lora:${properPath}:`;
+    return text.replace(/<lora:(.*?):/, newTag);
+  }
+
+  return text;
+}
+
+export const optimizePrompt = (text: string, models?: Models): string => {
   // --- Normalize whitespace + flatten lines ---
   const parts = text
     .split("\n")
@@ -89,7 +131,7 @@ export const optimizePrompt = (text: string): string => {
 
   for (const p of unique) {
     if (p.startsWith("<lora:")) {
-      loras.push(p);
+      loras.push(fixLoraPath(p, models));
     } else if (p.includes("embedding:")) {
       embeds.push(p);
     } else {

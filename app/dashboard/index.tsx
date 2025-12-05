@@ -3,7 +3,12 @@ import { motion, type HTMLMotionProps } from "framer-motion";
 import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
 import { forwardRef, useEffect } from "react";
 import { optimizePrompt } from "../lib/metadataParser";
-import { useAppStore, useDiffusionConfig, useDiffusionJob } from "../stores";
+import {
+  useAppStore,
+  useDiffusionConfig,
+  useDiffusionJob,
+  useModels,
+} from "../stores";
 import ConsoleOutput from "./ConsoleOutput";
 import ControlPanel from "./ControlPanel";
 import ImageDisplay from "./ImageDisplay";
@@ -13,18 +18,20 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     const { outputTab, setOutputTab } = useAppStore();
     const { image, isProcessing, start, stop, checkJobs } = useDiffusionJob();
     const store = useDiffusionConfig();
+    const { models, fetchModels } = useModels();
 
     useEffect(() => {
       checkJobs();
-    }, [checkJobs]);
+      fetchModels();
+    }, [checkJobs, fetchModels]);
 
     const handleDiffusion = () => {
       if (isProcessing) {
         stop();
       } else {
         store.updateAll({
-          prompt: optimizePrompt(store.params.prompt),
-          negativePrompt: optimizePrompt(store.params.negativePrompt),
+          prompt: optimizePrompt(store.params.prompt, models),
+          negativePrompt: optimizePrompt(store.params.negativePrompt, models),
         });
         start(store.params);
       }
