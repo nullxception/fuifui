@@ -50,9 +50,25 @@ const TriggerWordsEditor: React.FC = () => {
     });
   };
 
+  const normalizeFP = (num?: number) => {
+    let t = num?.toString() || "1";
+    t = t.indexOf(".") >= 0 ? t.slice(0, t.indexOf(".") + 3) : t;
+    return Number(t);
+  };
+
   const handleSaveNew = () => {
-    if (newEntry && newEntry.target && newEntry.words.length > 0) {
-      addTriggerWord(newEntry);
+    if (!newEntry) return;
+    const loraStrength = newEntry.loraStrength ?? 1;
+    const isSaveable = newEntry.words.length > 0 || loraStrength < 1;
+    if (newEntry && newEntry.target && isSaveable) {
+      let tw = newEntry;
+      if (loraStrength < 1) {
+        tw = {
+          ...newEntry,
+          loraStrength: normalizeFP(newEntry.loraStrength),
+        };
+      }
+      addTriggerWord(tw);
       setNewEntry(null);
     }
   };
@@ -81,7 +97,16 @@ const TriggerWordsEditor: React.FC = () => {
   };
 
   const handleSaveEdit = (index: number, updated: TriggerWord) => {
-    updateTriggerWord(index, updated);
+    let tw = updated;
+    const loraStrength = updated.loraStrength ?? 1;
+
+    if (loraStrength < 1) {
+      tw = {
+        ...updated,
+        loraStrength: normalizeFP(updated.loraStrength),
+      };
+    }
+    updateTriggerWord(index, tw);
     setEditingIndex(null);
   };
 
@@ -284,6 +309,17 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
 
   const loraStrength = entry.loraStrength ?? 1;
   const typeLabel = entry.type === "lora" ? "LoRA" : "Embedding";
+
+  const isSaveable = () => {
+    if (!entry.target) return false;
+    const hasWords = entry.words.length > 0;
+    if (entry.type === "embedding" && !hasWords) return false;
+    if (entry.type === "lora") {
+      if (!hasWords && loraStrength >= 1) return false;
+    }
+    return true;
+  };
+
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
@@ -382,6 +418,8 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
               type="number"
               min={0}
               max={1}
+              inputMode="numeric"
+              pattern="[0-9+-.]+"
               step={0.01}
               value={loraStrength}
               onChange={(e) => {
@@ -407,7 +445,7 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
           onClick={onSave}
           variant="default"
           size="sm"
-          disabled={!entry.target || entry.words.length === 0}
+          disabled={!isSaveable()}
         >
           Save
         </Button>
