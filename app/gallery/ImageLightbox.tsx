@@ -175,38 +175,40 @@ export default function ImageLightbox() {
           ref={ref}
         >
           <AnimatePresence initial={false} custom={page}>
-            <motion.img
-              key={image?.name}
-              className="absolute h-full w-full object-contain"
-              src={image?.url}
-              alt="preview"
-              custom={page}
-              variants={variants}
-              inherit={false}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: "tween", duration: 0.3, ease: "circOut" },
-                opacity: { duration: 0.3 },
-              }}
-              drag="x"
-              dragConstraints={{
-                left: hasNext ? undefined : 0,
-                right: hasPrev ? undefined : 0,
-              }}
-              dragElastic={0.2}
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipeThreshold = 50;
-                const swipePower = Math.abs(offset.x) * velocity.x;
+            {image && (
+              <motion.img
+                key={image?.name}
+                className="absolute h-full w-full object-contain"
+                src={image.url}
+                alt="preview"
+                custom={page}
+                variants={variants}
+                inherit={false}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "tween", duration: 0.3, ease: "circOut" },
+                  opacity: { duration: 0.3 },
+                }}
+                drag="x"
+                dragConstraints={{
+                  left: hasNext ? undefined : 0,
+                  right: hasPrev ? undefined : 0,
+                }}
+                dragElastic={0.2}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipeThreshold = 50;
+                  const swipePower = Math.abs(offset.x) * velocity.x;
 
-                if (swipePower < -swipeThreshold || offset.x < -100) {
-                  goto("next");
-                } else if (swipePower > swipeThreshold || offset.x > 100) {
-                  goto("prev");
-                }
-              }}
-            />
+                  if (swipePower < -swipeThreshold || offset.x < -100) {
+                    goto("next");
+                  } else if (swipePower > swipeThreshold || offset.x > 100) {
+                    goto("prev");
+                  }
+                }}
+              />
+            )}
           </AnimatePresence>
           <div
             className={`absolute top-1/2 left-0 z-110 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-transparent to-background/35 select-none hover:-bg-linear-90`}

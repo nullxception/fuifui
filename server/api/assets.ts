@@ -1,14 +1,15 @@
 import { promises as fs } from "fs";
 import path from "path";
 import sharp from "sharp";
-import { PUBLIC_DIR, ROOT_DIR, THUMBS_DIR } from "../dirs";
+import { OUTPUT_DIR, PUBLIC_DIR, THUMBS_DIR } from "../dirs";
 
 const assetsCacheControl = "public, max-age=31536000, immutable";
 
-const serveThumbnail = async (url: URL, size: number): Promise<Response> => {
-  const pathname = url.pathname;
-  const filepath = path.join(ROOT_DIR, pathname);
-  let thumb = path.parse(pathname).name;
+const serveThumbnail = async (
+  filepath: string,
+  size: number,
+): Promise<Response> => {
+  let thumb = path.parse(filepath).name;
   thumb = `${thumb}--${size}.jpg`;
   thumb = path.join(THUMBS_DIR, thumb);
 
@@ -42,11 +43,11 @@ const serveStatic = async (req: Request): Promise<Response> => {
 
   // Serve output images
   if (pathname.startsWith("/output/")) {
-    const filepath = path.join(ROOT_DIR, pathname);
+    const filepath = path.join(OUTPUT_DIR, pathname.replace("/output", ""));
     const width = Number(url.searchParams.get("width")) || 0;
     if (width > 0) {
       // looks like we're getting thumbnail request
-      return await serveThumbnail(url, width);
+      return await serveThumbnail(filepath, width);
     }
 
     return new Response(Bun.file(filepath), {

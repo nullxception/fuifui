@@ -276,7 +276,7 @@ export const startDiffusion = async (
         id: jobId,
         status: "completed",
         data: {
-          image: await getImageData(`output/txt2img/${outputFilename}`),
+          image: await getImageData(outputPath),
         },
       });
     } else {

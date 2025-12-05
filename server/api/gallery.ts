@@ -1,20 +1,19 @@
 import exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
-import { OUTPUT_DIR, ROOT_DIR, THUMBS_DIR } from "../dirs";
+import { OUTPUT_DIR, THUMBS_DIR } from "../dirs";
 import type { Image } from "../types";
 
 export const IMAGE_EXT = [".png", ".jpg", ".jpeg", ".webp"];
 
 export async function getDataFromImage(filePath: string): Promise<Image> {
   try {
-    const rfile = path.join(ROOT_DIR, filePath);
-    const stats = await fs.stat(rfile);
-    const file = path.parse(rfile);
+    const stats = await fs.stat(filePath);
+    const file = path.parse(filePath);
 
     let metadata = {};
     try {
-      metadata = await exifr.parse(rfile, {
+      metadata = await exifr.parse(filePath, {
         userComment: true,
         xmp: true,
         icc: false,
@@ -25,7 +24,7 @@ export async function getDataFromImage(filePath: string): Promise<Image> {
 
     return {
       name: file.name,
-      url: `/output/txt2img/${file.base}`,
+      url: path.join("/output", path.relative(OUTPUT_DIR, filePath)),
       mtime: stats.mtime.getTime(),
       metadata,
     };
@@ -75,8 +74,8 @@ const list = async (limit: number, offset: number): Promise<Image[]> => {
         }
 
         return {
-          url: `/output/txt2img/${filename}`,
           name: path.parse(filename).name,
+          url: path.join("/output", path.relative(OUTPUT_DIR, filePath)),
           mtime,
           metadata,
         };
@@ -97,7 +96,7 @@ const remove = async (images: string[]): Promise<void> => {
       if (!img.startsWith("/output/")) {
         continue;
       }
-      img = path.join(ROOT_DIR, img);
+      img = path.join(OUTPUT_DIR, path.normalize(img));
       console.log(`removing ${img}`);
       await Bun.file(img).delete();
       const filename = path.basename(img);
