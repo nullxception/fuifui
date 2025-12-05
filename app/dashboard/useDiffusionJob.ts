@@ -39,11 +39,12 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
   clearLogs: () => set({ logs: [] }),
   postResult: (result) => {
     const { setOutputTab } = useAppStore.getState();
-    const { images, fetchImages } = useGallery.getState();
-    if (result.image && result.image.url.length > 0) {
-      set({ image: result.image });
-      if (!images.includes(result.image)) {
-        fetchImages(false);
+    const { images, appendImage } = useGallery.getState();
+    const newImage = result.image;
+    if (newImage) {
+      set({ image: newImage });
+      if (!images.find((x) => x.url === newImage.url)) {
+        appendImage(newImage);
       }
     }
     set({ jobId: "", isProcessing: false });

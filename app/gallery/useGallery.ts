@@ -17,6 +17,7 @@ interface GalleryState {
   clearImage: () => void;
   findNewId: (dest: "next" | "prev") => string | undefined;
   removeImages: (urls: string[]) => Promise<void>;
+  appendImage: (image: Image) => void;
 }
 
 const LIMIT = 20;
@@ -62,6 +63,11 @@ export const useGallery = create<GalleryState>((set, get) => ({
       hasNext: false,
       hasPrev: false,
     });
+  },
+  appendImage(image) {
+    set((state) => ({
+      images: [image, ...state.images],
+    }));
   },
 
   async fetchImages(isLoadMore = false) {
