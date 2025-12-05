@@ -169,8 +169,11 @@ export default function ImageLightbox() {
       >
         <div className="relative flex flex-1 items-stretch justify-center overflow-hidden">
           <AnimatePresence initial={false} custom={page}>
-            <motion.div
+            <motion.img
               key={image?.name}
+              className="absolute h-full w-full object-contain"
+              src={image?.url}
+              alt="preview"
               custom={page}
               variants={variants}
               inherit={false}
@@ -197,17 +200,7 @@ export default function ImageLightbox() {
                   goto("prev");
                 }
               }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              {image && (
-                <img
-                  src={`${image.url}`}
-                  alt="preview"
-                  className="h-full w-full object-contain"
-                  style={{ pointerEvents: "none" }}
-                />
-              )}
-            </motion.div>
+            />
           </AnimatePresence>
           <div
             className={`absolute top-1/2 left-0 z-110 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-transparent to-background/35 select-none hover:-bg-linear-90`}
