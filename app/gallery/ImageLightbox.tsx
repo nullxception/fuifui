@@ -10,7 +10,7 @@ import {
   Trash2Icon,
   XIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useRoute } from "wouter";
 import { useShallow } from "zustand/react/shallow";
 import ImageMetadata from "./ImageMetadata";
@@ -158,16 +158,31 @@ export default function ImageLightbox() {
     goto(hasPrev ? "prev" : "next");
   };
 
+  // prevent scroll on preview canvas
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onWheel = (e: { deltaY: number; preventDefault: () => void }) => {
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
   return (
     <>
       <motion.div
-        className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
+        className="fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
         transition={{ duration: 0.3 }}
         initial={{ opacity: 0, scale: 1.25 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 1.25 }}
       >
-        <div className="relative flex flex-1 items-stretch justify-center overflow-hidden">
+        <div
+          className="relative flex flex-1 items-stretch justify-center overflow-hidden"
+          ref={ref}
+        >
           <AnimatePresence initial={false} custom={page}>
             <motion.img
               key={image?.name}
