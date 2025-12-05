@@ -10,9 +10,9 @@ import {
   diffusionStop,
 } from "./api/diffusion";
 import { listImages, removeImages } from "./api/gallery";
-import { stopDiffusion } from "./api/services/diffusion";
 import system from "./api/system";
 import { ensureDirectories } from "./dirs";
+import { stopDiffusion } from "./services/diffusion";
 
 const PORT = process.env.PORT || 5141;
 

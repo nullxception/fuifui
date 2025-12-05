@@ -6,7 +6,7 @@ import type {
   Job,
   JobStatus,
   LogData,
-} from "../../types/index";
+} from "../types";
 
 export const jobEvents = new EventEmitter();
 export const activeProcesses = new Map<string, Subprocess>();

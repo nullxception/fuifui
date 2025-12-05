@@ -1,5 +1,6 @@
 import { file, spawn } from "bun";
 import path from "path";
+import { getDataFromImage as getImageData } from "../api/gallery";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
@@ -10,9 +11,8 @@ import {
   TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
-} from "../../dirs";
-import type { DiffusionParams } from "../../types";
-import { getDataFromImage as getImageData } from "../gallery";
+} from "../dirs";
+import type { DiffusionParams } from "../types";
 import { activeProcesses, addJobLog, getJob, updateJobStatus } from "./jobs";
 
 export const stopDiffusion = (jobId?: string) => {
