@@ -108,40 +108,53 @@ function fixLoraPath(text: string, models?: Models): string {
 }
 
 export const optimizePrompt = (text: string, models?: Models): string => {
-  // --- Normalize whitespace + flatten lines ---
-  const parts = text
+  const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
+
+  const chunks = text
     .split("\n")
-    .flatMap((line) => splitSmart(line))
-    .map((p) => p.replace(/\s+/g, " ").trim())
+    .flatMap(splitSmart)
+    .map(normalize)
     .filter(Boolean);
 
-  // --- Remove duplicates (case-insensitive) ---
-  const seen = new Set<string>();
-  const unique = parts.filter((p) => {
-    const key = p.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
-  // --- Categorize ---
   const loras: string[] = [];
   const embeds: string[] = [];
   const others: string[] = [];
 
-  for (const p of unique) {
-    if (p.startsWith("<lora:")) {
-      loras.push(fixLoraPath(p, models));
-    } else if (p.includes("embedding:")) {
-      embeds.push(p);
-    } else {
-      others.push(p);
+  for (let chunk of chunks) {
+    if (!chunk) continue;
+
+    const loraMatches = chunk.match(/<lora:[^>]+>/g) || [];
+    if (loraMatches.length) {
+      loras.push(...loraMatches);
+      chunk = chunk.replace(/<lora:[^>]+>/g, " ");
     }
+
+    const embedMatches = chunk.match(/embedding:[^,\s)]+/gi) || [];
+    if (embedMatches.length) {
+      embeds.push(...embedMatches);
+      chunk = embedMatches.reduce((acc, m) => acc.replace(m, " "), chunk);
+    }
+
+    const rest = normalize(chunk);
+    if (rest) others.push(rest);
   }
 
-  return [...loras, ...embeds, ...others]
+  const seen = new Set<string>();
+  const deduped = [
+    ...loras.map((l) => fixLoraPath(l, models)),
+    ...embeds,
+    ...others,
+  ].filter((v) => {
+    const k = v.toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  return deduped
     .join(", ")
-    .replace(/(\()\s+|\s+(\))/g, (_, open, close) => open || close);
+    .replace(/(\()\s+|\s+(\))/g, (_, o, c) => o || c)
+    .replace(/>\s*,\s*/g, "> ");
 };
 
 export const parseDiffusionParams = (
