@@ -1,3 +1,4 @@
+import { useDiffusionJob } from "@/stores";
 import type { Image } from "server/types";
 import { create } from "zustand";
 
@@ -95,7 +96,10 @@ export const useGallery = create<GalleryState>((set, get) => ({
         method: "DELETE",
         body: JSON.stringify(urls),
       });
-
+      const { setImage, image } = useDiffusionJob.getState();
+      if (image && urls.includes(image.url)) {
+        setImage(undefined);
+      }
       set((state) => {
         const newImages = state.images.filter((img) => !urls.includes(img.url));
 

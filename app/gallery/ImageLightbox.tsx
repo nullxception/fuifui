@@ -142,7 +142,11 @@ export default function ImageLightbox() {
         showMetadata(false);
       }
     }, 300);
-    goto(hasPrev ? "prev" : "next");
+    if (hasPrev) {
+      goto("prev");
+    } else {
+      close();
+    }
   };
 
   // prevent scroll on preview canvas
