@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import path from "path";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
@@ -16,8 +17,13 @@ const getFileList = async (
   dir: string,
   recursive: boolean = true,
 ): Promise<string[]> => {
-  const files = await fs.readdir(dir, { recursive: recursive });
-  return files.filter((file) => !/.placeholder$/.test(file));
+  const files = await fs.readdir(dir, {
+    recursive: recursive,
+    withFileTypes: true,
+  });
+  return files
+    .filter((it) => !/.placeholder$/.test(it.name) && it.isFile())
+    .map((it) => path.relative(dir, path.join(it.parentPath, it.name)));
 };
 
 export const diffusionModels = async () => {
