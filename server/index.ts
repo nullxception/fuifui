@@ -1,4 +1,4 @@
-import app from "public/index.html";
+import app from "app/index.html";
 import serveStatic from "./api/assets";
 import { removeBackground, uploadBackground } from "./api/background";
 import { readConfig, saveConfig } from "./api/config";
