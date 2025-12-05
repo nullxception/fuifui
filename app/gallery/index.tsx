@@ -1,6 +1,7 @@
 import { Footer } from "@/components/customized/Footer";
+import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import { ImageIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import type { Image } from "server/types";
 import { Link, useRoute } from "wouter";
@@ -61,108 +62,116 @@ function GalleryItem({ image }: GalleryItemProps) {
   );
 }
 
-export default function Gallery() {
-  const { images, hasMore, isLoading } = useGallery(
-    useShallow((state) => ({
-      images: state.images,
-      hasMore: state.hasMore,
-      isLoading: state.isLoading,
-    })),
-  );
-  const { fetchImages } = useGallery();
-  const isLoadingMore = isLoading && images.length > 0;
-  const observerTarget = useRef(null);
-  const [appScrollTop, setAppScrollTop] = useState(0);
-  const [match] = useRoute("/gallery");
-
-  useEffect(() => {
-    const app = document.querySelector("#app");
-    if (match && app && appScrollTop > 0) {
-      // scroll saved scrollTop after going back from /gallery/:id
-      app.scrollTop = appScrollTop;
-    }
-  }, [match, appScrollTop]);
-
-  useEffect(() => {
-    fetchImages(false);
-  }, [fetchImages]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry && entry.isIntersecting && hasMore && !isLoading) {
-          fetchImages(true);
-        }
-      },
-      { threshold: 0.1 },
+const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+  (props, ref) => {
+    const { images, hasMore, isLoading } = useGallery(
+      useShallow((state) => ({
+        images: state.images,
+        hasMore: state.hasMore,
+        isLoading: state.isLoading,
+      })),
     );
+    const { fetchImages } = useGallery();
+    const isLoadingMore = isLoading && images.length > 0;
+    const observerTarget = useRef(null);
+    const [appScrollTop, setAppScrollTop] = useState(0);
+    const [match] = useRoute("/gallery");
 
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
+    useEffect(() => {
+      const app = document.querySelector("#app");
+      if (match && app && appScrollTop > 0) {
+        // scroll saved scrollTop after going back from /gallery/:id
+        app.scrollTop = appScrollTop;
+      }
+    }, [match, appScrollTop]);
+
+    useEffect(() => {
+      fetchImages(false);
+    }, [fetchImages]);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (entry && entry.isIntersecting && hasMore && !isLoading) {
+            fetchImages(true);
+          }
+        },
+        { threshold: 0.1 },
+      );
+
+      const currentTarget = observerTarget.current;
+      if (currentTarget) {
+        observer.observe(currentTarget);
+      }
+
+      return () => {
+        if (currentTarget) {
+          observer.unobserve(currentTarget);
+        }
+      };
+    }, [hasMore, isLoading, fetchImages]);
+
+    const [, params] = useRoute("/gallery/:id");
+
+    if (images.length === 0 && !isLoadingMore) {
+      return (
+        <>
+          <motion.div
+            ref={ref}
+            {...props}
+            className="flex h-full flex-col items-center justify-center py-24 text-center"
+          >
+            <div className="mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-background/50 p-2 text-foreground">
+              <ImageIcon className="h-12 w-12" />
+            </div>
+            <p className="text-lg font-medium text-foreground">No images yet</p>
+            <p className="text-sm text-muted-foreground">
+              Generated images will appear here
+            </p>
+          </motion.div>
+          <Footer />
+        </>
+      );
     }
 
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasMore, isLoading, fetchImages]);
-
-  const [, params] = useRoute("/gallery/:id");
-
-  if (images.length === 0 && !isLoadingMore) {
     return (
       <>
-        <div className="flex h-full flex-col items-center justify-center py-24 text-center">
-          <div className="mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-background/50 p-2 text-foreground">
-            <ImageIcon className="h-12 w-12" />
-          </div>
-          <p className="text-lg font-medium text-foreground">No images yet</p>
-          <p className="text-sm text-muted-foreground">
-            Generated images will appear here
-          </p>
-        </div>
-        <Footer />
+        <motion.div ref={ref} {...props} className="grow p-2">
+          <ResponsiveMasonry
+            columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
+            gutterBreakPoints={{ 350: "6px", 720: "12px" }}
+            className="mx-auto max-w-screen-2xl"
+          >
+            <Masonry>
+              {images.map((image, index) => (
+                <Link
+                  key={index}
+                  href={`~/gallery/${image.name}`}
+                  state={{ from: "~/gallery" }}
+                  onClick={() => {
+                    const app = document.querySelector("#app");
+                    setAppScrollTop(app?.scrollTop ?? 0);
+                  }}
+                  className="w-full"
+                >
+                  <GalleryItem image={image} />
+                </Link>
+              ))}
+            </Masonry>
+          </ResponsiveMasonry>
+          <div ref={observerTarget} className="col-span-full h-10 w-full" />
+          {isLoadingMore && (
+            <div className="col-span-full flex justify-center p-4">
+              <span className="text-foreground">Loading more...</span>
+            </div>
+          )}
+          <Footer className="col-span-full flex justify-center p-4" />
+        </motion.div>
+        <AnimatePresence>{params?.id && <ImageLightbox />}</AnimatePresence>
       </>
     );
-  }
+  },
+);
 
-  return (
-    <>
-      <main className="grow p-2">
-        <ResponsiveMasonry
-          columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
-          gutterBreakPoints={{ 350: "6px", 720: "12px" }}
-          className="mx-auto max-w-screen-2xl"
-        >
-          <Masonry>
-            {images.map((image, index) => (
-              <Link
-                key={index}
-                href={`~/gallery/${image.name}`}
-                state={{ from: "~/gallery" }}
-                onClick={() => {
-                  const app = document.querySelector("#app");
-                  setAppScrollTop(app?.scrollTop ?? 0);
-                }}
-                className="w-full"
-              >
-                <GalleryItem image={image} />
-              </Link>
-            ))}
-          </Masonry>
-        </ResponsiveMasonry>
-        <div ref={observerTarget} className="col-span-full h-10 w-full" />
-        {isLoadingMore && (
-          <div className="col-span-full flex justify-center p-4">
-            <span className="text-foreground">Loading more...</span>
-          </div>
-        )}
-        <Footer className="col-span-full flex justify-center p-4" />
-      </main>
-      {params?.id && <ImageLightbox />}
-    </>
-  );
-}
+export default Gallery;

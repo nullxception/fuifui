@@ -34,7 +34,7 @@ const saveImage = async (image: Image) => {
 interface ImageMetadataProps {
   image: Image;
   onRemove: () => void;
-  showMetadata: (value: boolean) => void;
+  onClose: () => void;
   className: string;
 }
 
@@ -64,7 +64,11 @@ function MetadataChip({
       </Label>
       <p className="text-gray truncate font-mono text-xs whitespace-pre-wrap">
         {Array.isArray(value)
-          ? value.map((v, i) => <div key={i}>{v}</div>)
+          ? value.map((v, i) => (
+              <span className="block" key={i}>
+                {v}
+              </span>
+            ))
           : value?.toString()?.trim()}
       </p>
     </div>
@@ -74,7 +78,7 @@ function MetadataChip({
 export default function ImageMetadata({
   image,
   onRemove,
-  showMetadata,
+  onClose,
   className = "",
 }: ImageMetadataProps) {
   const [, navigate] = useLocation();
@@ -101,10 +105,10 @@ export default function ImageMetadata({
     });
 
     // Navigate back to generate tab
-    showMetadata(false);
     setImage(image);
     setOutputTab("image");
     navigate("~/");
+    onClose();
   };
 
   return (
@@ -120,9 +124,7 @@ export default function ImageMetadata({
             variant="ghost"
             size="icon-lg"
             className="text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
-            onClick={() => {
-              showMetadata(false);
-            }}
+            onClick={onClose}
           >
             <ChevronDownIcon className="text-foreground" />
           </Button>

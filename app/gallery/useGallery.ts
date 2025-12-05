@@ -6,14 +6,17 @@ interface GalleryState {
   isLoading: boolean;
   offset: number;
   hasMore: boolean;
+  lastLoadedImage?: Image;
 
   fetchImages: (isLoadMore?: boolean) => Promise<void>;
   removeImages: (urls: string[]) => Promise<void>;
+  setLastLoadedImage: (image: Image) => void;
 }
 
 const LIMIT = 20;
 
 export const useGallery = create<GalleryState>((set, get) => ({
+  lastLoadedImage: undefined,
   images: [],
   isLoading: false,
   offset: 0,
@@ -63,5 +66,8 @@ export const useGallery = create<GalleryState>((set, get) => ({
     } catch (error) {
       console.error("Failed to remove image:", error);
     }
+  },
+  setLastLoadedImage: (image: Image) => {
+    set({ lastLoadedImage: image });
   },
 }));

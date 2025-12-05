@@ -76,24 +76,31 @@ export default function ImageLightbox() {
   });
   const [, navigate] = useLocation();
   const [, params] = useRoute("/gallery/:id");
-  const id = params ? params.id : "";
-  const { images } = useGallery(
-    useShallow((state) => ({ images: state.images })),
+  const { images, lastLoadedImage } = useGallery(
+    useShallow((state) => ({
+      images: state.images,
+      lastLoadedImage: state.lastLoadedImage,
+    })),
   );
-  const { removeImages, fetchImages } = useGallery();
+  const { removeImages, fetchImages, setLastLoadedImage } = useGallery();
   const [shouldShowRemoveDialog, showRemoveDialog] = useState(false);
-  const [shouldShowMetadata, showMetadata] = useState(() => {
-    return window.innerWidth >= 1024; // lg breakpoint
-  });
+  const isMd = window.innerWidth < 768;
+  const [shouldShowMetadata, showMetadata] = useState(!isMd);
 
-  const index = images.findLastIndex((i) => i.name === id);
-  const image = images[index];
+  const index = images.findLastIndex((i) => i.name === params?.id);
+  const image = images[index] ?? lastLoadedImage;
+
   const close = useCallback(() => {
-    if (window.innerWidth < 1024) {
-      showMetadata(false);
+    if (image && image !== lastLoadedImage) {
+      setLastLoadedImage(image);
     }
+    setTimeout(() => {
+      if (isMd) {
+        showMetadata(false);
+      }
+    }, 300);
     navigate(history.state?.from || "~/gallery", { replace: true });
-  }, [navigate]);
+  }, [image, isMd, lastLoadedImage, navigate, setLastLoadedImage]);
 
   const hasNext = index + 1 < images.length;
   const hasPrev = index != 0;
@@ -142,28 +149,37 @@ export default function ImageLightbox() {
     if (image) {
       removeImages([image.url]);
     }
-    if (window.innerWidth < 1024) {
-      showMetadata(false);
-    }
     showRemoveDialog(false);
+    setTimeout(() => {
+      if (isMd) {
+        showMetadata(false);
+      }
+    }, 300);
     goto(hasPrev ? "prev" : "next");
   };
 
   return (
     <>
-      <div className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row">
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+      <motion.div
+        className="lightbox fixed inset-0 z-100 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
+        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0, scale: 1.25 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 1.25 }}
+      >
+        <div className="relative flex flex-1 items-stretch justify-center overflow-hidden">
           <AnimatePresence initial={false} custom={page}>
             <motion.div
-              key={id}
+              key={image?.name}
               custom={page}
               variants={variants}
+              inherit={false}
               initial="enter"
               animate="center"
               exit="exit"
               transition={{
-                x: { type: "tween", duration: 0.3, ease: "easeOut" },
-                opacity: { duration: 0.15 },
+                x: { type: "tween", duration: 0.3, ease: "circOut" },
+                opacity: { duration: 0.3 },
               }}
               drag="x"
               dragConstraints={{
@@ -242,11 +258,11 @@ export default function ImageLightbox() {
           <ImageMetadata
             image={image}
             onRemove={() => showRemoveDialog(true)}
-            showMetadata={showMetadata}
+            onClose={() => showMetadata(false)}
             className={`${shouldShowMetadata ? "block" : "hidden"}`}
           />
         )}
-      </div>
+      </motion.div>
       {shouldShowRemoveDialog && (
         <RemoveImage
           onRemove={onRemove}

@@ -13,10 +13,10 @@ import { useAppStore } from "../stores/useAppStore";
 interface DiffusionState {
   jobId: string;
   isProcessing: boolean;
-  image: Image | null;
+  image?: Image;
   logs: LogEntry[];
 
-  setImage: (image: Image | null) => void;
+  setImage: (image?: Image) => void;
   postResult: (result: DiffusionResult) => void;
   addLog: (log: LogEntry) => void;
   clearLogs: () => void;
@@ -31,7 +31,7 @@ let eventSource: EventSource | null = null;
 export const useDiffusionJob = create<DiffusionState>((set, get) => ({
   jobId: "",
   isProcessing: false,
-  image: null,
+  image: undefined,
   logs: [],
 
   setImage: (image) => set({ image: image }),
@@ -164,11 +164,12 @@ export const useDiffusionJob = create<DiffusionState>((set, get) => ({
       if (jobs.length == 0) return;
 
       const last = jobs[jobs.length - 1];
-      const isRunning =
-        last?.status === "pending" || last?.status === "running";
-      if (last?.id && isRunning) {
+      if (!last) return;
+
+      const isRunning = last.status === "pending" || last.status === "running";
+      if (last.id && isRunning) {
         connectToJob(last.id);
-      } else if (last?.status === "completed" && last?.result) {
+      } else if (last.status === "completed" && last.result) {
         postResult(last.result);
       }
     } catch (error) {

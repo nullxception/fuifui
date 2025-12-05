@@ -4,7 +4,7 @@ import type { Image } from "server/types";
 import { Link } from "wouter";
 
 interface ImageDisplayProps {
-  image: Image | null;
+  image?: Image;
   isProcessing: boolean;
 }
 
