@@ -1,6 +1,7 @@
 import exifr from "exifr";
 import { promises as fs } from "fs";
 import path from "path";
+import { deleteJobByResultFile } from "server/services/jobs";
 import { OUTPUT_DIR, THUMBS_DIR } from "../dirs";
 import type { Image } from "../types";
 
@@ -89,32 +90,36 @@ const list = async (limit: number, offset: number): Promise<Image[]> => {
   }
 };
 
-const remove = async (images: string[]): Promise<void> => {
+async function cleanupThumbnails(img: string) {
+  const filename = path.basename(img);
+  const files = await fs.readdir(THUMBS_DIR);
+
+  files
+    .filter((file) => file.startsWith(filename))
+    .forEach(async (it) => {
+      const thumb = path.join(THUMBS_DIR, it);
+      console.log(`thumbnails: removing ${thumb}`);
+      await Bun.file(thumb).delete();
+    });
+}
+
+async function remove(images: string[]) {
   try {
-    for (let img of images) {
-      img = path.normalize(img);
+    for (const image of images) {
+      let img = path.normalize(image);
       if (!img.startsWith("/output/")) {
         continue;
       }
-      img = path.join(OUTPUT_DIR, path.normalize(img));
+      img = path.join(OUTPUT_DIR, path.normalize(img.replace("/output", "")));
       console.log(`removing ${img}`);
       await Bun.file(img).delete();
-      const filename = path.basename(img);
-
-      const files = await fs.readdir(THUMBS_DIR);
-
-      files
-        .filter((file) => file.startsWith(filename))
-        .forEach(async (it) => {
-          const thumb = path.join(THUMBS_DIR, it);
-          console.log(`thumbnails: removing ${thumb}`);
-          await Bun.file(thumb).delete();
-        });
+      cleanupThumbnails(img);
+      deleteJobByResultFile(image);
     }
   } catch {
     throw new Error(`Image(s) not found`);
   }
-};
+}
 
 export const listImages = async (req: Request) => {
   const url = new URL(req.url);

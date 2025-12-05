@@ -93,6 +93,14 @@ export const getAllJobs = (): Job[] => {
   return Array.from(jobs.values());
 };
 
+export const deleteJobByResultFile = (filename: string): void => {
+  for (const [id, job] of jobs.entries()) {
+    if (job.result?.image?.url === filename) {
+      jobs.delete(id);
+    }
+  }
+};
+
 export const cleanupOldJobs = (maxAge: number = 24 * 60 * 60 * 1000): void => {
   const now = Date.now();
   for (const [id, job] of jobs.entries()) {
