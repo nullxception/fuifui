@@ -77,6 +77,7 @@ export type ExtraDataType = "embedding" | "lora";
 export interface TriggerWord {
   type: ExtraDataType;
   target: string;
+  loraStrength?: number;
   words: string[];
 }
 

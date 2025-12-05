@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,7 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PencilIcon, PlusIcon, TrashIcon, XIcon } from "lucide-react";
+import {
+  MinusIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+  XIcon,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import type { ExtraDataType, TriggerWord } from "server/types";
 import { splitSmart } from "../lib/metadataParser";
@@ -88,7 +99,7 @@ const TriggerWordsEditor: React.FC = () => {
         <Label>Trigger Words</Label>
         <Button
           onClick={handleAdd}
-          variant="secondary"
+          variant="outline"
           size="sm"
           disabled={newEntry !== null}
         >
@@ -144,25 +155,30 @@ const TriggerWordsEditor: React.FC = () => {
                       </div>
                     </div>
                     <div className="ml-2 flex gap-1">
-                      <Button
-                        onClick={() => handleEdit(index)}
-                        variant="secondary"
-                        size="sm"
-                        className="h-8 w-10"
-                      >
-                        <PencilIcon />
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(index)}
-                        variant="destructive"
-                        size="sm"
-                        className="h-8 w-10"
-                      >
-                        <TrashIcon />
-                      </Button>
+                      <ButtonGroup>
+                        <Button
+                          onClick={() => handleEdit(index)}
+                          variant="outline"
+                          className="h-8 w-10"
+                        >
+                          <PencilIcon />
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(index)}
+                          variant="destructive"
+                          className="h-8 w-10"
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </ButtonGroup>
                     </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="mt-2 flex flex-wrap items-center gap-1">
+                    {entry.loraStrength && entry.loraStrength < 1 && (
+                      <span className="items-center rounded bg-purple-500/20 px-2 py-1 text-xs">
+                        strength:{entry.loraStrength}
+                      </span>
+                    )}
                     {entry.words.map((word, wordIndex) => (
                       <span
                         key={wordIndex}
@@ -258,11 +274,20 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
     }
   };
 
+  const handleStrengthChange = (value: number) => {
+    if (value > 1) value = 1;
+    onChange({
+      ...entry,
+      loraStrength: value,
+    });
+  };
+
+  const loraStrength = entry.loraStrength ?? 1;
+  const typeLabel = entry.type === "lora" ? "LoRA" : "Embedding";
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label className="mb-1 text-xs">Type</Label>
           <Select
             value={entry.type}
             onValueChange={(e) =>
@@ -285,7 +310,6 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
           </Select>
         </div>
         <div>
-          <Label className="mb-1 text-xs">Target</Label>
           <Select
             value={entry.target}
             onValueChange={(e) =>
@@ -296,7 +320,7 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
             }
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={`Select ${entry.type}...`} />
+              <SelectValue placeholder={`Select ${typeLabel}...`} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -313,18 +337,19 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
       </div>
 
       <div>
-        <Label className="mb-1 text-xs">Words</Label>
         <div className="mb-2 flex gap-2">
-          <Input
-            value={wordInput}
-            onChange={(e) => setWordInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Add a word..."
-            className="flex-1"
-          />
-          <Button onClick={handleAddWord} variant="secondary" size="sm">
-            <PlusIcon />
-          </Button>
+          <InputGroup>
+            <InputGroupInput
+              value={wordInput}
+              onChange={(e) => setWordInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Add some word"
+              className="flex-1"
+            />
+            <InputGroupButton onClick={handleAddWord}>
+              <PlusIcon />
+            </InputGroupButton>
+          </InputGroup>
         </div>
         <div className="flex flex-wrap gap-1">
           {entry.words.map((word, index) => (
@@ -344,8 +369,38 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
         </div>
       </div>
 
+      {entry.type === "lora" && (
+        <div className="flex justify-end gap-4 pt-2">
+          <Label>Strength</Label>
+          <InputGroup className="w-30">
+            <InputGroupButton
+              onClick={() => handleStrengthChange(loraStrength - 0.1)}
+            >
+              <MinusIcon />
+            </InputGroupButton>
+            <InputGroupInput
+              type="number"
+              min={0}
+              max={1}
+              step={0.01}
+              value={loraStrength}
+              onChange={(e) => {
+                handleStrengthChange(e.target.valueAsNumber);
+              }}
+              placeholder="1"
+              className="w-15 text-center"
+            />
+            <InputGroupButton
+              onClick={() => handleStrengthChange(loraStrength + 0.1)}
+            >
+              <PlusIcon />
+            </InputGroupButton>
+          </InputGroup>
+        </div>
+      )}
+
       <div className="flex justify-end gap-2 pt-2">
-        <Button onClick={onCancel} variant="ghost" size="sm">
+        <Button onClick={onCancel} variant="outline" size="sm">
           Cancel
         </Button>
         <Button

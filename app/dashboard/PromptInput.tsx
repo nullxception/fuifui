@@ -63,17 +63,21 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   const title = type === "prompt" ? "Prompt" : "Negative Prompt";
 
   const addExtraData = (filename: string, extraType: ExtraDataType) => {
-    const name = filename.replace(/\.(safetensors|ckpt)$/, "");
-    const prefix =
-      extraType === "lora" ? `<lora:${name}:1>` : `embedding:${name}`;
-
+    console.log(triggerWords);
     // Find matching trigger words for this embedding/lora
     const matchingTrigger = triggerWords.find(
-      (tw) => tw.type === extraType && tw.target === name,
+      (tw) => tw.type === extraType && tw.target.startsWith(filename),
     );
 
     // Build the text to add: prefix + trigger words (if any)
     const triggerWordsText = matchingTrigger?.words.join(", ") || "";
+    const loraStrength = matchingTrigger?.loraStrength || 1;
+
+    const name = filename.replace(/\.(safetensors|ckpt)$/, "");
+    const prefix =
+      extraType === "lora"
+        ? `<lora:${name}:${loraStrength}>`
+        : `embedding:${name}`;
     const textToAdd = triggerWordsText
       ? `${prefix}, ${triggerWordsText}`
       : prefix;

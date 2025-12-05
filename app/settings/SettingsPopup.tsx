@@ -22,7 +22,7 @@ const SettingsPopup: React.FC = () => {
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <Card className="mx-4 flex max-h-[80vh] flex-col overflow-clip border-border bg-background/90 shadow-2xl scrollbar-thumb-border scrollbar-track-border">
+      <Card className="mx-4 flex max-h-[80vh] w-[90vw] flex-col overflow-clip border-border bg-background/90 shadow-2xl scrollbar-thumb-border scrollbar-track-border lg:w-[70vw]">
         <div className="bg-surface sticky top-0 z-10 flex flex-row items-center justify-between border-b border-border p-2">
           <div className="px-2 leading-none font-semibold tracking-tight">
             Settings
