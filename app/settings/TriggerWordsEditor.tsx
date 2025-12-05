@@ -79,8 +79,7 @@ const TriggerWordsEditor: React.FC = () => {
   };
 
   const getAvailableTargets = (type: ExtraDataType) => {
-    const targets = type === "embedding" ? models.embeddings : models.loras;
-    return targets.map((t) => t.replace(".safetensors", ""));
+    return type === "embedding" ? models.embeddings : models.loras;
   };
 
   return (

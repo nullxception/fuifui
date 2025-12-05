@@ -46,7 +46,7 @@ const ExtraSelector: React.FC<{
       <SelectContent>
         {extras.map((extra) => (
           <SelectItem key={extra} value={extra}>
-            {extra.replace(".safetensors", "")}
+            {extra}
           </SelectItem>
         ))}
       </SelectContent>
@@ -86,7 +86,7 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   }, []);
 
   const addExtraData = (filename: string, extraType: ExtraDataType) => {
-    const name = filename.replace(".safetensors", "");
+    const name = filename.replace(/\.(safetensors|ckpt)$/, "");
     const prefix =
       extraType === "lora" ? `<lora:${name}:1>` : `embedding:${name}`;
 
