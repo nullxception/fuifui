@@ -7,13 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import type { ExtraDataType } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
 import { useModels, useTriggerWords } from "../stores";
@@ -54,36 +48,19 @@ const ExtraSelector: React.FC<{
   );
 };
 
-const autoResize = (el: HTMLTextAreaElement, cb: () => void) => {
+const autoResize = (el: HTMLTextAreaElement) => {
   requestAnimationFrame(() => {
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
-    cb();
   });
 };
 
 const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
   const { models } = useModels();
-  const {
-    value: prompt,
-    changed: changed,
-    updatePrompt,
-    forceSave,
-  } = usePromptState(type);
+  const { value, changed, updatePrompt, forceSave } = usePromptState(type);
   const ref = useRef<HTMLTextAreaElement>(null);
   const { triggerWords } = useTriggerWords();
-  const [start, setStart] = useState(0);
-  const [end, setEnd] = useState(0);
   const title = type === "prompt" ? "Prompt" : "Negative Prompt";
-
-  const updateCaret = useCallback(() => {
-    if (ref.current) {
-      const { selectionStart, selectionEnd } = ref.current;
-
-      setStart(selectionStart);
-      setEnd(selectionEnd);
-    }
-  }, []);
 
   const addExtraData = (filename: string, extraType: ExtraDataType) => {
     const name = filename.replace(/\.(safetensors|ckpt)$/, "");
@@ -101,22 +78,15 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
       ? `${prefix}, ${triggerWordsText}`
       : prefix;
 
-    const newPrompt = optimizePrompt(`${textToAdd}, ${prompt}`);
+    const newPrompt = optimizePrompt(`${textToAdd}, ${value}`);
     updatePrompt(newPrompt);
   };
 
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.setSelectionRange(start, end);
-    }
-  });
-
   useLayoutEffect(() => {
-    const el = ref.current;
-    if (el) {
-      autoResize(el, updateCaret);
+    if (ref.current) {
+      autoResize(ref.current);
     }
-  }, [updateCaret, prompt]);
+  }, [value]);
 
   return (
     <div className="space-y-2 px-4">
@@ -137,10 +107,9 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
       </div>
       <Textarea
         ref={ref}
-        value={prompt}
+        value={value}
         onChange={(e) => {
           updatePrompt(e.target.value);
-          updateCaret();
         }}
         onBlur={() => {
           forceSave();
