@@ -12,8 +12,11 @@ import { startDiffusion, stopDiffusion } from "../services/diffusion";
 import { createJob, getAllJobs, getJob, jobEvents } from "../services/jobs";
 import type { DiffusionParams, DiffusionResult, Models } from "../types";
 
-const getFileList = async (dir: string): Promise<string[]> => {
-  const files = await fs.readdir(dir, { recursive: true });
+const getFileList = async (
+  dir: string,
+  recursive: boolean = true,
+): Promise<string[]> => {
+  const files = await fs.readdir(dir, { recursive: recursive });
   return files.filter((file) => !/.placeholder$/.test(file));
 };
 
@@ -21,7 +24,7 @@ export const diffusionModels = async () => {
   try {
     return Response.json(<Models>{
       checkpoints: await getFileList(CHECKPOINT_DIR),
-      embeddings: await getFileList(EMBEDDING_DIR),
+      embeddings: await getFileList(EMBEDDING_DIR, false),
       loras: await getFileList(LORA_DIR),
       vaes: await getFileList(VAE_DIR),
       upscalers: await getFileList(UPSCALER_DIR),
