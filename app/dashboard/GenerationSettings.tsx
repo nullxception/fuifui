@@ -255,6 +255,15 @@ export const GenerationSettings: React.FC = () => {
           </InputGroup>
         </div>
         <div className="flex items-center justify-between py-2">
+          <Label htmlFor="verbose" className="cursor-pointer">
+            Verbose console output
+          </Label>
+          <Switch
+            checked={store.params.verbose}
+            onCheckedChange={(e) => store.update("verbose", e)}
+          />
+        </div>
+        <div className="flex items-center justify-between py-2">
           <Label htmlFor="diffusionFa" className="cursor-pointer">
             Flash Attention
           </Label>

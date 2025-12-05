@@ -19,6 +19,7 @@ export const defaultDiffusionParams: DiffusionParams = {
   threads: -1,
   offloadToCpu: false,
   forceSdxlVaeConvScale: false,
+  verbose: false,
 };
 
 export const defaultSettings: AppSettings = {

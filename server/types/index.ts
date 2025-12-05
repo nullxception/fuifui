@@ -30,6 +30,7 @@ export interface DiffusionParams {
   threads: number;
   offloadToCpu: boolean;
   forceSdxlVaeConvScale: boolean;
+  verbose: boolean;
 }
 
 export type JobStatus =

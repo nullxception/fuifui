@@ -184,6 +184,9 @@ export const startDiffusion = async (
     args.push("--force-sdxl-vae-conv-scale");
   }
 
+  if (params.verbose) {
+    args.push("--verbose");
+  }
   const sendLog = (type: "stdout" | "stderr", message: string) => {
     const log = message.trim().replaceAll(ROOT_DIR + path.sep, "");
     if (type === "stderr") {
