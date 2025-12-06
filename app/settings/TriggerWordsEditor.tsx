@@ -428,7 +428,7 @@ function TriggerWordsEditor() {
       {/* Delete Confirmation Dialog */}
       {deleteConfirmIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-          <Card className="bg-surface mx-4 w-full max-w-sm border-border shadow-2xl">
+          <Card className="mx-4 w-full max-w-sm border-border bg-background/90 shadow-2xl">
             <div className="space-y-4 p-4">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Delete Trigger Word?</h3>
