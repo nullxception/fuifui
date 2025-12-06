@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useModels } from "@/dashboard/useModels";
 import {
   MinusIcon,
   PencilIcon,
@@ -26,7 +27,7 @@ import {
 import React, { useEffect, useState } from "react";
 import type { ExtraDataType, TriggerWord } from "server/types";
 import { splitSmart } from "../lib/metadataParser";
-import { useModels, useTriggerWords } from "../stores";
+import { useTriggerWords } from "./useTriggerWords";
 
 interface TriggerWordFormProps {
   isEditing?: boolean;
@@ -37,14 +38,14 @@ interface TriggerWordFormProps {
   onCancel: () => void;
 }
 
-const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
+function TriggerWordForm({
   isEditing = false,
   entry,
   onChange,
   availableTargets,
   onSave,
   onCancel,
-}) => {
+}: TriggerWordFormProps) {
   const [wordInput, setWordInput] = useState("");
 
   const handleAddWord = () => {
@@ -221,9 +222,9 @@ const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
       </div>
     </div>
   );
-};
+}
 
-const TriggerWordsEditor: React.FC = () => {
+function TriggerWordsEditor() {
   const { triggerWords, addTriggerWord, updateTriggerWord, deleteTriggerWord } =
     useTriggerWords();
   const { models, fetchModels } = useModels();
@@ -454,6 +455,6 @@ const TriggerWordsEditor: React.FC = () => {
       )}
     </>
   );
-};
+}
 
 export default TriggerWordsEditor;

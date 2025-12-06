@@ -12,17 +12,17 @@ import {
 import { listImages, removeImages } from "./api/gallery";
 import system from "./api/system";
 import { ensureDirectories } from "./dirs";
-import { stopDiffusion } from "./services/diffusion";
+import { stopJobs } from "./services/jobs";
 
 const PORT = process.env.PORT || 5141;
 
 await ensureDirectories();
 
-const cleanup = () => {
+function cleanup() {
   console.log("Terminating all active jobs...");
-  stopDiffusion();
+  stopJobs();
   process.exit(0);
-};
+}
 
 process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);

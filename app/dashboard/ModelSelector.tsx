@@ -8,9 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GGML_WEIGHTS_TYPE } from "server/types/ggml";
-import { useDiffusionConfig, useModels } from "../stores";
+import { useDiffusionConfig } from "./useDiffusionConfig";
+import { useModels } from "./useModels";
 
-export const ModelSelector = () => {
+export function ModelSelector() {
   const { models } = useModels();
   const store = useDiffusionConfig();
 
@@ -256,4 +257,4 @@ export const ModelSelector = () => {
       </div>
     </div>
   );
-};
+}

@@ -20,7 +20,7 @@ export const PUBLIC_DIR = path.join(ROOT_DIR, "public");
 export const UPLOAD_DIR = path.join(PUBLIC_DIR, "upload");
 export const CONFIG_PATH = path.join(ROOT_DIR, "config.yaml");
 
-export const ensureDirectories = async () => {
+export async function ensureDirectories() {
   const dirs = [
     CHECKPOINT_DIR,
     EMBEDDING_DIR,
@@ -36,4 +36,4 @@ export const ensureDirectories = async () => {
   for (const dir of dirs) {
     await fs.mkdir(dir, { recursive: true });
   }
-};
+}

@@ -1,4 +1,4 @@
-const info = async () => {
+async function info() {
   try {
     async function getPhysicalCoreCount(): Promise<number | null> {
       const platform = process.platform;
@@ -51,6 +51,6 @@ const info = async () => {
       { status: 500 },
     );
   }
-};
+}
 
 export default { info };

@@ -5,10 +5,7 @@ import { OUTPUT_DIR, PUBLIC_DIR, THUMBS_DIR } from "../dirs";
 
 const assetsCacheControl = "public, max-age=31536000, immutable";
 
-const serveThumbnail = async (
-  filepath: string,
-  size: number,
-): Promise<Response> => {
+async function serveThumbnail(filepath: string, size: number) {
   let thumb = path.parse(filepath).name;
   thumb = `${thumb}--${size}.jpg`;
   thumb = path.join(THUMBS_DIR, thumb);
@@ -27,9 +24,9 @@ const serveThumbnail = async (
   return new Response(Bun.file(thumb), {
     headers: { "Cache-Control": assetsCacheControl },
   });
-};
+}
 
-const serveStatic = async (req: Request): Promise<Response> => {
+async function serveStatic(req: Request) {
   const url = new URL(req.url);
   const pathname = url.pathname;
 
@@ -56,6 +53,6 @@ const serveStatic = async (req: Request): Promise<Response> => {
   }
 
   return new Response("Not found", { status: 404 });
-};
+}
 
 export default serveStatic;

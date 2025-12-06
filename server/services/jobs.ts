@@ -2,11 +2,11 @@ import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
 import type { DiffusionResult, Job, JobStatus, LogData } from "../types";
 
-export const jobEvents = new EventEmitter();
-export const activeProcesses = new Map<string, Subprocess>();
+const jobEvents = new EventEmitter();
+const activeProcesses = new Map<string, Subprocess>();
 const jobs = new Map<string, Job>();
 
-export const createJob = (id?: string): Job => {
+export function createJob(id?: string) {
   const job: Job = {
     id: id ?? randomUUIDv7(),
     status: "pending",
@@ -16,11 +16,12 @@ export const createJob = (id?: string): Job => {
 
   jobs.set(job.id, job);
   return job;
-};
+}
 
-export const getJob = (id: string): Job | undefined => {
-  return jobs.get(id);
-};
+export const getJob = (id: string) => jobs.get(id);
+
+export const withJobEvents = (predicate: (events: EventEmitter) => void) =>
+  predicate(jobEvents);
 
 export function updateJobStatus({
   id,
@@ -79,7 +80,7 @@ export function updateJobStatus({
   }
 }
 
-export const addJobLog = (id: string, log: LogData): void => {
+export function addJobLog(id: string, log: LogData) {
   let job = jobs.get(id);
   if (!job) {
     job = createJob(id);
@@ -87,25 +88,36 @@ export const addJobLog = (id: string, log: LogData): void => {
 
   job?.logs.push(log);
   jobEvents.emit("log", { jobId: id, log });
-};
+}
 
-export const getAllJobs = (): Job[] => {
+export function getAllJobs(): Job[] {
   return Array.from(jobs.values());
-};
+}
 
-export const deleteJobByResultFile = (filename: string): void => {
+export function deleteJobByResultFile(filename: string) {
   for (const [id, job] of jobs.entries()) {
     if (job.result?.image?.url === filename) {
       jobs.delete(id);
     }
   }
-};
+}
 
-export const cleanupOldJobs = (maxAge: number = 24 * 60 * 60 * 1000): void => {
+export function stopJob(jobId?: string) {
+  if (jobId) {
+    updateJobStatus({ id: jobId, status: "cancelled" });
+  }
+}
+
+export function stopJobs() {
+  for (const [id] of activeProcesses.entries()) {
+    stopJob(id);
+  }
+}
+export function cleanupOldJobs(maxAge: number = 24 * 60 * 60 * 1000) {
   const now = Date.now();
   for (const [id, job] of jobs.entries()) {
     if (job.completedAt && now - job.completedAt > maxAge) {
       jobs.delete(id);
     }
   }
-};
+}

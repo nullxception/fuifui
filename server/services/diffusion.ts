@@ -13,19 +13,9 @@ import {
   VAE_DIR,
 } from "../dirs";
 import type { DiffusionParams } from "../types";
-import { activeProcesses, addJobLog, getJob, updateJobStatus } from "./jobs";
+import { addJobLog, getJob, updateJobStatus } from "./jobs";
 
-export const stopDiffusion = (jobId?: string) => {
-  if (jobId) {
-    updateJobStatus({ id: jobId, status: "cancelled" });
-  }
-
-  for (const [id] of activeProcesses.entries()) {
-    updateJobStatus({ id: id, status: "cancelled" });
-  }
-};
-
-const printableArgs = (args: (string | number)[]) => {
+function printableArgs(args: (string | number)[]) {
   return args
     .map((arg) =>
       arg.toString().includes(" ")
@@ -33,11 +23,13 @@ const printableArgs = (args: (string | number)[]) => {
         : arg,
     )
     .join(" ");
-};
+}
 
-const pad = (num: number) => String(num).padStart(2, "0");
+function pad(num: number) {
+  return String(num).padStart(2, "0");
+}
 
-const filename = (timestamp: number) => {
+function filename(timestamp: number) {
   const date = new Date(timestamp);
   const year = date.getFullYear();
   const month = pad(date.getMonth() + 1);
@@ -46,22 +38,19 @@ const filename = (timestamp: number) => {
   const minute = pad(date.getMinutes());
   const second = pad(date.getSeconds());
   return `${year}${month}${day}-${hour}${minute}${second}`;
-};
+}
 
-const hasValue = (value: string | undefined) => {
+function hasValue(value: string | undefined) {
   if (typeof value !== "string") return false;
   return value?.trim()?.length ?? 0 > 0;
-};
+}
 
 /**
  * Starts the diffusion process in the background.
  * @param jobId The unique job ID.
  * @param params Diffusion parameters.
  */
-export const startDiffusion = async (
-  jobId: string,
-  params: DiffusionParams,
-) => {
+export async function startDiffusion(jobId: string, params: DiffusionParams) {
   const timestamp = Date.now();
   const outputFilename = `${filename(timestamp)}.png`;
   const outputPath = path.join(OUTPUT_DIR, "txt2img", outputFilename);
@@ -70,21 +59,10 @@ export const startDiffusion = async (
   // sd at project root or from $PATH
   const project_sd = path.join(ROOT_DIR, "sd");
   const sd = (await file(project_sd).exists()) ? project_sd : "sd";
-
-  const args = [
-    "--steps",
-    params.steps || "20",
-    "--cfg-scale",
-    params.cfgScale || "7.0",
-    "-s",
-    params.seed || "-1",
-    "-W",
-    params.width || "512",
-    "-H",
-    params.height || "512",
-    "-o",
-    outputPath,
-  ];
+  const positivePrompt = params.prompt ?? "";
+  const negativePrompt = params.negativePrompt ?? "";
+  const allPrompts = positivePrompt + negativePrompt;
+  const args: (string | number)[] = [];
 
   if (params.modelType === "standalone") {
     args.push("--diffusion-model", modelPath);
@@ -96,33 +74,12 @@ export const startDiffusion = async (
     args.push("--type", params.weightType);
   }
 
-  if (hasValue(params.prompt)) {
-    args.push("-p", params.prompt);
-  }
-
-  if (hasValue(params.negativePrompt)) {
-    args.push("-n", params.negativePrompt);
-  }
-
-  const allPrompts = params.prompt + params.negativePrompt;
   if (allPrompts.includes("embedding:")) {
     args.push("--embd-dir", EMBEDDING_DIR);
   }
 
   if (allPrompts.includes("lora:")) {
     args.push("--lora-model-dir", LORA_DIR);
-  }
-
-  if (hasValue(params.samplingMethod)) {
-    args.push("--sampling-method", params.samplingMethod ?? "euler");
-  }
-
-  if (hasValue(params.scheduler)) {
-    args.push("--scheduler", params.scheduler ?? "discrete");
-  }
-
-  if (params.clipSkip) {
-    args.push("--clip-skip", params.clipSkip);
   }
 
   if (hasValue(params.vae)) {
@@ -137,21 +94,64 @@ export const startDiffusion = async (
 
   if (hasValue(params.clipL)) {
     const clipLPath = path.join(TEXT_ENCODER_DIR, params.clipL || "");
-    args.push("--upscale-model", clipLPath);
+    args.push("--clip_l", clipLPath);
   }
 
   if (hasValue(params.clipG)) {
     const clipGPath = path.join(TEXT_ENCODER_DIR, params.clipG || "");
-    args.push("--upscale-model", clipGPath);
+    args.push("--clip_g", clipGPath);
   }
+
   if (hasValue(params.t5xxl)) {
     const t5xxlPath = path.join(TEXT_ENCODER_DIR, params.t5xxl || "");
     args.push("--t5xxl", t5xxlPath);
   }
+
   if (hasValue(params.llm)) {
     const llmPath = path.join(LLM_DIR, params.llm || "");
     args.push("--llm", llmPath);
   }
+
+  if (hasValue(positivePrompt)) {
+    args.push("-p", positivePrompt);
+  }
+
+  if (hasValue(negativePrompt)) {
+    args.push("-n", negativePrompt);
+  }
+
+  if (hasValue(params.samplingMethod)) {
+    args.push("--sampling-method", params.samplingMethod ?? "euler");
+  }
+
+  if (hasValue(params.scheduler)) {
+    args.push("--scheduler", params.scheduler ?? "discrete");
+  }
+
+  if (params.cfgScale) {
+    args.push("--cfg-scale", params.cfgScale ?? "7.0");
+  }
+
+  if (params.width) {
+    args.push("-W", params.width ?? 512);
+  }
+
+  if (params.height) {
+    args.push("-H", params.height ?? 512);
+  }
+
+  if (params.steps) {
+    args.push("--steps", params.steps ?? 20);
+  }
+
+  if (params.clipSkip || params.seed === 0) {
+    args.push("--clip-skip", params.clipSkip ?? -1);
+  }
+
+  if (params.seed || params.seed === 0) {
+    args.push("-s", params.seed ?? -1);
+  }
+
   if (params.rng) {
     args.push("--rng", params.rng);
   }
@@ -172,7 +172,7 @@ export const startDiffusion = async (
     args.push("--vae-conv-direct");
   }
 
-  if (params.threads) {
+  if (params.threads && params.threads > 0) {
     args.push("--threads", params.threads);
   }
 
@@ -184,9 +184,12 @@ export const startDiffusion = async (
     args.push("--force-sdxl-vae-conv-scale");
   }
 
+  args.push("-o", outputPath);
+
   if (params.verbose) {
     args.push("--verbose");
   }
+
   const sendLog = (type: "stdout" | "stderr", message: string) => {
     const log = message.trim().replaceAll(ROOT_DIR + path.sep, "");
     if (type === "stderr") {
@@ -311,4 +314,4 @@ export const startDiffusion = async (
       });
     }
   }
-};
+}

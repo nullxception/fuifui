@@ -16,13 +16,13 @@ import { useShallow } from "zustand/react/shallow";
 import ImageMetadata from "./ImageMetadata";
 import { useGallery } from "./useGallery";
 
-const RemoveImage = ({
+function RemoveImage({
   onCancel,
   onRemove,
 }: {
   onCancel: () => void;
   onRemove: () => void;
-}) => {
+}) {
   return (
     <>
       <div
@@ -45,7 +45,7 @@ const RemoveImage = ({
       </Card>
     </>
   );
-};
+}
 
 interface PageDirection {
   index: number;

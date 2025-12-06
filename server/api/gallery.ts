@@ -35,7 +35,7 @@ export async function getDataFromImage(filePath: string): Promise<Image> {
   }
 }
 
-const list = async (limit: number, offset: number): Promise<Image[]> => {
+async function list(limit: number, offset: number) {
   try {
     const dir = path.join(OUTPUT_DIR, "txt2img");
     const files = await fs.readdir(dir);
@@ -88,7 +88,7 @@ const list = async (limit: number, offset: number): Promise<Image[]> => {
     console.error("Error reading output directory:", error);
     throw new Error("Failed to list images");
   }
-};
+}
 
 async function cleanupThumbnails(img: string) {
   const filename = path.basename(img);
@@ -121,7 +121,7 @@ async function remove(images: string[]) {
   }
 }
 
-export const listImages = async (req: Request) => {
+export async function listImages(req: Request) {
   const url = new URL(req.url);
   const limit = parseInt(url.searchParams.get("limit") || "20");
   const offset = parseInt(url.searchParams.get("offset") || "0");
@@ -133,9 +133,9 @@ export const listImages = async (req: Request) => {
     console.error("Error reading output directory:", error);
     return Response.json({ error: "Failed to list images" }, { status: 500 });
   }
-};
+}
 
-export const removeImages = async (request?: Request) => {
+export async function removeImages(request?: Request) {
   if (!request) throw new Error("Request is required for this endpoint");
   try {
     const images = (await request.json()) as string[];
@@ -147,4 +147,4 @@ export const removeImages = async (request?: Request) => {
   } catch {
     return Response.json({ error: "Image(s) not found" }, { status: 404 });
   }
-};
+}

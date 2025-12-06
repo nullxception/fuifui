@@ -6,7 +6,7 @@ import { CloudUploadIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useSettings } from "./useSettings";
 
-const BackgroundSetting: React.FC = () => {
+function BackgroundSetting() {
   const { app, update } = useSettings();
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
@@ -61,7 +61,7 @@ const BackgroundSetting: React.FC = () => {
   };
 
   const deleteBackground = async () => {
-    if (app.background.startsWith("/upload/")) {
+    if (app.background?.startsWith("/upload/")) {
       try {
         await fetch("/api/config/background", {
           method: "DELETE",
@@ -122,7 +122,7 @@ const BackgroundSetting: React.FC = () => {
       </div>
 
       {/* Preview */}
-      {app.background.length > 0 && (
+      {app.background && app.background.length > 0 && (
         <div className="group relative">
           <img
             src={app.background}
@@ -138,5 +138,5 @@ const BackgroundSetting: React.FC = () => {
       )}
     </div>
   );
-};
+}
 export default BackgroundSetting;

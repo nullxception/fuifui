@@ -1,8 +1,8 @@
 import React from "react";
 
-export const Footer = ({
+export function Footer({
   className = "",
-}: React.HTMLAttributes<HTMLDivElement>) => {
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <footer
       className={`mx-auto mb-16 max-w-7xl px-8 py-4 text-center md:mb-0 ${className}`}
@@ -10,4 +10,4 @@ export const Footer = ({
       <p className="text-sm text-gray-400">too much neovim, ai, and coffee</p>
     </footer>
   );
-};
+}

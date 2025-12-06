@@ -1,10 +1,9 @@
-import { useSettings } from "app/stores";
-import React from "react";
+import { useSettings } from "@/settings/useSettings";
 
-export const BackgroundLayer: React.FC = () => {
+export function BackgroundLayer() {
   const { app } = useSettings();
   const bg = app.background;
-  const hasBg = bg.length > 0;
+  const hasBg = bg && bg.length > 0;
   return (
     <div
       className="fixed top-1/2 left-1/2 -z-2 h-screen w-full -translate-1/2 bg-radial-[at_50%_0%] from-purple-950/50 to-background bg-cover bg-center bg-no-repeat"
@@ -16,4 +15,4 @@ export const BackgroundLayer: React.FC = () => {
       />
     </div>
   );
-};
+}

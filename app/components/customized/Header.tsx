@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { SettingsIcon } from "lucide-react";
 import { useLocation } from "wouter";
 
-export const Header = () => {
+export function Header() {
   const [location, navigate] = useLocation();
 
   return (
@@ -47,4 +47,4 @@ export const Header = () => {
       </div>
     </header>
   );
-};
+}

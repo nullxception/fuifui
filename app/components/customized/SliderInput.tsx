@@ -14,7 +14,7 @@ interface SliderProps {
   className?: string;
 }
 
-export const SliderInput: React.FC<SliderProps> = ({
+export function SliderInput({
   className = "",
   label,
   valueDisplay,
@@ -23,7 +23,7 @@ export const SliderInput: React.FC<SliderProps> = ({
   step,
   value,
   onChange,
-}) => {
+}: SliderProps) {
   const handleSliderChange = (value: number) => {
     onChange(value);
   };
@@ -66,5 +66,5 @@ export const SliderInput: React.FC<SliderProps> = ({
       </div>
     </div>
   );
-};
+}
 SliderInput.displayName = "Slider";

@@ -31,7 +31,7 @@ function NavButton({
   );
 }
 
-export const MobileNav = () => {
+export function MobileNav() {
   const [location, navigate] = useLocation();
 
   return (
@@ -64,4 +64,4 @@ export const MobileNav = () => {
       </footer>
     </>
   );
-};
+}

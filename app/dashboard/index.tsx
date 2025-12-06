@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/stores/useAppStore";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
 import { forwardRef, useEffect } from "react";
 import { optimizePrompt } from "../lib/metadataParser";
-import {
-  useAppStore,
-  useDiffusionConfig,
-  useDiffusionJob,
-  useModels,
-} from "../stores";
 import ConsoleOutput from "./ConsoleOutput";
 import ControlPanel from "./ControlPanel";
 import ImageDisplay from "./ImageDisplay";
+import { useDiffusionConfig } from "./useDiffusionConfig";
+import { useDiffusionJob } from "./useDiffusionJob";
+import { useModels } from "./useModels";
 
 const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   (props, ref) => {

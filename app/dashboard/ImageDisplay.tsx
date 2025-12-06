@@ -1,5 +1,4 @@
 import { ImageIcon } from "lucide-react";
-import React from "react";
 import type { Image } from "server/types";
 import { Link } from "wouter";
 
@@ -8,7 +7,7 @@ interface ImageDisplayProps {
   isProcessing: boolean;
 }
 
-const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
+function ImageDisplay({ image, isProcessing }: ImageDisplayProps) {
   return (
     <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
       {isProcessing ? (
@@ -45,6 +44,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isProcessing }) => {
       )}
     </div>
   );
-};
+}
 
 export default ImageDisplay;

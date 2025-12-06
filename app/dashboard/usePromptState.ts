@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDiffusionConfig } from "../stores";
+import { useDiffusionConfig } from "./useDiffusionConfig";
 
 type PromptType = "prompt" | "negativePrompt";
 
@@ -10,7 +10,7 @@ interface PromptState {
 
 const DEBOUNCE_DELAY = 500;
 
-export const usePromptState = (type: PromptType) => {
+export function usePromptState(type: PromptType) {
   const store = useDiffusionConfig();
   const storeValue =
     type === "prompt" ? store.params.prompt : store.params.negativePrompt;
@@ -92,4 +92,4 @@ export const usePromptState = (type: PromptType) => {
     updatePrompt,
     forceSave,
   };
-};
+}

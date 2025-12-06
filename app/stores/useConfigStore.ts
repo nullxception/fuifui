@@ -23,8 +23,8 @@ const MAX_RETRIES = 3;
 
 export const useConfigStore = create<ConfigState>((set, get) => ({
   config: {
-    diffusion: defaultDiffusionParams,
-    settings: defaultSettings,
+    diffusion: defaultDiffusionParams(),
+    settings: defaultSettings(),
     triggerWords: [],
   },
   isLoading: false,

@@ -14,18 +14,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useDiffusionConfig, useSettings } from "app/stores";
+import { useSettings } from "@/settings/useSettings";
 import { DicesIcon, RotateCcwIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { defaultSettings } from "server/defaults";
+import { useDiffusionConfig } from "./useDiffusionConfig";
 
-export const GenerationSettings: React.FC = () => {
+export function GenerationSettings() {
   const store = useDiffusionConfig();
   const { app } = useSettings();
   const [cpuCount, setCpuCount] = useState(16);
+  const defs = defaultSettings();
 
-  const maxSliderWidth = app.maxWidth || defaultSettings.maxWidth;
-  const maxSliderHeight = app.maxHeight || defaultSettings.maxHeight;
+  const maxSliderWidth = app.maxWidth || defs.maxWidth;
+  const maxSliderHeight = app.maxHeight || defs.maxHeight;
 
   const samplingMethods = [
     "euler",
@@ -76,7 +78,7 @@ export const GenerationSettings: React.FC = () => {
           valueDisplay={store.params.steps}
           min={1}
           max={100}
-          value={store.params.steps}
+          value={store.params.steps ?? 20}
           onChange={(e) => store.update("steps", e)}
         />
 
@@ -86,7 +88,7 @@ export const GenerationSettings: React.FC = () => {
           min={1}
           max={20}
           step={0.5}
-          value={store.params.cfgScale}
+          value={store.params.cfgScale ?? 7}
           onChange={(e) => store.update("cfgScale", e)}
         />
 
@@ -194,7 +196,7 @@ export const GenerationSettings: React.FC = () => {
           min={128}
           step={64}
           max={maxSliderWidth}
-          value={store.params.width}
+          value={store.params.width ?? 512}
           onChange={(e) => store.update("width", e)}
         />
 
@@ -204,7 +206,7 @@ export const GenerationSettings: React.FC = () => {
           min={128}
           step={64}
           max={maxSliderHeight}
-          value={store.params.height}
+          value={store.params.height ?? 512}
           onChange={(e) => store.update("height", e)}
         />
 
@@ -213,15 +215,15 @@ export const GenerationSettings: React.FC = () => {
           min={-1}
           max={2}
           step={1}
-          value={store.params.clipSkip}
+          value={store.params.clipSkip ?? -1}
           onChange={(e) => store.update("clipSkip", e)}
         />
 
         <SliderInput
-          label={`Threads ${store.params.threads < 0 ? ": Auto" : ""}`}
+          label={`Threads ${(store.params.threads ?? -1) < 0 ? ": Auto" : ""}`}
           min={-1}
           max={cpuCount}
-          value={store.params.threads}
+          value={store.params.threads ?? -1}
           onChange={(e) => store.update("threads", e)}
         />
 
@@ -315,4 +317,4 @@ export const GenerationSettings: React.FC = () => {
       </div>
     </div>
   );
-};
+}

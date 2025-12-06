@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useDiffusionJob } from "./useDiffusionJob";
 
-const formatTime = (timestamp: number) => {
+function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString();
-};
+}
 
-const ConsoleOutput: React.FC = () => {
+function ConsoleOutput() {
   const consoleRef = useRef<HTMLDivElement>(null);
   const { logs } = useDiffusionJob();
 
@@ -75,6 +75,6 @@ const ConsoleOutput: React.FC = () => {
       )}
     </div>
   );
-};
+}
 
 export default ConsoleOutput;

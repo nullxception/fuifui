@@ -1,4 +1,4 @@
-import { useDiffusionJob } from "@/stores";
+import { useDiffusionJob } from "@/dashboard/useDiffusionJob";
 import type { Image } from "server/types";
 import { create } from "zustand";
 

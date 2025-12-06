@@ -9,14 +9,17 @@ import {
   UPSCALER_DIR,
   VAE_DIR,
 } from "../dirs";
-import { startDiffusion, stopDiffusion } from "../services/diffusion";
-import { createJob, getAllJobs, getJob, jobEvents } from "../services/jobs";
+import { startDiffusion } from "../services/diffusion";
+import {
+  createJob,
+  getAllJobs,
+  getJob,
+  stopJob,
+  withJobEvents,
+} from "../services/jobs";
 import type { DiffusionParams, DiffusionResult, Models } from "../types";
 
-const getFileList = async (
-  dir: string,
-  recursive: boolean = true,
-): Promise<string[]> => {
+async function getFileList(dir: string, recursive: boolean = true) {
   const files = await fs.readdir(dir, {
     recursive: recursive,
     withFileTypes: true,
@@ -24,9 +27,9 @@ const getFileList = async (
   return files
     .filter((it) => !/.placeholder$/.test(it.name) && it.isFile())
     .map((it) => path.relative(dir, path.join(it.parentPath, it.name)));
-};
+}
 
-export const diffusionModels = async () => {
+export async function diffusionModels() {
   try {
     return Response.json(<Models>{
       checkpoints: await getFileList(CHECKPOINT_DIR),
@@ -41,9 +44,9 @@ export const diffusionModels = async () => {
     console.error("Error reading models directory:", error);
     return Response.json({ error: "Failed to list models" }, { status: 500 });
   }
-};
+}
 
-export const diffusionStart = async (req: Request) => {
+export async function diffusionStart(req: Request) {
   try {
     const body = (await req.json()) as DiffusionParams;
 
@@ -59,17 +62,17 @@ export const diffusionStart = async (req: Request) => {
     console.error("Error parsing request body:", error);
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
-};
+}
 
-export const diffusionStop = async (req: Request) => {
+export async function diffusionStop(req: Request) {
   const { jobId } = await req.json();
 
-  stopDiffusion(jobId);
+  stopJob(jobId);
   return Response.json({
     success: true,
     message: "Diffusion stopped",
   });
-};
+}
 
 export const diffusionProgress: Bun.Serve.Handler<
   Bun.BunRequest<"/api/jobs/:id">,
@@ -90,7 +93,6 @@ export const diffusionProgress: Bun.Serve.Handler<
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
-
       const sendEvent = (event: string, data: unknown) => {
         try {
           controller.enqueue(
@@ -147,20 +149,22 @@ export const diffusionProgress: Bun.Serve.Handler<
         }
       };
 
-      jobEvents.on("log", onLog);
-      jobEvents.on("complete", onComplete);
-      jobEvents.on("error", onError);
+      withJobEvents((events) => {
+        events.on("log", onLog);
+        events.on("complete", onComplete);
+        events.on("error", onError);
 
-      // Cleanup on close
-      req.signal.addEventListener("abort", () => {
-        jobEvents.off("log", onLog);
-        jobEvents.off("complete", onComplete);
-        jobEvents.off("error", onError);
-        try {
-          controller.close();
-        } catch {
-          // Ignore
-        }
+        // Cleanup on close
+        req.signal.addEventListener("abort", () => {
+          events.off("log", onLog);
+          events.off("complete", onComplete);
+          events.off("error", onError);
+          try {
+            controller.close();
+          } catch {
+            // Ignore
+          }
+        });
       });
     },
   });
@@ -176,7 +180,7 @@ export const diffusionProgress: Bun.Serve.Handler<
   });
 };
 
-export const diffusionJobs = async () => {
+export async function diffusionJobs() {
   const jobs = getAllJobs().map((job) => ({ ...job, logs: [], params: {} }));
   return Response.json(jobs);
-};
+}

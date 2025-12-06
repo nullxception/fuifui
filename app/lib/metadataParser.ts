@@ -38,15 +38,15 @@ const emptyMetadata: ParsedMetadata = {
   version: "",
 };
 
-const snakeToCamel = (str: string) =>
-  str
+function snakeToCamel(str: string) {
+  return str
     .toLowerCase()
     .replace(/([-_][a-z])/g, (group) =>
       group.toUpperCase().replace("-", "").replace("_", ""),
     );
-
+}
 // --- Split by commas but ignore commas inside parentheses ---
-export const splitSmart = (t: string): string[] => {
+export function splitSmart(t: string) {
   const result: string[] = [];
   let current = "";
   let depth = 0;
@@ -65,7 +65,7 @@ export const splitSmart = (t: string): string[] => {
 
   if (current.trim()) result.push(current.trim());
   return result;
-};
+}
 
 function fixLoraPath(text: string, models?: Models): string {
   if (!models?.loras.length) {
@@ -107,7 +107,7 @@ function fixLoraPath(text: string, models?: Models): string {
   return text;
 }
 
-export const optimizePrompt = (text: string, models?: Models): string => {
+export function optimizePrompt(text: string, models?: Models) {
   const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
 
   const chunks = text
@@ -155,11 +155,9 @@ export const optimizePrompt = (text: string, models?: Models): string => {
     .join(", ")
     .replace(/(\()\s+|\s+(\))/g, (_, o, c) => o || c)
     .replace(/>\s*,\s*/g, "> ");
-};
+}
 
-export const parseDiffusionParams = (
-  metadata?: Record<string, unknown>,
-): ParsedMetadata => {
+export function parseDiffusionParams(metadata?: Record<string, unknown>) {
   if (!metadata) return emptyMetadata;
   const data: ParsedMetadata = Object.create(emptyMetadata);
 
@@ -299,4 +297,4 @@ export const parseDiffusionParams = (
     console.error("Failed to parse parameters", e);
     return data;
   }
-};
+}

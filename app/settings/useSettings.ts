@@ -2,8 +2,8 @@ import { defaultSettings } from "server/defaults";
 import type { AppSettings } from "server/types";
 import useConfig from "../stores/useConfig";
 
-export const useSettings = () => {
-  const [app, setApp] = useConfig<AppSettings>("settings", defaultSettings);
+export function useSettings() {
+  const [app, setApp] = useConfig<AppSettings>("settings", defaultSettings());
 
   return {
     app,
@@ -14,4 +14,4 @@ export const useSettings = () => {
       setApp((prev) => ({ ...prev, ...partial }));
     },
   };
-};
+}

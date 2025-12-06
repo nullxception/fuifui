@@ -2,12 +2,7 @@ import path from "path";
 import sharp from "sharp";
 import { UPLOAD_DIR } from "../dirs";
 
-const process = async (
-  file: File,
-): Promise<{
-  filename: string;
-  url: string;
-}> => {
+async function process(file: File) {
   const buffer = await file.arrayBuffer();
   const processedImage = await sharp(Buffer.from(buffer))
     .resize(3840, 2160, {
@@ -24,9 +19,9 @@ const process = async (
     filename,
     url: `/upload/${filename}?t=${Date.now()}`,
   };
-};
+}
 
-export const uploadBackground = async (request?: Request) => {
+export async function uploadBackground(request?: Request) {
   if (!request) throw new Error("Request is required for this endpoint");
   try {
     const formData = await request.formData();
@@ -42,9 +37,9 @@ export const uploadBackground = async (request?: Request) => {
     console.error("Image processing error:", error);
     return Response.json({ error: "Image processing failed" }, { status: 500 });
   }
-};
+}
 
-export const removeBackground = async () => {
+export async function removeBackground() {
   try {
     const filePath = path.join(UPLOAD_DIR, "background.webp");
     await Bun.file(filePath).delete();
@@ -55,4 +50,4 @@ export const removeBackground = async () => {
   } catch {
     return Response.json({ error: "Background not found" }, { status: 404 });
   }
-};
+}

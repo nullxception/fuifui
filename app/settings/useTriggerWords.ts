@@ -1,7 +1,7 @@
 import type { TriggerWord } from "server/types";
 import useConfig from "../stores/useConfig";
 
-export const useTriggerWords = () => {
+export function useTriggerWords() {
   const [triggerWords, setTriggerWords] = useConfig<TriggerWord[]>(
     "triggerWords",
     [],
@@ -26,4 +26,4 @@ export const useTriggerWords = () => {
 
     reset: () => setTriggerWords([]),
   };
-};
+}

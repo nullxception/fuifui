@@ -3,15 +3,17 @@ import { Label } from "@/components/ui/label";
 import { defaultSettings } from "server/defaults";
 import { useSettings } from "./useSettings";
 
-const SliderSettings: React.FC = () => {
+function SliderSettings() {
   const { app, update } = useSettings();
+  const defs = defaultSettings();
+
   return (
     <div className={`mb-4 space-y-4 space-x-4`}>
       <div className="flex w-full flex-col justify-between space-y-2">
         <Label>Max width slider</Label>
         <Input
           type="number"
-          placeholder={`default: ${defaultSettings.maxWidth}`}
+          placeholder={`default: ${defs.maxWidth}`}
           min={64}
           step={64}
           value={app.maxWidth}
@@ -22,7 +24,7 @@ const SliderSettings: React.FC = () => {
         <Label>Max height slider</Label>
         <Input
           type="number"
-          placeholder={`default: ${defaultSettings.maxHeight}`}
+          placeholder={`default: ${defs.maxHeight}`}
           min={64}
           step={64}
           value={app.maxHeight}
@@ -31,6 +33,6 @@ const SliderSettings: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SliderSettings;

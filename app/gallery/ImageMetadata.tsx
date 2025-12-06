@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useDiffusionConfig } from "@/dashboard/useDiffusionConfig";
+import { useDiffusionJob } from "@/dashboard/useDiffusionJob";
+import { useAppStore } from "@/stores/useAppStore";
 import {
   ChevronDownIcon,
   DownloadIcon,
@@ -12,9 +15,8 @@ import {
   parseDiffusionParams,
   type ParsedMetadata,
 } from "../lib/metadataParser";
-import { useAppStore, useDiffusionConfig, useDiffusionJob } from "../stores";
 
-const saveImage = async (image: Image) => {
+async function saveImage(image: Image) {
   try {
     const response = await fetch(image.url);
     const blob = await response.blob();
@@ -29,7 +31,7 @@ const saveImage = async (image: Image) => {
   } catch (error) {
     console.error("Error downloading the image:", error);
   }
-};
+}
 
 interface ImageMetadataProps {
   image: Image;

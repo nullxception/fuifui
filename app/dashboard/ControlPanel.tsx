@@ -6,7 +6,7 @@ import { ModelSelector } from "./ModelSelector";
 import { PromptInput } from "./PromptInput";
 import { useModels } from "./useModels";
 
-const ControlPanel: React.FC = () => {
+function ControlPanel() {
   const { fetchModels } = useModels();
 
   useEffect(() => {
@@ -23,6 +23,6 @@ const ControlPanel: React.FC = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default ControlPanel;

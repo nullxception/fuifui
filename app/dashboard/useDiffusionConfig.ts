@@ -2,10 +2,10 @@ import { defaultDiffusionParams } from "server/defaults";
 import type { DiffusionParams } from "server/types";
 import useConfig from "../stores/useConfig";
 
-export const useDiffusionConfig = () => {
+export function useDiffusionConfig() {
   const [diffusion, setDiffusion] = useConfig<DiffusionParams>(
     "diffusion",
-    defaultDiffusionParams,
+    defaultDiffusionParams(),
   );
 
   return {
@@ -24,4 +24,4 @@ export const useDiffusionConfig = () => {
       await setDiffusion((prev) => ({ ...prev, ...partial }));
     },
   };
-};
+}

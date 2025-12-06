@@ -12,25 +12,25 @@ export interface DiffusionParams {
   clipG?: string;
   t5xxl?: string;
   llm?: string;
-  prompt: string;
-  negativePrompt: string;
-  steps: number;
-  cfgScale: number;
-  seed: number;
-  width: number;
-  height: number;
-  clipSkip: number;
-  diffusionFa: boolean;
+  prompt?: string;
+  negativePrompt?: string;
+  steps?: number;
+  cfgScale?: number;
+  seed?: number;
+  width?: number;
+  height?: number;
+  clipSkip?: number;
+  diffusionFa?: boolean;
   samplingMethod?: string;
   scheduler?: string;
-  rng: string;
-  samplerRng: string;
-  diffusionConvDirect: boolean;
-  vaeConvDirect: boolean;
-  threads: number;
-  offloadToCpu: boolean;
-  forceSdxlVaeConvScale: boolean;
-  verbose: boolean;
+  rng?: string;
+  samplerRng?: string;
+  diffusionConvDirect?: boolean;
+  vaeConvDirect?: boolean;
+  threads?: number;
+  offloadToCpu?: boolean;
+  forceSdxlVaeConvScale?: boolean;
+  verbose?: boolean;
 }
 
 export type JobStatus =
@@ -82,7 +82,7 @@ export interface TriggerWord {
 }
 
 export interface AppSettings {
-  background: string;
+  background?: string;
   maxWidth: number;
   maxHeight: number;
 }

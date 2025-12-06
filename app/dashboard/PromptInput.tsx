@@ -7,10 +7,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useTriggerWords } from "@/settings/useTriggerWords";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import type { ExtraDataType } from "server/types";
 import { optimizePrompt } from "../lib/metadataParser";
-import { useModels, useTriggerWords } from "../stores";
+import { useModels } from "./useModels";
 import { usePromptState } from "./usePromptState";
 
 type PromptType = "prompt" | "negativePrompt";
@@ -48,14 +49,14 @@ const ExtraSelector: React.FC<{
   );
 };
 
-const autoResize = (el: HTMLTextAreaElement) => {
+function autoResize(el: HTMLTextAreaElement) {
   requestAnimationFrame(() => {
     el.style.height = "auto";
     el.style.height = el.scrollHeight + "px";
   });
-};
+}
 
-const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
+function Prompt({ type }: { type: PromptType }) {
   const { models } = useModels();
   const { value, changed, updatePrompt, forceSave } = usePromptState(type);
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -144,13 +145,13 @@ const Prompt: React.FC<{ type: PromptType }> = ({ type }) => {
       </div>
     </div>
   );
-};
+}
 
-export const PromptInput: React.FC = () => {
+export function PromptInput() {
   return (
     <div className="flex flex-col space-y-4">
       <Prompt type="prompt" />
       <Prompt type="negativePrompt" />
     </div>
   );
-};
+}
