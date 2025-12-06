@@ -95,8 +95,9 @@ function Prompt({ type }: { type: PromptType }) {
         onChange={(e) => {
           updatePrompt(e.target.value);
         }}
-        onBlur={() => {
+        onBlur={(e) => {
           forceSave();
+          autoResize(e.target);
         }}
         className={`scrollbar-none ${
           type === "prompt"
