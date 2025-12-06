@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useDiffusionConfig } from "@/dashboard/useDiffusionConfig";
 import { useDiffusionJob } from "@/dashboard/useDiffusionJob";
+import { useModels } from "@/dashboard/useModels";
 import { useAppStore } from "@/stores/useAppStore";
 import {
   ChevronDownIcon,
@@ -87,7 +88,8 @@ export default function ImageMetadata({
   const { setOutputTab } = useAppStore();
   const store = useDiffusionConfig();
   const { setImage } = useDiffusionJob();
-  const metadata = parseDiffusionParams(image.metadata);
+  const { models } = useModels();
+  const metadata = parseDiffusionParams(image.metadata, models);
 
   const handleRemake = () => {
     if (!metadata) return;

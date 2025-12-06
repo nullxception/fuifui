@@ -160,7 +160,10 @@ export function optimizePrompt(text: string, models?: Models) {
     .replace(/>\s*,\s*/g, "> ");
 }
 
-export function parseDiffusionParams(metadata?: Record<string, unknown>) {
+export function parseDiffusionParams(
+  metadata?: Record<string, unknown>,
+  models?: Models,
+) {
   if (!metadata) return emptyMetadata;
   const data: ParsedMetadata = Object.create(emptyMetadata);
 
@@ -293,8 +296,11 @@ export function parseDiffusionParams(metadata?: Record<string, unknown>) {
       }
     }
 
-    data.prompt = optimizePrompt(prompt.replace(/['"]+/g, ""));
-    data.negativePrompt = optimizePrompt(negativePrompt.replace(/['"]+/g, ""));
+    data.prompt = optimizePrompt(prompt.replace(/['"]+/g, ""), models);
+    data.negativePrompt = optimizePrompt(
+      negativePrompt.replace(/['"]+/g, ""),
+      models,
+    );
     return data;
   } catch (e) {
     console.error("Failed to parse parameters", e);
