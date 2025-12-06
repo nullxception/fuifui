@@ -107,9 +107,10 @@ function fixLoraPath(text: string, models?: Models): string {
   return text;
 }
 
-export function optimizePrompt(text: string, models?: Models) {
-  const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
+const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
 
+export function optimizePrompt(text?: string, models?: Models) {
+  if (!text) return "";
   const chunks = text
     .split("\n")
     .flatMap(splitSmart)

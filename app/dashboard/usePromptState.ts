@@ -4,7 +4,7 @@ import { useDiffusionConfig } from "./useDiffusionConfig";
 type PromptType = "prompt" | "negativePrompt";
 
 interface PromptState {
-  value: string;
+  value?: string;
   changed: boolean;
 }
 
@@ -40,7 +40,7 @@ export function usePromptState(type: PromptType) {
   }, []);
 
   const saveToStore = useCallback(
-    async (value: string) => {
+    async (value?: string) => {
       try {
         store.update(type, value);
         setState((prev) => ({
@@ -55,7 +55,7 @@ export function usePromptState(type: PromptType) {
   );
 
   const debouncedSave = useCallback(
-    (value: string) => {
+    (value?: string) => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
@@ -71,7 +71,7 @@ export function usePromptState(type: PromptType) {
   );
 
   const updatePrompt = useCallback(
-    (newValue: string) => {
+    (newValue?: string) => {
       setState((prev) => ({ ...prev, value: newValue }));
       debouncedSave(newValue);
     },

@@ -26,7 +26,11 @@ export function useTriggerWords() {
       setTriggerWords((prev) => prev.filter((_, i) => i !== index)),
 
     reset: () => setTriggerWords([]),
-    buildPrompt(prompt: string, filename: string, type: ExtraDataType) {
+    buildPrompt(
+      prompt: string | undefined,
+      filename: string,
+      type: ExtraDataType,
+    ) {
       // Find matching trigger words for this embedding/lora
       const match = triggerWords.find(
         (tw) => tw.type === type && tw.target.startsWith(filename),
