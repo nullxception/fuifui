@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { useAppStore } from "app/stores";
 import { SettingsIcon } from "lucide-react";
 import { useLocation } from "wouter";
 
 export const Header = () => {
-  const { setShowSettings } = useAppStore();
   const [location, navigate] = useLocation();
 
   return (
@@ -40,7 +38,7 @@ export const Header = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setShowSettings(true)}
+            onClick={() => navigate("/settings")}
             title="Settings"
           >
             <SettingsIcon />

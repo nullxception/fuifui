@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useAppStore } from "app/stores";
 import {
   ImageIcon,
   SettingsIcon,
@@ -33,7 +32,6 @@ function NavButton({
 }
 
 export const MobileNav = () => {
-  const { showSettings, setShowSettings } = useAppStore();
   const [location, navigate] = useLocation();
 
   return (
@@ -42,29 +40,23 @@ export const MobileNav = () => {
         <div className="container flex h-full max-w-screen-2xl items-center justify-around rounded-t-2xl border border-border bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
           <NavButton
             icon={ZapIcon}
-            onClick={() => {
-              setShowSettings(false);
-              navigate("/");
-            }}
-            isActive={location === "/" && !showSettings}
+            onClick={() => navigate("/")}
+            isActive={location === "/"}
           >
             Diffusion
           </NavButton>
           <NavButton
             icon={ImageIcon}
-            onClick={() => {
-              setShowSettings(false);
-              navigate("/gallery");
-            }}
-            isActive={location.startsWith("/gallery") && !showSettings}
+            onClick={() => navigate("/gallery")}
+            isActive={location.startsWith("/gallery")}
           >
             Gallery
           </NavButton>
 
           <NavButton
             icon={SettingsIcon}
-            isActive={showSettings}
-            onClick={() => setShowSettings(!showSettings)}
+            isActive={location === "/settings"}
+            onClick={() => navigate("/settings")}
           >
             Settings
           </NavButton>
