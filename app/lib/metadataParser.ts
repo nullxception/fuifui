@@ -118,6 +118,7 @@ export function optimizePrompt(text: string, models?: Models) {
 
   const loras: string[] = [];
   const embeds: string[] = [];
+  const scores: string[] = [];
   const others: string[] = [];
 
   for (let chunk of chunks) {
@@ -135,6 +136,12 @@ export function optimizePrompt(text: string, models?: Models) {
       chunk = embedMatches.reduce((acc, m) => acc.replace(m, " "), chunk);
     }
 
+    const scoreMatches = chunk.match(/score_\d+.*/gi) || [];
+    if (scoreMatches.length) {
+      scores.push(...scoreMatches.sort().reverse());
+      chunk = scoreMatches.reduce((acc, m) => acc.replace(m, " "), chunk);
+    }
+
     const rest = normalize(chunk);
     if (rest) others.push(rest);
   }
@@ -143,6 +150,7 @@ export function optimizePrompt(text: string, models?: Models) {
   const deduped = [
     ...loras.map((l) => fixLoraPath(l, models)),
     ...embeds,
+    ...scores,
     ...others,
   ]
     .map((it) => it.trim())
