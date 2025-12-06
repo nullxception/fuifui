@@ -4,10 +4,10 @@ import { removeBackground, uploadBackground } from "./api/background";
 import { readConfig, saveConfig } from "./api/config";
 import {
   diffusionJobs,
-  diffusionModels,
   diffusionProgress,
   diffusionStart,
   diffusionStop,
+  listDiffusionModels,
 } from "./api/diffusion";
 import { listImages, removeImages } from "./api/gallery";
 import system from "./api/system";
@@ -55,7 +55,7 @@ Bun.serve({
       DELETE: removeBackground,
     },
     "/api/images": { GET: listImages, DELETE: removeImages },
-    "/api/models": diffusionModels,
+    "/api/models": listDiffusionModels,
     "/api/txt2img": { POST: diffusionStart },
     "/api/jobs/stop": { POST: diffusionStop },
     "/api/jobs/:id": diffusionProgress,

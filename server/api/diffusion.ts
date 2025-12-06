@@ -1,10 +1,11 @@
-import { promises as fs } from "fs";
+import { Glob } from "bun";
 import path from "path";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
   LLM_DIR,
   LORA_DIR,
+  MODELS_DIR,
   TEXT_ENCODER_DIR,
   UPSCALER_DIR,
   VAE_DIR,
@@ -19,27 +20,44 @@ import {
 } from "../services/jobs";
 import type { DiffusionParams, DiffusionResult, Models } from "../types";
 
-async function getFileList(dir: string, recursive: boolean = true) {
-  const files = await fs.readdir(dir, {
-    recursive: recursive,
-    withFileTypes: true,
-  });
-  return files
-    .filter((it) => !/.placeholder$/.test(it.name) && it.isFile())
-    .map((it) => path.relative(dir, path.join(it.parentPath, it.name)));
+function putModelFiles(file: string, subdir: string, target: string[]) {
+  if (file.startsWith(subdir + path.sep)) {
+    target.push(path.relative(subdir, file));
+  }
 }
 
-export async function diffusionModels() {
+export async function listDiffusionModels() {
   try {
-    return Response.json(<Models>{
-      checkpoints: await getFileList(CHECKPOINT_DIR),
-      embeddings: await getFileList(EMBEDDING_DIR, false),
-      loras: await getFileList(LORA_DIR),
-      vaes: await getFileList(VAE_DIR),
-      upscalers: await getFileList(UPSCALER_DIR),
-      llms: await getFileList(LLM_DIR),
-      textEncoders: await getFileList(TEXT_ENCODER_DIR),
-    });
+    const glob = new Glob("**/*");
+    const models: Models = {
+      checkpoints: [],
+      embeddings: [],
+      loras: [],
+      vaes: [],
+      upscalers: [],
+      llms: [],
+      textEncoders: [],
+    };
+
+    const rCheckpoint = path.relative(MODELS_DIR, CHECKPOINT_DIR);
+    const rEmbedding = path.relative(MODELS_DIR, EMBEDDING_DIR);
+    const rLora = path.relative(MODELS_DIR, LORA_DIR);
+    const rVae = path.relative(MODELS_DIR, VAE_DIR);
+    const rUpscaler = path.relative(MODELS_DIR, UPSCALER_DIR);
+    const rLlm = path.relative(MODELS_DIR, LLM_DIR);
+    const rTextEncoder = path.relative(MODELS_DIR, TEXT_ENCODER_DIR);
+
+    for await (const file of glob.scan(MODELS_DIR)) {
+      putModelFiles(file, rCheckpoint, models.checkpoints);
+      putModelFiles(file, rEmbedding, models.embeddings);
+      putModelFiles(file, rLora, models.loras);
+      putModelFiles(file, rVae, models.vaes);
+      putModelFiles(file, rUpscaler, models.upscalers);
+      putModelFiles(file, rLlm, models.llms);
+      putModelFiles(file, rTextEncoder, models.textEncoders);
+    }
+
+    return Response.json(models);
   } catch (error) {
     console.error("Error reading models directory:", error);
     return Response.json({ error: "Failed to list models" }, { status: 500 });
