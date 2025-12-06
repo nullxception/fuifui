@@ -8,7 +8,7 @@ export const Header = () => {
   const [location, navigate] = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 hidden w-full justify-center border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 md:flex">
+    <header className="sticky top-0 z-30 hidden w-full justify-center border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 md:flex">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-2">
           <h1

@@ -7,6 +7,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import TextToImage from "./dashboard";
 import Gallery from "./gallery";
 import SettingsPopup from "./settings/SettingsPopup";
+import { useAppStore } from "./stores";
 
 const AnimationSettings = {
   transition: { duration: 0.3 },
@@ -18,6 +19,7 @@ const AnimationSettings = {
 export default function App() {
   const [isGallery] = useRoute("/gallery/*?");
   const [isIndex] = useRoute("/");
+  const { showSettings, setShowSettings } = useAppStore();
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
@@ -27,8 +29,12 @@ export default function App() {
         <AnimatePresence>
           {isGallery && <Gallery {...AnimationSettings} />}
           {isIndex && <TextToImage {...AnimationSettings} />}
+          <SettingsPopup
+            {...AnimationSettings}
+            isShowing={showSettings}
+            show={setShowSettings}
+          />
         </AnimatePresence>
-        <SettingsPopup />
         <MobileNav />
       </div>
     </ThemeProvider>

@@ -28,6 +28,201 @@ import type { ExtraDataType, TriggerWord } from "server/types";
 import { splitSmart } from "../lib/metadataParser";
 import { useModels, useTriggerWords } from "../stores";
 
+interface TriggerWordFormProps {
+  isEditing?: boolean;
+  entry: TriggerWord;
+  onChange: (entry: TriggerWord) => void;
+  availableTargets: string[];
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
+  isEditing = false,
+  entry,
+  onChange,
+  availableTargets,
+  onSave,
+  onCancel,
+}) => {
+  const [wordInput, setWordInput] = useState("");
+
+  const handleAddWord = () => {
+    const newWords = splitSmart(wordInput);
+    if (newWords.length > 0) {
+      onChange({
+        ...entry,
+        words: [...entry.words, ...newWords],
+      });
+      setWordInput("");
+    }
+  };
+
+  const handleRemoveWord = (index: number) => {
+    onChange({
+      ...entry,
+      words: entry.words.filter((_, i) => i !== index),
+    });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddWord();
+    }
+  };
+
+  const handleStrengthChange = (value: number) => {
+    if (value > 1) value = 1;
+    onChange({
+      ...entry,
+      loraStrength: value,
+    });
+  };
+
+  const loraStrength = entry.loraStrength ?? 1;
+  const typeLabel = entry.type === "lora" ? "LoRA" : "Embedding";
+
+  const isSaveable = () => {
+    if (!entry.target) return false;
+    const hasWords = entry.words.length > 0;
+    if (entry.type === "embedding" && !hasWords) return false;
+    if (entry.type === "lora") {
+      if (!hasWords && loraStrength >= 1) return false;
+    }
+    return true;
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-row gap-3">
+        <Select
+          value={entry.type}
+          disabled={isEditing}
+          onValueChange={(e) =>
+            onChange({
+              ...entry,
+              type: e as ExtraDataType,
+              target: "", // Reset target when type changes
+            })
+          }
+        >
+          <SelectTrigger className="shrink-0">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="embedding">Embedding</SelectItem>
+              <SelectItem value="lora">LoRA</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Select
+          value={entry.target}
+          disabled={isEditing}
+          onValueChange={(e) =>
+            onChange({
+              ...entry,
+              target: e,
+            })
+          }
+        >
+          <SelectTrigger className="grow overflow-hidden">
+            <SelectValue placeholder={`Select ${typeLabel}...`} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Select {entry.type}</SelectLabel>
+              {availableTargets.map((target) => (
+                <SelectItem key={target} value={target}>
+                  {target}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-2 flex gap-2">
+        <InputGroup>
+          <InputGroupInput
+            value={wordInput}
+            onChange={(e) => setWordInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Add some word"
+            className="flex-1"
+          />
+          <InputGroupButton onClick={handleAddWord}>
+            <PlusIcon />
+          </InputGroupButton>
+        </InputGroup>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {entry.words.map((word, index) => (
+          <span
+            key={index}
+            className="bg-surface-hover flex items-center gap-1 rounded border border-border px-2 py-1 text-xs"
+          >
+            {word}
+            <button
+              onClick={() => handleRemoveWord(index)}
+              className="hover:text-red-400"
+            >
+              <XIcon className="h-3 w-3" />
+            </button>
+          </span>
+        ))}
+      </div>
+
+      {entry.type === "lora" && (
+        <div className="flex justify-end gap-4 pt-2">
+          <Label>Strength</Label>
+          <InputGroup className="w-30">
+            <InputGroupButton
+              onClick={() => handleStrengthChange(loraStrength - 0.1)}
+            >
+              <MinusIcon />
+            </InputGroupButton>
+            <InputGroupInput
+              type="number"
+              min={0}
+              max={1}
+              inputMode="numeric"
+              pattern="[0-9+-.]+"
+              step={0.01}
+              value={loraStrength}
+              onChange={(e) => {
+                handleStrengthChange(e.target.valueAsNumber);
+              }}
+              placeholder="1"
+              className="w-15 text-center"
+            />
+            <InputGroupButton
+              onClick={() => handleStrengthChange(loraStrength + 0.1)}
+            >
+              <PlusIcon />
+            </InputGroupButton>
+          </InputGroup>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-2 pt-2">
+        <Button onClick={onCancel} variant="outline" size="sm">
+          Cancel
+        </Button>
+        <Button
+          onClick={onSave}
+          variant="default"
+          size="sm"
+          disabled={!isSaveable()}
+        >
+          Save
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const TriggerWordsEditor: React.FC = () => {
   const { triggerWords, addTriggerWord, updateTriggerWord, deleteTriggerWord } =
     useTriggerWords();
@@ -119,8 +314,8 @@ const TriggerWordsEditor: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <>
+      <div className="col-span-1 row-span-1 flex items-center justify-between md:col-span-2">
         <Label>Trigger Words</Label>
         <Button
           onClick={handleAdd}
@@ -135,7 +330,7 @@ const TriggerWordsEditor: React.FC = () => {
 
       {/* New Entry Form */}
       {newEntry && (
-        <Card className="bg-surface-hover border-primary p-4">
+        <Card className="bg-surface-hover col-span-1 border-primary p-4 md:col-span-2">
           <TriggerWordForm
             entry={newEntry}
             onChange={setNewEntry}
@@ -147,63 +342,42 @@ const TriggerWordsEditor: React.FC = () => {
       )}
 
       {/* Existing Entries */}
-      <div className="space-y-2">
+      <>
         {triggerWords.map((entry, index) => (
-          <Card key={index} className="bg-surface border-border p-4">
-            {editingIndex === index ? (
-              <TriggerWordForm
-                entry={entry}
-                onChange={(updated) => {
-                  // Update in place for editing
-                  updateTriggerWord(index, updated);
-                }}
-                availableTargets={getAvailableTargets(entry.type)}
-                onSave={() => handleSaveEdit(index, entry)}
-                onCancel={handleCancelEdit}
-              />
-            ) : (
-              <div className="space-y-2">
-                <div className="flex flex-col items-stretch justify-center">
+          <div>
+            <Card
+              key={index}
+              className={`bg-surface p-4 ${editingIndex === index ? "border-primary" : "border-border"}`}
+            >
+              {editingIndex === index ? (
+                <TriggerWordForm
+                  isEditing={true}
+                  entry={entry}
+                  onChange={(updated) => {
+                    // Update in place for editing
+                    updateTriggerWord(index, updated);
+                  }}
+                  availableTargets={getAvailableTargets(entry.type)}
+                  onSave={() => handleSaveEdit(index, entry)}
+                  onCancel={handleCancelEdit}
+                />
+              ) : (
+                <div className="flex flex-col items-stretch justify-center space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="mb-1 flex items-center gap-2">
-                        <span
-                          className={`rounded px-2 py-0.5 text-xs ${
-                            entry.type === "embedding"
-                              ? "bg-blue-500/20 text-blue-300"
-                              : "bg-purple-500/20 text-purple-300"
-                          }`}
-                        >
-                          {entry.type === "lora" ? "LoRA" : "Embedding"}
-                        </span>
-                        <span className="text-xs">{entry.target}</span>
-                      </div>
-                    </div>
-                    <div className="ml-2 flex gap-1">
-                      <ButtonGroup>
-                        <Button
-                          onClick={() => handleEdit(index)}
-                          variant="outline"
-                          className="h-8 w-10"
-                        >
-                          <PencilIcon />
-                        </Button>
-                        <Button
-                          onClick={() => handleDelete(index)}
-                          variant="destructive"
-                          className="h-8 w-10"
-                        >
-                          <TrashIcon />
-                        </Button>
-                      </ButtonGroup>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs ${
+                          entry.type === "embedding"
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-purple-500/20 text-purple-300"
+                        }`}
+                      >
+                        {entry.type === "lora" ? "LoRA" : "Embedding"}
+                      </span>
+                      <span className="text-xs">{entry.target}</span>
                     </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-1">
-                    {entry.loraStrength && entry.loraStrength < 1 && (
-                      <span className="items-center rounded bg-purple-500/20 px-2 py-1 text-xs">
-                        strength:{entry.loraStrength}
-                      </span>
-                    )}
+                  <div className="flex flex-wrap items-center gap-1">
                     {entry.words.map((word, wordIndex) => (
                       <span
                         key={wordIndex}
@@ -213,12 +387,37 @@ const TriggerWordsEditor: React.FC = () => {
                       </span>
                     ))}
                   </div>
+                  <div className="flex items-center justify-end">
+                    {entry.loraStrength && entry.loraStrength < 1 && (
+                      <div className="grow">
+                        <span className="items-center rounded bg-purple-500/20 px-2 py-1 text-xs">
+                          strength:{entry.loraStrength}
+                        </span>
+                      </div>
+                    )}
+                    <ButtonGroup>
+                      <Button
+                        onClick={() => handleEdit(index)}
+                        variant="outline"
+                        className="h-8 w-10"
+                      >
+                        <PencilIcon />
+                      </Button>
+                      <Button
+                        onClick={() => handleDelete(index)}
+                        variant="destructive"
+                        className="h-8 w-10"
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </ButtonGroup>
+                  </div>
                 </div>
-              </div>
-            )}
-          </Card>
+              )}
+            </Card>
+          </div>
         ))}
-      </div>
+      </>
 
       {triggerWords.length === 0 && !newEntry && (
         <div className="py-8 text-center text-sm text-muted-foreground">
@@ -253,204 +452,7 @@ const TriggerWordsEditor: React.FC = () => {
           </Card>
         </div>
       )}
-    </div>
-  );
-};
-
-interface TriggerWordFormProps {
-  entry: TriggerWord;
-  onChange: (entry: TriggerWord) => void;
-  availableTargets: string[];
-  onSave: () => void;
-  onCancel: () => void;
-}
-
-const TriggerWordForm: React.FC<TriggerWordFormProps> = ({
-  entry,
-  onChange,
-  availableTargets,
-  onSave,
-  onCancel,
-}) => {
-  const [wordInput, setWordInput] = useState("");
-
-  const handleAddWord = () => {
-    const newWords = splitSmart(wordInput);
-    if (newWords.length > 0) {
-      onChange({
-        ...entry,
-        words: [...entry.words, ...newWords],
-      });
-      setWordInput("");
-    }
-  };
-
-  const handleRemoveWord = (index: number) => {
-    onChange({
-      ...entry,
-      words: entry.words.filter((_, i) => i !== index),
-    });
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddWord();
-    }
-  };
-
-  const handleStrengthChange = (value: number) => {
-    if (value > 1) value = 1;
-    onChange({
-      ...entry,
-      loraStrength: value,
-    });
-  };
-
-  const loraStrength = entry.loraStrength ?? 1;
-  const typeLabel = entry.type === "lora" ? "LoRA" : "Embedding";
-
-  const isSaveable = () => {
-    if (!entry.target) return false;
-    const hasWords = entry.words.length > 0;
-    if (entry.type === "embedding" && !hasWords) return false;
-    if (entry.type === "lora") {
-      if (!hasWords && loraStrength >= 1) return false;
-    }
-    return true;
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Select
-            value={entry.type}
-            onValueChange={(e) =>
-              onChange({
-                ...entry,
-                type: e as ExtraDataType,
-                target: "", // Reset target when type changes
-              })
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="embedding">Embedding</SelectItem>
-                <SelectItem value="lora">LoRA</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Select
-            value={entry.target}
-            onValueChange={(e) =>
-              onChange({
-                ...entry,
-                target: e,
-              })
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={`Select ${typeLabel}...`} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Select {entry.type}</SelectLabel>
-                {availableTargets.map((target) => (
-                  <SelectItem key={target} value={target}>
-                    {target}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-2 flex gap-2">
-          <InputGroup>
-            <InputGroupInput
-              value={wordInput}
-              onChange={(e) => setWordInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Add some word"
-              className="flex-1"
-            />
-            <InputGroupButton onClick={handleAddWord}>
-              <PlusIcon />
-            </InputGroupButton>
-          </InputGroup>
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {entry.words.map((word, index) => (
-            <span
-              key={index}
-              className="bg-surface-hover flex items-center gap-1 rounded border border-border px-2 py-1 text-xs"
-            >
-              {word}
-              <button
-                onClick={() => handleRemoveWord(index)}
-                className="hover:text-red-400"
-              >
-                <XIcon className="h-3 w-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {entry.type === "lora" && (
-        <div className="flex justify-end gap-4 pt-2">
-          <Label>Strength</Label>
-          <InputGroup className="w-30">
-            <InputGroupButton
-              onClick={() => handleStrengthChange(loraStrength - 0.1)}
-            >
-              <MinusIcon />
-            </InputGroupButton>
-            <InputGroupInput
-              type="number"
-              min={0}
-              max={1}
-              inputMode="numeric"
-              pattern="[0-9+-.]+"
-              step={0.01}
-              value={loraStrength}
-              onChange={(e) => {
-                handleStrengthChange(e.target.valueAsNumber);
-              }}
-              placeholder="1"
-              className="w-15 text-center"
-            />
-            <InputGroupButton
-              onClick={() => handleStrengthChange(loraStrength + 0.1)}
-            >
-              <PlusIcon />
-            </InputGroupButton>
-          </InputGroup>
-        </div>
-      )}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button onClick={onCancel} variant="outline" size="sm">
-          Cancel
-        </Button>
-        <Button
-          onClick={onSave}
-          variant="default"
-          size="sm"
-          disabled={!isSaveable()}
-        >
-          Save
-        </Button>
-      </div>
-    </div>
+    </>
   );
 };
 

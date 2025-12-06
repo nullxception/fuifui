@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { CloudUploadIcon } from "lucide-react";
 import React, { useState } from "react";
@@ -74,7 +75,7 @@ const BackgroundSetting: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full flex-col space-y-4">
+    <div className="row-span-3 flex w-full flex-col space-y-4">
       <Label>Background</Label>
 
       {/* Upload Section */}
@@ -107,21 +108,17 @@ const BackgroundSetting: React.FC = () => {
       {/* URL Input */}
       <div className="space-y-2">
         <Label>Or enter image URL</Label>
-        <div className="flex gap-2">
-          <Input
-            type="url"
-            placeholder="https://example.com/image.jpg"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-          <Button
-            onClick={handleUrlSubmit}
-            disabled={!imageUrl.trim()}
-            variant="secondary"
-          >
-            Set
-          </Button>
-        </div>
+        <ButtonGroup className="w-full">
+          <InputGroup>
+            <InputGroupInput
+              type="url"
+              placeholder="https://example.com/image.jpg"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+          </InputGroup>
+          <Button onClick={handleUrlSubmit}>Set</Button>
+        </ButtonGroup>
       </div>
 
       {/* Preview */}
