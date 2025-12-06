@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTriggerWords } from "@/settings/useTriggerWords";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import type { ExtraDataType } from "server/types";
-import { optimizePrompt } from "../lib/metadataParser";
 import { useModels } from "./useModels";
 import { usePromptState } from "./usePromptState";
 
@@ -60,31 +59,11 @@ function Prompt({ type }: { type: PromptType }) {
   const { models } = useModels();
   const { value, changed, updatePrompt, forceSave } = usePromptState(type);
   const ref = useRef<HTMLTextAreaElement>(null);
-  const { triggerWords } = useTriggerWords();
+  const { buildPrompt } = useTriggerWords();
   const title = type === "prompt" ? "Prompt" : "Negative Prompt";
 
-  const addExtraData = (filename: string, extraType: ExtraDataType) => {
-    console.log(triggerWords);
-    // Find matching trigger words for this embedding/lora
-    const matchingTrigger = triggerWords.find(
-      (tw) => tw.type === extraType && tw.target.startsWith(filename),
-    );
-
-    // Build the text to add: prefix + trigger words (if any)
-    const triggerWordsText = matchingTrigger?.words.join(", ") || "";
-    const loraStrength = matchingTrigger?.loraStrength || 1;
-
-    const name = filename.replace(/\.(safetensors|ckpt)$/, "");
-    const prefix =
-      extraType === "lora"
-        ? `<lora:${name}:${loraStrength}>`
-        : `embedding:${name}`;
-    const textToAdd = triggerWordsText
-      ? `${prefix}, ${triggerWordsText}`
-      : prefix;
-
-    const newPrompt = optimizePrompt(`${textToAdd}, ${value}`);
-    updatePrompt(newPrompt);
+  const addExtraData = (filename: string, type: ExtraDataType) => {
+    updatePrompt(buildPrompt(value, filename, type));
   };
 
   useLayoutEffect(() => {

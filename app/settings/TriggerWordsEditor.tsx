@@ -345,9 +345,8 @@ function TriggerWordsEditor() {
       {/* Existing Entries */}
       <>
         {triggerWords.map((entry, index) => (
-          <div>
+          <div key={index}>
             <Card
-              key={index}
               className={`bg-surface p-4 ${editingIndex === index ? "border-primary" : "border-border"}`}
             >
               {editingIndex === index ? (
