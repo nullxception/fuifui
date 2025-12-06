@@ -144,12 +144,15 @@ export function optimizePrompt(text: string, models?: Models) {
     ...loras.map((l) => fixLoraPath(l, models)),
     ...embeds,
     ...others,
-  ].filter((v) => {
-    const k = v.toLowerCase();
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
+  ]
+    .map((it) => it.trim())
+    .filter((it) => {
+      if (it.length === 0) return false;
+      const k = it.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
 
   return deduped
     .join(", ")
