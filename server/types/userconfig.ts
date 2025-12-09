@@ -5,7 +5,7 @@ export type DiffusionModelType = "full" | "standalone";
 export interface DiffusionParams {
   model: string;
   modelType: DiffusionModelType;
-  weightType?: GGMLWeightType;
+  quantizationType?: GGMLWeightType;
   vae?: string;
   upscaleModel?: string;
   clipL?: string;

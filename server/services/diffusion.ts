@@ -120,8 +120,8 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     args.push("-m", modelPath);
   }
 
-  if (params.weightType) {
-    args.push("--type", params.weightType);
+  if (params.quantizationType) {
+    args.push("--type", params.quantizationType);
   }
 
   if (allPrompts.includes("embedding:")) {

@@ -64,19 +64,19 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="weightType-select">Weight Type</Label>
+        <Label htmlFor="quantizationType-select">Quantization</Label>
         <Select
-          value={store.params.weightType}
+          value={store.params.quantizationType}
           onValueChange={(e) => {
             if (e === "unset") {
-              store.unset("weightType");
+              store.unset("quantizationType");
               return;
             }
-            store.update("weightType", e);
+            store.update("quantizationType", e);
           }}
         >
-          <SelectTrigger id="model-select" className="w-full">
-            <SelectValue placeholder="Select weight type" />
+          <SelectTrigger id="quantizationType-select" className="w-full">
+            <SelectValue placeholder="Select quantization type" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
