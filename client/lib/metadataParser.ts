@@ -1,0 +1,318 @@
+import type { Models } from "server/types";
+
+export interface ParsedMetadata {
+  prompt: string;
+  negativePrompt: string;
+  width: number;
+  height: number;
+  upscaled: boolean;
+  baseWidth: number;
+  baseHeight: number;
+  model: string;
+  steps: number;
+  cfgScale: number;
+  seed: number;
+  rng: string;
+  samplingMethod: string;
+  scheduler: string;
+  version: string;
+  vae?: string;
+  textEncoders?: string[];
+}
+
+const emptyMetadata: ParsedMetadata = {
+  prompt: "",
+  negativePrompt: "",
+  width: -1,
+  height: -1,
+  upscaled: false,
+  baseWidth: -1,
+  baseHeight: -1,
+  model: "",
+  steps: -1,
+  cfgScale: -1,
+  seed: -1,
+  rng: "",
+  samplingMethod: "",
+  scheduler: "",
+  version: "",
+};
+
+function snakeToCamel(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/([-_][a-z])/g, (group) =>
+      group.toUpperCase().replace("-", "").replace("_", ""),
+    );
+}
+// --- Split by commas but ignore commas inside parentheses ---
+export function splitSmart(t: string) {
+  const result: string[] = [];
+  let current = "";
+  let depth = 0;
+
+  for (const char of t) {
+    if (char === "(") depth++;
+    if (char === ")") depth--;
+
+    if (char === "," && depth === 0) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.trim()) result.push(current.trim());
+  return result;
+}
+
+function fixLoraPath(text: string, models?: Models): string {
+  if (!models?.loras.length) {
+    return text;
+  }
+
+  const validLoras = new Set(
+    models.loras.map((x) => x.replace(/\.(safetensors|ckpt)$/, "")),
+  );
+
+  const loraRegex = /<lora:(.*?):[^>]*>/;
+  const match = text.match(loraRegex);
+
+  if (!match) {
+    return text;
+  }
+
+  const [, currentPath] = match;
+
+  if (currentPath && validLoras.has(currentPath)) {
+    return text;
+  }
+
+  const filename = currentPath?.split("/").at(-1);
+
+  if (!filename) {
+    return text;
+  }
+
+  const properPath = models.loras
+    .map((x) => x.replace(/\.(safetensors|ckpt)$/, ""))
+    .find((validPath) => validPath.endsWith(filename));
+
+  if (properPath) {
+    const newTag = `<lora:${properPath}:`;
+    return text.replace(/<lora:(.*?):/, newTag);
+  }
+
+  return text;
+}
+
+const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
+
+export function optimizePrompt(text?: string, models?: Models) {
+  if (!text) return "";
+  const chunks = text
+    .split("\n")
+    .flatMap(splitSmart)
+    .map(normalize)
+    .filter(Boolean);
+
+  const loras: string[] = [];
+  const embeds: string[] = [];
+  const scores: string[] = [];
+  const others: string[] = [];
+
+  for (let chunk of chunks) {
+    if (!chunk) continue;
+
+    const loraMatches = chunk.match(/<lora:[^>]+>/g) || [];
+    if (loraMatches.length) {
+      loras.push(...loraMatches);
+      chunk = chunk.replace(/<lora:[^>]+>/g, " ");
+    }
+
+    const embedMatches = chunk.match(/embedding:[^,\s)]+/gi) || [];
+    if (embedMatches.length) {
+      embeds.push(...embedMatches);
+      chunk = embedMatches.reduce((acc, m) => acc.replace(m, " "), chunk);
+    }
+
+    const scoreMatches = chunk.match(/score_\d+.*/gi) || [];
+    if (scoreMatches.length) {
+      scores.push(...scoreMatches.sort().reverse());
+      chunk = scoreMatches.reduce((acc, m) => acc.replace(m, " "), chunk);
+    }
+
+    const rest = normalize(chunk);
+    if (rest) others.push(rest);
+  }
+
+  const seen = new Set<string>();
+  const deduped = [
+    ...loras.map((l) => fixLoraPath(l, models)),
+    ...embeds,
+    ...scores,
+    ...others,
+  ]
+    .map((it) => it.trim())
+    .filter((it) => {
+      if (it.length === 0) return false;
+      const k = it.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+
+  return deduped
+    .join(", ")
+    .replace(/(\()\s+|\s+(\))/g, (_, o, c) => o || c)
+    .replace(/>\s*,\s*/g, "> ");
+}
+
+export function parseDiffusionParams(
+  metadata?: Record<string, unknown>,
+  models?: Models,
+) {
+  if (!metadata) return emptyMetadata;
+  const data: ParsedMetadata = Object.create(emptyMetadata);
+
+  // Try to find the parameters string. It's often in 'parameters' or 'UserComment'
+  // based on how stable-diffusion.cpp or other tools save it.
+  // We check for the string content provided by the user.
+  let rawParams = "";
+  if (typeof metadata.parameters === "string") {
+    rawParams = metadata.parameters;
+  } else if (typeof metadata.UserComment === "string") {
+    // Sometimes UserComment has a prefix like "UNICODE=" or similar, but often it's just the string
+    rawParams = metadata.UserComment;
+  } else if (typeof metadata.Description === "string") {
+    rawParams = metadata.Description;
+  } else {
+    // If we can't find a specific key, try to find any string value that looks like parameters
+    const potentialValue = Object.values(metadata).find(
+      (val) => typeof val === "string" && val.includes("Steps: "),
+    ) as string | undefined;
+    if (potentialValue) rawParams = potentialValue;
+  }
+
+  if (typeof metadata.ImageWidth === "number") {
+    data.width = metadata.ImageWidth;
+  }
+  if (typeof metadata.ImageHeight === "number") {
+    data.height = metadata.ImageHeight;
+  }
+
+  if (!rawParams) return data;
+
+  try {
+    const lines = rawParams.split("\n").filter((l) => l.trim() !== "");
+    let prompt = "";
+    let negativePrompt = "";
+    const otherParams: Record<string, string | number> = {};
+
+    let isNegative = false;
+    let isParams = false;
+
+    for (const line of lines) {
+      if (line.startsWith("Negative prompt:")) {
+        negativePrompt = line.replace("Negative prompt:", "").trim();
+        isNegative = true;
+        continue;
+      }
+      if (line.startsWith("Steps: ")) {
+        isParams = true;
+        isNegative = false; // End of negative prompt section
+        const pairs = line.split(", ");
+        pairs.forEach((pair) => {
+          const [key, ...values] = pair.split(": ");
+          if (key && values.length > 0) {
+            let k = key.toLowerCase().replace(/ /g, "_").trim();
+            k = snakeToCamel(k);
+            const v = values.join(": ").trim();
+            switch (k) {
+              case "version":
+                data.version = v;
+                break;
+              case "model":
+              case "unet":
+                data.model = v;
+                break;
+              case "vae":
+                data.vae = v;
+                break;
+              case "te":
+                if (data.textEncoders?.includes(v)) {
+                  break;
+                }
+                data.textEncoders = data.textEncoders
+                  ? [...data.textEncoders, v]
+                  : [v];
+                break;
+              case "cfgScale":
+                data.cfgScale = parseFloat(v);
+                break;
+              case "steps":
+                data.steps = parseInt(v);
+                break;
+              case "size": {
+                const [width, height] = v.split("x").map((d) => d.trim());
+
+                if (width && height) {
+                  data.baseWidth = parseInt(width);
+                  data.baseHeight = parseInt(height);
+                }
+                if (
+                  data.width > data.baseWidth ||
+                  data.height > data.baseHeight
+                ) {
+                  data.upscaled = true;
+                }
+                break;
+              }
+              case "sampler": {
+                const [method, sched] = v.split(" ").map((s) => s.trim());
+                if (method && sched) {
+                  data.samplingMethod = method;
+                  data.scheduler = sched;
+                }
+                break;
+              }
+              case "rng":
+                data.rng = v;
+                break;
+              case "seed":
+                data.seed = Number(v);
+                break;
+              case "guidance":
+              case "eta":
+                break; // Ignore for now
+              default:
+                otherParams[k] = v;
+                break;
+            }
+          }
+        });
+        continue;
+      }
+
+      if (isNegative && !isParams) {
+        negativePrompt += (negativePrompt ? "\n" : "") + line;
+        continue;
+      }
+
+      if (!isNegative && !isParams) {
+        prompt += (prompt ? "\n" : "") + line;
+      }
+    }
+
+    data.prompt = optimizePrompt(prompt.replace(/['"]+/g, ""), models);
+    data.negativePrompt = optimizePrompt(
+      negativePrompt.replace(/['"]+/g, ""),
+      models,
+    );
+    return data;
+  } catch (e) {
+    console.error("Failed to parse parameters", e);
+    return data;
+  }
+}

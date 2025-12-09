@@ -1,0 +1,123 @@
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "client/components/ui/button";
+import { ButtonGroup } from "client/components/ui/button-group";
+import { InputGroup, InputGroupInput } from "client/components/ui/input-group";
+import { Label } from "client/components/ui/label";
+import { useTRPC } from "client/query";
+import { CloudUploadIcon } from "lucide-react";
+import React, { useState } from "react";
+import { useSettings } from "./useSettings";
+
+function BackgroundSetting() {
+  const { settings: app, update } = useSettings();
+  const [imageUrl, setImageUrl] = useState("");
+  const rpc = useTRPC();
+  const mutation = useMutation(
+    rpc.updateBackground.mutationOptions({
+      onError(error) {
+        alert("Failed to update background: " + error);
+      },
+      async onSettled(data) {
+        update("background", data?.url);
+      },
+    }),
+  );
+
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 30 * 1024 * 1024) {
+      alert("Image size must be less than 30MB");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    const data = new FormData();
+    data.append("image", file);
+    mutation.mutate(data);
+  };
+
+  const handleUrlSubmit = () => {
+    if (imageUrl.trim()) {
+      update("background", imageUrl.trim());
+      setImageUrl("");
+    }
+  };
+
+  const deleteBackground = async () => {
+    mutation.mutate(new FormData());
+  };
+
+  return (
+    <div className="row-span-3 flex w-full flex-col space-y-4">
+      <Label>Background</Label>
+
+      {/* Upload Section */}
+      <div>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          className="hidden"
+          id="bg-upload"
+          disabled={mutation.isPending}
+        />
+        <label
+          htmlFor="bg-upload"
+          className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
+            mutation.isPending
+              ? "cursor-not-allowed border-border text-muted-foreground"
+              : "hover:bg-surface-hover border-border text-muted-foreground hover:border-primary hover:text-foreground"
+          }`}
+        >
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <CloudUploadIcon className="mb-3 h-8 w-8" />
+            <p className="text-sm">
+              {mutation.isPending ? "Uploading..." : "Click to upload image"}
+            </p>
+          </div>
+        </label>
+      </div>
+
+      {/* URL Input */}
+      <div className="space-y-2">
+        <Label>Or enter image URL</Label>
+        <ButtonGroup className="w-full">
+          <InputGroup>
+            <InputGroupInput
+              type="url"
+              placeholder="https://example.com/image.jpg"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+          </InputGroup>
+          <Button onClick={handleUrlSubmit}>Set</Button>
+        </ButtonGroup>
+      </div>
+
+      {/* Preview */}
+      {app.background && app.background.length > 0 && (
+        <div className="group relative">
+          <img
+            src={app.background}
+            alt="Background preview"
+            className="h-48 w-full rounded-md border border-border object-cover"
+          />
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button onClick={deleteBackground} variant="destructive" size="sm">
+              Remove Background
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+export default BackgroundSetting;

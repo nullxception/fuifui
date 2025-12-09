@@ -1,0 +1,50 @@
+@import "./globals.css";
+
+@layer base {
+  :root {
+    @apply font-sans;
+  }
+  html {
+    @apply bg-background;
+  }
+  body {
+    @apply relative m-0 bg-transparent text-foreground;
+  }
+  input[type="number"] {
+    @apply [appearance:textfield] text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none;
+  }
+}
+
+.dark {
+  --background: black;
+  --card: oklch(15% 0 271.152 / 0.75);
+  --primary: oklch(52.008% 0.2474 292.867 / 0.8);
+  --primary-foreground: oklch(100% 0.00011 271.152);
+  --destructive: var(--color-pink-500);
+}
+
+@keyframes slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 256px 224px;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+  }
+}
