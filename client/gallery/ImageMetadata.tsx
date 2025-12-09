@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "client/components/ui/button";
 import { Label } from "client/components/ui/label";
 import { useDiffusionConfig } from "client/dashboard/useDiffusionConfig";
-import { useDiffusionJob } from "client/dashboard/useDiffusionJob";
 import { useTRPC } from "client/query";
 import { useAppStore } from "client/stores/useAppStore";
+import { useJobs } from "client/stores/useJobs";
 import {
   ChevronDownIcon,
   DownloadIcon,
@@ -88,7 +88,7 @@ export default function ImageMetadata({
   const [, navigate] = useLocation();
   const { setOutputTab } = useAppStore();
   const store = useDiffusionConfig();
-  const { setImage } = useDiffusionJob();
+  const { setPreviewImage } = useJobs();
   const rpc = useTRPC();
   const { data } = useQuery(rpc.listModels.queryOptions());
   const metadata = parseDiffusionParams(image.metadata, data);
@@ -111,7 +111,7 @@ export default function ImageMetadata({
     });
 
     // Navigate back to generate tab
-    setImage(image);
+    setPreviewImage(image);
     setOutputTab("image");
     navigate("~/");
     onClose();

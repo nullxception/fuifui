@@ -72,7 +72,7 @@ function hasValidNum(
   }
 }
 
-const filterLogs = (message: string) => {
+export const filterLogs = (message: string) => {
   const modelRoot = path.resolve(MODELS_DIR, "..");
   const r = String.raw`(["'\s])(${modelRoot}|${ROOT_DIR})${path.sep}`;
 
@@ -274,7 +274,7 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     updateJobStatus({
       id: jobId,
       status: "failed",
-      data: { message: `Process spawn failed (${sdProcess.exitCode})` },
+      result: `Process spawn failed (${sdProcess.exitCode})`,
     });
     return;
   }
@@ -329,15 +329,13 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
       updateJobStatus({
         id: jobId,
         status: "completed",
-        data: {
-          image: await getImageData(outputPath),
-        },
+        result: await getImageData(outputPath),
       });
     } else if (job?.status !== "cancelled") {
       updateJobStatus({
         id: jobId,
         status: "failed",
-        data: { message: `Diffusion failed with exit code: ${code}` },
+        result: `Diffusion failed with exit code: ${code}`,
       });
     }
   } catch (error) {
@@ -345,7 +343,7 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     updateJobStatus({
       id: jobId,
       status: "failed",
-      data: { message: `Process error: ${msg}` },
+      result: `Process error: ${msg}`,
     });
   }
 }

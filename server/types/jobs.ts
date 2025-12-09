@@ -10,11 +10,6 @@ export type JobStatus =
   | "failed"
   | "cancelled";
 
-export interface DiffusionResult {
-  image?: Image;
-  message?: string;
-}
-
 export interface Job {
   id: string;
   status: JobStatus;
@@ -22,7 +17,7 @@ export interface Job {
   createdAt: number;
   startedAt?: number;
   completedAt?: number;
-  result?: DiffusionResult;
+  result?: Image | string;
   logs: LogData[];
 }
 

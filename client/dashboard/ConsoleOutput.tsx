@@ -1,14 +1,12 @@
 import type { LogEntry } from "client/types";
 import { useEffect, useMemo, useRef } from "react";
-import { useDiffusionJob } from "./useDiffusionJob";
 
 function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString();
 }
 
-function ConsoleOutput() {
+function ConsoleOutput({ logs }: { logs: LogEntry[] | undefined }) {
   const consoleRef = useRef<HTMLDivElement>(null);
-  const { logs } = useDiffusionJob();
 
   useEffect(() => {
     if (consoleRef.current) {
@@ -24,7 +22,7 @@ function ConsoleOutput() {
     > = [];
     let lastProgressIndex = -1;
 
-    logs.forEach((log) => {
+    logs?.forEach((log) => {
       const message = log.message.trim();
       // Check if this is a progress bar line
       const isProgress = /\|=*.*\| \d+\/\d+/.test(message);

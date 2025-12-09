@@ -6,42 +6,45 @@ import { motion, type HTMLMotionProps } from "framer-motion";
 import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
 import { forwardRef, useEffect } from "react";
 import { optimizePrompt } from "../lib/metadataParser";
+import { useJobs } from "../stores/useJobs";
 import ConsoleOutput from "./ConsoleOutput";
 import ControlPanel from "./ControlPanel";
 import ImageDisplay from "./ImageDisplay";
 import { useDiffusionConfig } from "./useDiffusionConfig";
-import { useDiffusionJob } from "./useDiffusionJob";
 
 const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   (props, ref) => {
     const { outputTab, setOutputTab } = useAppStore();
-    const { jobId, image, isProcessing, checkJobs, connectToJob, setError } =
-      useDiffusionJob();
+    const { jobStatus, checkJobs, connectToJob, setError, logs } = useJobs();
     const store = useDiffusionConfig();
     const rpc = useTRPC();
     const { data: models } = useQuery(rpc.listModels.queryOptions());
-    const { data: jobs } = useQuery(rpc.listJobs.queryOptions("txt2img"));
+    const { data: process } = useQuery(rpc.listJobs.queryOptions("txt2img"));
+    const jobState = jobStatus("txt2img");
+    const jobId = jobState?.id;
     const diffusionStart = useMutation(
       rpc.startDiffusion.mutationOptions({
         onError() {
-          setError("Failed to generate image");
+          if (jobId) setError(jobId, "txt2img", "Failed to generate image");
         },
         onSuccess(data) {
-          connectToJob(data.jobId);
+          connectToJob(data.jobId, "txt2img");
         },
       }),
     );
 
+    const isProcessing = jobState?.isProcessing;
+    const image = jobState?.image;
     const diffusionStop = useMutation(rpc.stopDiffusion.mutationOptions());
 
     useEffect(() => {
-      if (jobs) {
-        checkJobs(jobs);
+      if (process) {
+        checkJobs(process);
       }
-    }, [checkJobs, jobs]);
+    }, [checkJobs, process]);
 
     const handleDiffusion = async () => {
-      if (isProcessing) {
+      if (isProcessing && jobId) {
         diffusionStop.mutate(jobId);
       } else {
         await store.updateAll({
@@ -85,9 +88,12 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
 
               <div className="relative min-h-0 w-full flex-1">
                 {outputTab === "image" ? (
-                  <ImageDisplay image={image} isProcessing={isProcessing} />
+                  <ImageDisplay
+                    image={image}
+                    isProcessing={isProcessing ?? false}
+                  />
                 ) : (
-                  <ConsoleOutput />
+                  <ConsoleOutput logs={logs.filter((x) => x.jobId === jobId)} />
                 )}
               </div>
             </div>

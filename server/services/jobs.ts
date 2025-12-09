@@ -1,6 +1,6 @@
 import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
-import type { DiffusionResult, Job, JobStatus, LogData } from "server/types";
+import type { Image, Job, JobStatus, LogData } from "server/types";
 import type { JobType } from "server/types/jobs";
 
 const jobEvents = new EventEmitter();
@@ -29,12 +29,12 @@ export function updateJobStatus({
   id,
   status,
   process = null,
-  data,
+  result,
 }: {
   id: string;
   status: JobStatus;
   process?: Subprocess | null;
-  data?: DiffusionResult;
+  result?: Image | string;
 }) {
   const job = jobs.get(id);
 
@@ -60,14 +60,14 @@ export function updateJobStatus({
   job.status = status;
   const finished = ["completed", "failed", "cancelled"];
   if (status === "cancelled") {
-    data = { message: `Job ${id} has been cancelled` };
+    result = `Job ${id} has been cancelled`;
   }
   if (finished.includes(status)) {
     job.completedAt = Date.now();
-    job.result = data;
+    job.result = result;
     const event = status === "completed" ? "complete" : "error";
     if (jobEvents.listenerCount(event) > 0) {
-      jobEvents.emit(event, { jobId: id, data });
+      jobEvents.emit(event, { jobId: id, data: result });
     }
   }
 }
@@ -88,7 +88,8 @@ export function getAllJobs(type: JobType): Job[] {
 
 export function deleteJobByResultFile(filename: string) {
   for (const [id, job] of jobs.entries()) {
-    if (job.result?.image?.url === filename) {
+    const result = job.result;
+    if (typeof result !== "string" && result?.url === filename) {
       jobs.delete(id);
     }
   }

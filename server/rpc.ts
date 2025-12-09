@@ -8,7 +8,7 @@ import {
   saveDiffusionParams,
   saveTriggerWords,
 } from "./api/config";
-import { convertWeights } from "./api/converter";
+import { quantizationStart } from "./api/converter";
 import {
   diffusionJobs,
   diffusionStart,
@@ -63,9 +63,12 @@ export const router = t.router({
   stopDiffusion: t.procedure
     .input(z.string())
     .mutation((opts) => stopJob(opts.input)),
-  convertModel: t.procedure
+  startQuantization: t.procedure
     .input(convertParamsSchema)
-    .mutation((opts) => convertWeights(opts.input)),
+    .mutation((opts) => quantizationStart(opts.input)),
+  stopQuantization: t.procedure
+    .input(z.string())
+    .mutation((opts) => stopJob(opts.input)),
 });
 
 export type AppRouter = typeof router;
