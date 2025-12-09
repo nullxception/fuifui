@@ -1,47 +1,18 @@
 import Modal from "client/components/Modal";
 import { Button } from "client/components/ui/button";
-import { Card } from "client/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeftIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CircleAlertIcon,
   InfoIcon,
-  Trash2Icon,
   XIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Image } from "server/types";
 import { useLocation, useRoute } from "wouter";
 import ImageMetadata from "./ImageMetadata";
+import { RemoveDialog } from "./RemoveDialog";
 import { useImageQuery } from "./useImageQuery";
-function RemoveImage({
-  onCancel,
-  onRemove,
-}: {
-  onCancel: () => void;
-  onRemove: () => void;
-}) {
-  return (
-    <>
-      <Card className="flex max-w-80 flex-col justify-center overflow-clip shadow-background drop-shadow-lg">
-        <CircleAlertIcon className="mt-5 h-10 w-10 self-center text-pink-500" />
-        <p className="p-4 text-center">Are you sure you want to remove it ?</p>
-        <div className="flex justify-center gap-2 bg-background/40 p-4">
-          <Button variant="outline" className="w-1/2" onClick={onCancel}>
-            <ArrowLeftIcon />
-            Go back
-          </Button>
-          <Button variant="destructive" className="w-1/2" onClick={onRemove}>
-            <Trash2Icon />
-            Remove
-          </Button>
-        </div>
-      </Card>
-    </>
-  );
-}
 
 interface PageDirection {
   index: number;
@@ -272,15 +243,18 @@ export default function ImageLightbox() {
           />
         )}
       </motion.div>
-      <Modal
-        isOpen={shouldShowRemoveDialog}
-        onClose={() => showRemoveDialog(false)}
-      >
-        <RemoveImage
-          onRemove={onRemove}
-          onCancel={() => showRemoveDialog(false)}
-        />
-      </Modal>
+      {image && (
+        <Modal
+          isOpen={shouldShowRemoveDialog}
+          onClose={() => showRemoveDialog(false)}
+        >
+          <RemoveDialog
+            onRemove={onRemove}
+            onCancel={() => showRemoveDialog(false)}
+            images={[image]}
+          />
+        </Modal>
+      )}
     </>
   );
 }

@@ -1,11 +1,15 @@
 import { Footer } from "client/components/Footer";
+import Modal from "client/components/Modal";
+import { Button } from "client/components/ui/button";
+import { ButtonGroup } from "client/components/ui/button-group";
 import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Trash2Icon, XIcon } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import type { Image } from "server/types";
-import { Link, useRoute } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import ImageLightbox from "./ImageLightbox";
+import { RemoveDialog } from "./RemoveDialog";
 import { useImageQuery } from "./useImageQuery";
 
 function useElementWidth<T extends HTMLElement>() {
@@ -27,11 +31,22 @@ function useElementWidth<T extends HTMLElement>() {
 
   return [ref, width] as const;
 }
+
 interface GalleryItemProps {
   image: Image;
+  selected?: boolean;
+  className: string;
+  isSelectionMode: boolean;
+  onClick: () => void;
 }
 
-function GalleryItem({ image }: GalleryItemProps) {
+function GalleryItem({
+  image,
+  selected,
+  className,
+  isSelectionMode,
+  onClick,
+}: GalleryItemProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
 
   // derive appropriate thumbnail size based on real width
@@ -45,17 +60,27 @@ function GalleryItem({ image }: GalleryItemProps) {
   return (
     <div
       ref={ref}
-      className="group bg-surface relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border border-border transition-colors hover:border-primary/50"
+      onClick={onClick}
+      className={`group bg-surface relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border transition-colors select-none hover:border-primary/50 ${className} ${isSelectionMode ? "opacity-70" : ""} ${
+        selected ? "bg-pink-700" : "border-border"
+      }`}
     >
       {width > 1 ? (
         <img
           src={`${image.url}?width=${size}`}
           alt=""
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${selected && "opacity-70"}`}
         />
       ) : (
         <></>
+      )}
+      {isSelectionMode && selected && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="rounded-full bg-pink-700/50 p-2 text-primary-foreground">
+            <Trash2Icon className="h-6 w-6" />
+          </div>
+        </div>
       )}
     </div>
   );
@@ -72,11 +97,39 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       isFetchingNextPage,
       status,
       images,
+      removeImages,
     } = useImageQuery();
     const [match] = useRoute("/gallery");
     const [, params] = useRoute("/gallery/:id");
     const [appScrollTop, setAppScrollTop] = useState(0);
     const observerTarget = useRef(null);
+    const [, navigate] = useLocation();
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<Set<string>>(
+      new Set(),
+    );
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const toggleSelection = (name: string) => {
+      const newSelected = new Set(selectedImages);
+      if (newSelected.has(name)) {
+        newSelected.delete(name);
+      } else {
+        newSelected.add(name);
+      }
+      setSelectedImages(newSelected);
+    };
+
+    const handleBatchDelete = () => {
+      setShowDeleteDialog(true);
+    };
+
+    const confirmDelete = () => {
+      removeImages(Array.from(selectedImages));
+      setIsSelectionMode(false);
+      setSelectedImages(new Set());
+      setShowDeleteDialog(false);
+    };
 
     useEffect(() => {
       const app = document.querySelector("#app");
@@ -129,9 +182,8 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         </>
       );
     }
-
-    return (
-      <>
+    if (status === "pending" || status === "error") {
+      return (
         <motion.div ref={ref} {...props} className="grow p-2">
           {status === "pending" ? (
             <div className="col-span-full flex justify-center p-4">
@@ -142,42 +194,98 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
               <span className="text-foreground">Error: {error.message}</span>
             </div>
           ) : (
-            <>
-              <ResponsiveMasonry
-                columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
-                gutterBreakPoints={{ 350: "6px", 720: "12px" }}
-                className="mx-auto max-w-screen-2xl"
-              >
-                <Masonry>
-                  {data.pages.map((group) =>
-                    group.map((image, i) => (
-                      <Link
-                        key={i}
-                        href={`~/gallery/${image.name}`}
-                        state={{ from: "~/gallery" }}
-                        onClick={() => {
-                          const app = document.querySelector("#app");
-                          setAppScrollTop(app?.scrollTop ?? 0);
-                        }}
-                        className="w-full"
-                      >
-                        <GalleryItem image={image} />
-                      </Link>
-                    )),
-                  )}
-                </Masonry>
-              </ResponsiveMasonry>
-              <div ref={observerTarget} className="col-span-full h-10 w-full" />
-              {isFetchingNextPage && (
-                <div className="col-span-full flex justify-center p-4">
-                  <span className="text-foreground">Loading more...</span>
-                </div>
-              )}
-              <Footer className="col-span-full flex justify-center p-4" />
-            </>
+            <></>
           )}
         </motion.div>
+      );
+    }
+
+    return (
+      <>
+        <motion.div ref={ref} {...props} className="grow p-2">
+          <div
+            className={`${isSelectionMode ? "sticky top-4 right-0 md:top-16" : "relative top-1"} z-2 mx-auto mb-4 flex max-w-screen-2xl justify-end gap-2 px-4 transition-all`}
+          >
+            {isSelectionMode ? (
+              <ButtonGroup className="overflow-clip rounded-md bg-background">
+                <Button
+                  variant="secondary"
+                  onClick={handleBatchDelete}
+                  disabled={selectedImages.size === 0}
+                  className="bg-pink-600 opacity-100"
+                >
+                  <Trash2Icon /> Delete ({selectedImages.size})
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsSelectionMode(false);
+                    setSelectedImages(new Set());
+                  }}
+                  className="bg-background"
+                >
+                  <XIcon /> Cancel
+                </Button>
+              </ButtonGroup>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setIsSelectionMode(true)}
+              >
+                <Trash2Icon />
+              </Button>
+            )}
+          </div>
+          <ResponsiveMasonry
+            columnsCountBreakPoints={{ 350: 2, 512: 3, 720: 4, 900: 5 }}
+            gutterBreakPoints={{ 350: "6px", 720: "12px" }}
+            className="mx-auto max-w-screen-2xl"
+          >
+            <Masonry>
+              {data.pages.map((group) =>
+                group.map((image, i) => (
+                  <GalleryItem
+                    key={i}
+                    className="w-full"
+                    image={image}
+                    isSelectionMode={isSelectionMode}
+                    selected={selectedImages.has(image.url)}
+                    onClick={() => {
+                      if (isSelectionMode) {
+                        toggleSelection(image.url);
+                      } else {
+                        const app = document.querySelector("#app");
+                        setAppScrollTop(app?.scrollTop ?? 0);
+                        navigate(`~/gallery/${image.name}`, {
+                          state: { from: "~/gallery" },
+                        });
+                      }
+                    }}
+                  />
+                )),
+              )}
+            </Masonry>
+          </ResponsiveMasonry>
+          <div ref={observerTarget} className="col-span-full h-10 w-full" />
+          {isFetchingNextPage && (
+            <div className="col-span-full flex justify-center p-4">
+              <span className="text-foreground">Loading more...</span>
+            </div>
+          )}
+          <Footer className="col-span-full flex justify-center p-4" />
+        </motion.div>
         <AnimatePresence>{params?.id && <ImageLightbox />}</AnimatePresence>
+        <Modal
+          isOpen={showDeleteDialog}
+          onClose={() => setShowDeleteDialog(false)}
+        >
+          <RemoveDialog
+            count={selectedImages.size}
+            images={images.filter((img) => selectedImages.has(img.name))}
+            onRemove={confirmDelete}
+            onCancel={() => setShowDeleteDialog(false)}
+          />
+        </Modal>
       </>
     );
   },
