@@ -1,5 +1,6 @@
 import { Button } from "client/components/ui/button";
 import {
+  AtomIcon,
   ImageIcon,
   SettingsIcon,
   ZapIcon,
@@ -51,6 +52,14 @@ export function MobileNav() {
             isActive={location.startsWith("/gallery")}
           >
             Gallery
+          </NavButton>
+
+          <NavButton
+            isActive={location.startsWith("/converter")}
+            onClick={() => navigate("/converter")}
+            icon={AtomIcon}
+          >
+            Converter
           </NavButton>
 
           <NavButton
