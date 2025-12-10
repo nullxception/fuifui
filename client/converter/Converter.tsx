@@ -18,7 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "client/components/ui/select";
+import { Switch } from "client/components/ui/switch";
 import { useTRPC } from "client/query";
+import { useAppStore } from "client/stores/useAppStore";
 import { useJobs } from "client/stores/useJobs";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { AlertTriangleIcon, CircleStopIcon, ZapIcon } from "lucide-react";
@@ -28,6 +30,7 @@ import { GGML_WEIGHTS_TYPE } from "server/types";
 function ConverterPanel() {
   const [model, setModel] = useState("");
   const [output, setOutput] = useState("");
+  const { hideGGUF, setHideGGUF } = useAppStore();
   const [type, setType] = useState("q8_0");
   const rpc = useTRPC();
   const { data: models } = useQuery(rpc.listModels.queryOptions());
@@ -47,9 +50,9 @@ function ConverterPanel() {
   );
   const quantizationStop = useMutation(rpc.stopQuantization.mutationOptions());
 
-  const filteredModels = models?.checkpoints.filter(
-    (m) => !m.endsWith(".gguf"),
-  );
+  const filteredModels = hideGGUF
+    ? models?.checkpoints.filter((m) => !m.endsWith(".gguf"))
+    : models?.checkpoints;
 
   const updateOutput = (newModel: string, newType: string) => {
     if (newModel && newType) {
@@ -88,8 +91,20 @@ function ConverterPanel() {
         <CardTitle>Model Weight Converter</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-stretch justify-center space-y-4">
-        <div className="space-y-2">
-          <Label>Model</Label>
+        <div className="flex flex-col items-stretch justify-between gap-4">
+          <div className="flex flex-row items-center justify-between gap-4">
+            <Label>Model</Label>
+            <div className="flex flex-row items-center justify-between gap-4">
+              <Label htmlFor="filterModel">Hide GGUF Models</Label>
+              <Switch
+                id="filterModel"
+                checked={hideGGUF}
+                onCheckedChange={(e) => setHideGGUF(e)}
+                title=""
+              />
+            </div>
+          </div>
+
           <Select value={model} onValueChange={handleModelChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a model" />
