@@ -64,8 +64,8 @@ export default function Converter(props: HTMLMotionProps<"div">) {
   const jobId = jobState?.id;
   const quantizationStart = useMutation(
     rpc.startQuantization.mutationOptions({
-      onError() {
-        if (jobId) setError(jobId, "convert", "Failed to generate image");
+      onError(err) {
+        setError("convert", err.message);
       },
       onSuccess(data) {
         connectToJob(data.jobId, "convert");

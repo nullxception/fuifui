@@ -24,8 +24,8 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     const jobId = jobState?.id;
     const diffusionStart = useMutation(
       rpc.startDiffusion.mutationOptions({
-        onError() {
-          if (jobId) setError(jobId, "txt2img", "Failed to generate image");
+        onError(error) {
+          setError("txt2img", error.message);
         },
         onSuccess(data) {
           connectToJob(data.jobId, "txt2img");

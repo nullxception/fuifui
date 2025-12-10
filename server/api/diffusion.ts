@@ -78,14 +78,14 @@ export async function listDiffusionModels() {
 }
 
 export async function diffusionStart(params: DiffusionParams) {
-  try {
-    if (!params.model) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Model is required",
-      });
-    }
+  if (!params.model) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Model is required",
+    });
+  }
 
+  try {
     const job = createJob("txt2img");
     startDiffusion(job.id, params);
     return { jobId: job.id };

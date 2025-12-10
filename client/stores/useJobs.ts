@@ -15,7 +15,7 @@ interface JobsState {
   logs: LogEntry[];
   jobStatus: (type: JobType) => JobStatus | undefined;
   setPreviewImage: (image?: Image) => void;
-  setError: (jobId: string, type: JobType, message: string) => void;
+  setError: (type: JobType, message: string) => void;
   postResult: (jobId: string, type: JobType, result: Image | string) => void;
   addLog: (log: LogEntry) => void;
   connectToJob: (id: string, type: JobType) => void;
@@ -65,16 +65,17 @@ export const useJobs = create<JobsState>((set, get) => ({
     }));
     setOutputTab("image");
   },
-  setError(jobId, type, message) {
-    const { addLog } = get();
+  setError(type, message) {
+    const { jobStatus, addLog } = get();
+    const id = jobStatus(type)?.id ?? TO_BE_FILLED;
     addLog({
-      jobId,
       type: "stderr",
       message: message,
+      jobId: id,
     });
     set((state) => ({
       jobs: new Map(state.jobs).set(type, {
-        id: jobId,
+        id: id,
         isProcessing: false,
       }),
     }));

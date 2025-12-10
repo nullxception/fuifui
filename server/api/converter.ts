@@ -12,26 +12,26 @@ import {
 import type { ConvertParams } from "server/types";
 
 export async function quantizationStart(params: ConvertParams) {
-  try {
-    if (!params.model) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Model is required",
-      });
-    }
-    if (!params.output) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Output filename is required",
-      });
-    }
-    if (!params.type) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: "Type is required",
-      });
-    }
+  if (!params.model) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Model is required",
+    });
+  }
+  if (!params.output) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Output filename is required",
+    });
+  }
+  if (!params.type) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Type is required",
+    });
+  }
 
+  try {
     const job = createJob("convert");
     startQuantization(job.id, params);
     return { jobId: job.id };
