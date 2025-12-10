@@ -6,56 +6,116 @@ import { useAppStore } from "client/stores/useAppStore";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { CircleStopIcon, ImageIcon, TerminalIcon, ZapIcon } from "lucide-react";
 import { forwardRef, useEffect } from "react";
+import { ConsoleOutput } from "../components/ConsoleOutput";
 import { optimizePrompt } from "../lib/metadataParser";
 import { useJobs } from "../stores/useJobs";
-import ConsoleOutput from "./ConsoleOutput";
-import ControlPanel from "./ControlPanel";
-import ImageDisplay from "./ImageDisplay";
+import { ControlPanel } from "./ControlPanel";
+import { ImageDisplay } from "./ImageDisplay";
 import { useDiffusionConfig } from "./useDiffusionConfig";
 
-const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+function OutputCard() {
+  const { outputTab, setOutputTab } = useAppStore();
+  const { jobStatus, logs } = useJobs();
+  const status = jobStatus("txt2img");
+
+  return (
+    <>
+      <div className="flex items-center justify-center gap-2 border-b border-border/40 bg-background/20 p-3">
+        <Button
+          variant={outputTab === "image" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOutputTab("image")}
+          className="w-1/4"
+        >
+          <ImageIcon />
+          Image
+        </Button>
+        <Button
+          variant={outputTab === "console" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOutputTab("console")}
+          className="w-1/4"
+        >
+          <TerminalIcon />
+          Console
+        </Button>
+      </div>
+
+      <div className="relative min-h-0 w-full flex-1">
+        {outputTab === "image" ? (
+          <ImageDisplay
+            image={status?.image}
+            isProcessing={status?.isProcessing ?? false}
+          />
+        ) : (
+          <ConsoleOutput logs={logs.filter((x) => x.jobId === status?.id)} />
+        )}
+      </div>
+    </>
+  );
+}
+
+function TextToImageAction() {
+  const { jobStatus, checkJobs, connectToJob, setError } = useJobs();
+  const store = useDiffusionConfig();
+  const rpc = useTRPC();
+  const { data: models } = useQuery(rpc.listModels.queryOptions());
+  const { data: process } = useQuery(rpc.listJobs.queryOptions("txt2img"));
+  const status = jobStatus("txt2img");
+  const diffusionStart = useMutation(
+    rpc.startDiffusion.mutationOptions({
+      onError(error) {
+        setError("txt2img", error.message);
+      },
+      onSuccess(data) {
+        connectToJob(data.jobId, "txt2img");
+      },
+    }),
+  );
+  const diffusionStop = useMutation(rpc.stopDiffusion.mutationOptions());
+
+  useEffect(() => {
+    if (process) {
+      checkJobs(process);
+    }
+  }, [checkJobs, process]);
+
+  const handleDiffusion = async () => {
+    if (status?.isProcessing && status?.id) {
+      diffusionStop.mutate(status?.id);
+    } else {
+      await store.updateAll({
+        prompt: optimizePrompt(store.params.prompt, models),
+        negativePrompt: optimizePrompt(store.params.negativePrompt, models),
+      });
+      diffusionStart.mutate(store.params);
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleDiffusion}
+      variant={status?.isProcessing ? "destructive" : "default"}
+      size="lg"
+      className="w-full rounded-xl"
+    >
+      {status?.isProcessing ? (
+        <>
+          <CircleStopIcon className="animate-pulse" />
+          Stop Generation
+        </>
+      ) : (
+        <>
+          <ZapIcon />
+          Generate
+        </>
+      )}
+    </Button>
+  );
+}
+
+export const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   (props, ref) => {
-    const { outputTab, setOutputTab } = useAppStore();
-    const { jobStatus, checkJobs, connectToJob, setError, logs } = useJobs();
-    const store = useDiffusionConfig();
-    const rpc = useTRPC();
-    const { data: models } = useQuery(rpc.listModels.queryOptions());
-    const { data: process } = useQuery(rpc.listJobs.queryOptions("txt2img"));
-    const jobState = jobStatus("txt2img");
-    const jobId = jobState?.id;
-    const diffusionStart = useMutation(
-      rpc.startDiffusion.mutationOptions({
-        onError(error) {
-          setError("txt2img", error.message);
-        },
-        onSuccess(data) {
-          connectToJob(data.jobId, "txt2img");
-        },
-      }),
-    );
-
-    const isProcessing = jobState?.isProcessing;
-    const image = jobState?.image;
-    const diffusionStop = useMutation(rpc.stopDiffusion.mutationOptions());
-
-    useEffect(() => {
-      if (process) {
-        checkJobs(process);
-      }
-    }, [checkJobs, process]);
-
-    const handleDiffusion = async () => {
-      if (isProcessing && jobId) {
-        diffusionStop.mutate(jobId);
-      } else {
-        await store.updateAll({
-          prompt: optimizePrompt(store.params.prompt, models),
-          negativePrompt: optimizePrompt(store.params.negativePrompt, models),
-        });
-        diffusionStart.mutate(store.params);
-      }
-    };
-
     return (
       <motion.div
         ref={ref}
@@ -66,70 +126,17 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           <Logo />
         </div>
         <div className="flex flex-col gap-4 p-2 lg:h-full lg:flex-row">
-          {/* Left Side: Image/Console */}
           <div className="mb-4 flex min-h-0 flex-1 flex-col overflow-clip rounded-xl border border-border">
             <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden bg-background/20 backdrop-blur-sm">
-              <div className="flex items-center justify-center gap-2 border-b border-border/40 bg-background/20 p-3">
-                <Button
-                  variant={outputTab === "image" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setOutputTab("image")}
-                  className="w-1/4"
-                >
-                  <ImageIcon />
-                  Image
-                </Button>
-                <Button
-                  variant={outputTab === "console" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setOutputTab("console")}
-                  className="w-1/4"
-                >
-                  <TerminalIcon />
-                  Console
-                </Button>
-              </div>
-
-              <div className="relative min-h-0 w-full flex-1">
-                {outputTab === "image" ? (
-                  <ImageDisplay
-                    image={image}
-                    isProcessing={isProcessing ?? false}
-                  />
-                ) : (
-                  <ConsoleOutput logs={logs.filter((x) => x.jobId === jobId)} />
-                )}
-              </div>
+              <OutputCard />
             </div>
-            {/* Generate Button */}
             <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border bg-background/20 p-2 backdrop-blur-sm">
-              <Button
-                onClick={handleDiffusion}
-                variant={isProcessing ? "destructive" : "default"}
-                size="lg"
-                className="w-full rounded-xl"
-              >
-                {isProcessing ? (
-                  <>
-                    <CircleStopIcon className="animate-pulse" />
-                    Stop Generation
-                  </>
-                ) : (
-                  <>
-                    <ZapIcon />
-                    Generate
-                  </>
-                )}
-              </Button>
+              <TextToImageAction />
             </div>
           </div>
-
-          {/* Right Side: Control Panel */}
           <ControlPanel />
         </div>
       </motion.div>
     );
   },
 );
-
-export default TextToImage;

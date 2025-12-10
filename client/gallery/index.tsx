@@ -90,7 +90,7 @@ function GalleryItem({
   );
 }
 
-const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   (props, ref) => {
     const {
       data,
@@ -307,5 +307,3 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     );
   },
 );
-
-export default Gallery;

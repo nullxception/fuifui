@@ -5,7 +5,13 @@ function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString();
 }
 
-function ConsoleOutput({ logs }: { logs: LogEntry[] | undefined }) {
+export function ConsoleOutput({
+  logs,
+  className,
+}: {
+  logs: LogEntry[] | undefined;
+  className?: string;
+}) {
   const consoleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,7 +54,7 @@ function ConsoleOutput({ logs }: { logs: LogEntry[] | undefined }) {
 
   return (
     <div
-      className="mb-1 scrollbar-thin h-[50vh] w-full overflow-auto bg-background/60 p-6 font-mono text-xs break-all scrollbar-thumb-secondary scrollbar-track-transparent lg:h-full"
+      className={`mb-1 scrollbar-thin h-[50vh] w-full overflow-auto bg-background/60 p-6 font-mono text-xs break-all scrollbar-thumb-secondary scrollbar-track-transparent lg:h-full ${className}`}
       ref={consoleRef}
     >
       {processedLogs.length === 0 ? (
@@ -74,5 +80,3 @@ function ConsoleOutput({ logs }: { logs: LogEntry[] | undefined }) {
     </div>
   );
 }
-
-export default ConsoleOutput;

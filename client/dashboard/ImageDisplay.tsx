@@ -7,7 +7,7 @@ interface ImageDisplayProps {
   isProcessing: boolean;
 }
 
-function ImageDisplay({ image, isProcessing }: ImageDisplayProps) {
+export function ImageDisplay({ image, isProcessing }: ImageDisplayProps) {
   return (
     <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
       {isProcessing ? (
@@ -45,5 +45,3 @@ function ImageDisplay({ image, isProcessing }: ImageDisplayProps) {
     </div>
   );
 }
-
-export default ImageDisplay;
