@@ -5,6 +5,7 @@ import path from "path";
 import { OUTPUT_DIR, THUMBS_DIR } from "server/dirs";
 import { deleteJobByResultFile } from "server/services/jobs";
 import type { Image } from "server/types";
+import type { ExifImage } from "server/types/image";
 
 export const IMAGE_EXT = [".png", ".jpg", ".jpeg", ".webp"];
 
@@ -12,8 +13,7 @@ export async function getDataFromImage(filePath: string): Promise<Image> {
   try {
     const stats = await fs.stat(filePath);
     const file = path.parse(filePath);
-
-    let metadata = {};
+    let metadata: ExifImage = {};
     try {
       metadata = await exifr.parse(filePath, {
         userComment: true,
@@ -28,7 +28,9 @@ export async function getDataFromImage(filePath: string): Promise<Image> {
       name: file.name,
       url: path.join("/output", path.relative(OUTPUT_DIR, filePath)),
       mtime: stats.mtime.getTime(),
-      metadata,
+      width: metadata?.ImageWidth ?? 0,
+      height: metadata?.ImageHeight ?? 0,
+      metadata: metadata?.parameters ?? "",
     };
   } catch (error) {
     console.error(`Error reading ${filePath}`, error);
@@ -53,7 +55,10 @@ async function cleanupThumbnails(img: string) {
     });
 }
 
-export async function listImages(limit: number, offset?: number | null) {
+export async function listImages(
+  limit: number,
+  offset?: number | null,
+): Promise<Image[]> {
   try {
     const dir = path.join(OUTPUT_DIR, "txt2img");
     const files = await fs.readdir(dir);
@@ -82,7 +87,7 @@ export async function listImages(limit: number, offset?: number | null) {
     // Parse metadata only for the current page
     const images = await Promise.all(
       paginatedFiles.map(async ({ filename, mtime, filePath }) => {
-        let metadata = {};
+        let metadata: ExifImage = {};
         try {
           metadata = await exifr.parse(filePath, {
             userComment: true,
@@ -97,7 +102,9 @@ export async function listImages(limit: number, offset?: number | null) {
           name: path.parse(filename).name,
           url: path.join("/output", path.relative(OUTPUT_DIR, filePath)),
           mtime,
-          metadata,
+          width: metadata?.ImageWidth ?? 0,
+          height: metadata?.ImageHeight ?? 0,
+          metadata: metadata?.parameters ?? "",
         };
       }),
     );

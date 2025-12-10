@@ -1,10 +1,8 @@
-import type { Models } from "server/types";
+import type { Image, Models } from "server/types";
 
 export interface ParsedMetadata {
   prompt: string;
   negativePrompt: string;
-  width: number;
-  height: number;
   upscaled: boolean;
   baseWidth: number;
   baseHeight: number;
@@ -23,8 +21,6 @@ export interface ParsedMetadata {
 const emptyMetadata: ParsedMetadata = {
   prompt: "",
   negativePrompt: "",
-  width: -1,
-  height: -1,
   upscaled: false,
   baseWidth: -1,
   baseHeight: -1,
@@ -169,43 +165,14 @@ export function optimizePrompt(text?: string, models?: Models) {
     .replace(/>\s*,\s*/g, "> ");
 }
 
-export function parseDiffusionParams(
-  metadata?: Record<string, unknown>,
-  models?: Models,
-) {
-  if (!metadata) return emptyMetadata;
+export function parseDiffusionParams(image?: Image, models?: Models) {
+  if (!image) return emptyMetadata;
   const data: ParsedMetadata = Object.create(emptyMetadata);
 
-  // Try to find the parameters string. It's often in 'parameters' or 'UserComment'
-  // based on how stable-diffusion.cpp or other tools save it.
-  // We check for the string content provided by the user.
-  let rawParams = "";
-  if (typeof metadata.parameters === "string") {
-    rawParams = metadata.parameters;
-  } else if (typeof metadata.UserComment === "string") {
-    // Sometimes UserComment has a prefix like "UNICODE=" or similar, but often it's just the string
-    rawParams = metadata.UserComment;
-  } else if (typeof metadata.Description === "string") {
-    rawParams = metadata.Description;
-  } else {
-    // If we can't find a specific key, try to find any string value that looks like parameters
-    const potentialValue = Object.values(metadata).find(
-      (val) => typeof val === "string" && val.includes("Steps: "),
-    ) as string | undefined;
-    if (potentialValue) rawParams = potentialValue;
-  }
-
-  if (typeof metadata.ImageWidth === "number") {
-    data.width = metadata.ImageWidth;
-  }
-  if (typeof metadata.ImageHeight === "number") {
-    data.height = metadata.ImageHeight;
-  }
-
-  if (!rawParams) return data;
+  if (!image.metadata) return data;
 
   try {
-    const lines = rawParams.split("\n").filter((l) => l.trim() !== "");
+    const lines = image.metadata.split("\n").filter((l) => l.trim() !== "");
     let prompt = "";
     let negativePrompt = "";
     const otherParams: Record<string, string | number> = {};
@@ -262,8 +229,8 @@ export function parseDiffusionParams(
                   data.baseHeight = parseInt(height);
                 }
                 if (
-                  data.width > data.baseWidth ||
-                  data.height > data.baseHeight
+                  image.width > data.baseWidth ||
+                  image.height > data.baseHeight
                 ) {
                   data.upscaled = true;
                 }

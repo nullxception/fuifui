@@ -316,7 +316,7 @@ function TriggerWordsEditor() {
 
   return (
     <>
-      <div className="col-span-1 row-span-1 flex items-center justify-between md:col-span-2">
+      <Card className="col-span-1 row-span-1 flex flex-row items-center justify-between bg-background/60 p-4 backdrop-blur-sm md:col-span-2">
         <Label>Trigger Words</Label>
         <Button
           onClick={handleAdd}
@@ -327,11 +327,11 @@ function TriggerWordsEditor() {
           <PlusIcon />
           Add Entry
         </Button>
-      </div>
+      </Card>
 
       {/* New Entry Form */}
       {newEntry && (
-        <Card className="bg-surface-hover col-span-1 border-primary p-4 md:col-span-2">
+        <Card className="col-span-1 border-primary bg-background/60 p-4 backdrop-blur-sm md:col-span-2">
           <TriggerWordForm
             entry={newEntry}
             onChange={setNewEntry}
@@ -347,7 +347,7 @@ function TriggerWordsEditor() {
         {triggerWords.map((entry, index) => (
           <div key={index}>
             <Card
-              className={`bg-surface p-4 ${editingIndex === index ? "border-primary" : "border-border"}`}
+              className={`bg-background/60 p-4 backdrop-blur-sm ${editingIndex === index ? "border-primary" : "border-border"}`}
             >
               {editingIndex === index ? (
                 <TriggerWordForm

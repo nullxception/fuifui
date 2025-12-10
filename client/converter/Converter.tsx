@@ -1,4 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Footer } from "client/components/Footer";
+import { Logo } from "client/components/Header";
 import { Button } from "client/components/ui/button";
 import {
   Card,
@@ -95,6 +97,9 @@ export default function Converter(props: HTMLMotionProps<"div">) {
       className="container mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col lg:overflow-hidden"
       {...props}
     >
+      <div className="flex items-center p-4 md:hidden">
+        <Logo />
+      </div>
       <div className="flex flex-col gap-4 p-2 lg:h-full lg:flex-row">
         {/* Left Side: Image/Console */}
         <div className="mb-4 flex min-h-0 flex-1 flex-col overflow-clip rounded-xl border border-border">
@@ -103,89 +108,88 @@ export default function Converter(props: HTMLMotionProps<"div">) {
           </div>
         </div>
         <div className="flex w-full flex-col lg:max-h-screen lg:w-[40vw]">
-          <div>
-            <Card className="scrollbar-thin w-full flex-1 grow space-y-4 overflow-y-auto py-4 backdrop-blur-md scrollbar-thumb-secondary scrollbar-track-transparent lg:max-h-full lg:w-[40vw] lg:shrink-0">
-              <CardHeader className="py-4">
-                <CardTitle>Model Weight Converter</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-stretch justify-center space-y-4">
+          <Card className="scrollbar-thin w-full flex-1 grow space-y-4 overflow-y-auto py-4 backdrop-blur-md scrollbar-thumb-secondary scrollbar-track-transparent lg:max-h-full lg:w-[40vw] lg:shrink-0">
+            <CardHeader className="py-4">
+              <CardTitle>Model Weight Converter</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-stretch justify-center space-y-4">
+              <div className="space-y-2">
+                <Label>Model</Label>
+                <Select value={model} onValueChange={handleModelChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredModels?.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-row gap-4">
                 <div className="space-y-2">
-                  <Label>Model</Label>
-                  <Select value={model} onValueChange={handleModelChange}>
+                  <Label>Quantization</Label>
+                  <Select value={type} onValueChange={handleTypeChange}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a model" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {filteredModels?.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
+                      {GGML_WEIGHTS_TYPE.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="flex flex-row gap-4">
-                  <div className="space-y-2">
-                    <Label>Quantization</Label>
-                    <Select value={type} onValueChange={handleTypeChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {GGML_WEIGHTS_TYPE.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grow space-y-2">
-                    <Label>Output</Label>
-                    <InputGroup>
-                      <InputGroupText className="ml-4">
-                        checkpoints/
-                      </InputGroupText>
-                      <InputGroupInput
-                        value={output}
-                        onChange={(e) => setOutput(e.target.value)}
-                        placeholder={`model.${type}.gguf`}
-                      />
-                    </InputGroup>
-                    {isOutputExists && (
-                      <div className="flex items-center gap-2 text-sm text-yellow-500">
-                        <AlertTriangleIcon className="h-4 w-4" />
-                        <span>
-                          Warning: Output file already exists and will be
-                          overwritten.
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleConvert}
-                  variant={isProcessing ? "destructive" : "default"}
-                  size="lg"
-                >
-                  {isProcessing ? (
-                    <>
-                      <CircleStopIcon className="animate-pulse" />
-                      Stop Quantization
-                    </>
-                  ) : (
-                    <>
-                      <ZapIcon />
-                      Quantizate
-                    </>
+                <div className="grow space-y-2">
+                  <Label>Output</Label>
+                  <InputGroup>
+                    <InputGroupText className="ml-4">
+                      checkpoints/
+                    </InputGroupText>
+                    <InputGroupInput
+                      value={output}
+                      onChange={(e) => setOutput(e.target.value)}
+                      placeholder={`model.${type}.gguf`}
+                    />
+                  </InputGroup>
+                  {isOutputExists && (
+                    <div className="flex items-center gap-2 text-sm text-yellow-500">
+                      <AlertTriangleIcon className="h-4 w-4" />
+                      <span>
+                        Warning: Output file already exists and will be
+                        overwritten.
+                      </span>
+                    </div>
                   )}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleConvert}
+                variant={isProcessing ? "destructive" : "default"}
+                size="lg"
+              >
+                {isProcessing ? (
+                  <>
+                    <CircleStopIcon className="animate-pulse" />
+                    Stop Quantization
+                  </>
+                ) : (
+                  <>
+                    <ZapIcon />
+                    Quantizate
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+          <Footer className="col-span-full flex justify-center p-4" />
         </div>
       </div>
     </motion.div>

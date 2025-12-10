@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Logo } from "client/components/Header";
 import { Button } from "client/components/ui/button";
 import { useTRPC } from "client/query";
 import { useAppStore } from "client/stores/useAppStore";
@@ -61,6 +62,9 @@ const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         className="container mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col lg:overflow-hidden"
         {...props}
       >
+        <div className="flex items-center p-4 md:hidden">
+          <Logo />
+        </div>
         <div className="flex flex-col gap-4 p-2 lg:h-full lg:flex-row">
           {/* Left Side: Image/Console */}
           <div className="mb-4 flex min-h-0 flex-1 flex-col overflow-clip rounded-xl border border-border">

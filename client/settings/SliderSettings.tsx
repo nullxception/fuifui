@@ -1,3 +1,4 @@
+import { Card } from "client/components/ui/card";
 import { Input } from "client/components/ui/input";
 import { Label } from "client/components/ui/label";
 import { defaultUserConfig } from "server/defaults";
@@ -8,7 +9,7 @@ function SliderSettings() {
   const defs = defaultUserConfig().settings;
 
   return (
-    <div className={`mb-4 space-y-4 space-x-4`}>
+    <Card className="space-y-4 space-x-4 bg-background/60 p-4 backdrop-blur-sm">
       <div className="flex w-full flex-col justify-between space-y-2">
         <Label>Max width slider</Label>
         <Input
@@ -31,7 +32,7 @@ function SliderSettings() {
           onChange={(e) => update("maxHeight", parseInt(e.target.value))}
         />
       </div>
-    </div>
+    </Card>
   );
 }
 

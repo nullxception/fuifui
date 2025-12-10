@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "client/components/ui/button";
 import { ButtonGroup } from "client/components/ui/button-group";
+import { Card } from "client/components/ui/card";
 import { InputGroup, InputGroupInput } from "client/components/ui/input-group";
 import { Label } from "client/components/ui/label";
 import { useTRPC } from "client/query";
@@ -56,7 +57,7 @@ function BackgroundSetting() {
   };
 
   return (
-    <div className="row-span-3 flex w-full flex-col space-y-4">
+    <Card className="row-span-3 flex w-full flex-col space-y-4 bg-background/60 p-4 backdrop-blur-sm">
       <Label>Background</Label>
 
       {/* Upload Section */}
@@ -117,7 +118,7 @@ function BackgroundSetting() {
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 export default BackgroundSetting;

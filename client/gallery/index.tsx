@@ -1,7 +1,9 @@
 import { Footer } from "client/components/Footer";
+import { Logo } from "client/components/Header";
 import Modal from "client/components/Modal";
 import { Button } from "client/components/ui/button";
 import { ButtonGroup } from "client/components/ui/button-group";
+import { Skeleton } from "client/components/ui/skeleton";
 import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import { ImageIcon, Trash2Icon, XIcon } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
@@ -48,6 +50,7 @@ function GalleryItem({
   onClick,
 }: GalleryItemProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // derive appropriate thumbnail size based on real width
   const size = (() => {
@@ -56,25 +59,26 @@ function GalleryItem({
     if (width < 480) return 480;
     return 512;
   })();
+  const paddingTopPercentage = (image.height / image.width) * 100;
 
   return (
     <div
       ref={ref}
       onClick={onClick}
-      className={`group bg-surface relative cursor-pointer break-inside-avoid overflow-hidden rounded-xl border transition-colors select-none hover:border-primary/50 ${className} ${isSelectionMode ? "opacity-70" : ""} ${
-        selected ? "bg-pink-700" : "border-border"
-      }`}
+      className={`group bg-surface relative w-full cursor-pointer break-inside-avoid overflow-hidden rounded-xl border transition-colors select-none ${className} ${selected ? "bg-pink-700 opacity-100" : "border-border"}`}
     >
-      {width > 1 ? (
-        <img
-          src={`${image.url}?width=${size}`}
-          alt=""
-          loading="lazy"
-          className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${selected && "opacity-70"}`}
-        />
-      ) : (
-        <></>
-      )}
+      <div
+        className="block"
+        style={{ paddingTop: `${paddingTopPercentage}%` }}
+      />
+      <img
+        src={`${image.url}?width=${size}`}
+        alt=""
+        loading="lazy"
+        onLoad={() => setIsLoaded(true)}
+        className={`absolute inset-0 h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-105 ${!isLoaded && "opacity-0"} ${isSelectionMode && selected && "opacity-100"} ${isSelectionMode && !selected && "opacity-70"} `}
+      />
+      {!isLoaded && <Skeleton className="absolute inset-0 rounded-lg" />}
       {isSelectionMode && selected && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="rounded-full bg-pink-700/50 p-2 text-primary-foreground">
@@ -162,7 +166,13 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       };
     }, [hasNextPage, isFetching, fetchNextPage]);
 
-    if (images.length === 0 && !isFetchingNextPage) {
+    const hasError = status === "error" && !isFetching;
+    const isLoading = status === "pending" || isFetching;
+
+    if (
+      images.length === 0 &&
+      (hasError || isLoading || status === "success")
+    ) {
       return (
         <>
           <motion.div
@@ -173,34 +183,45 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
             <div className="mb-4 flex h-18 w-18 items-center justify-center rounded-full bg-background/50 p-2 text-foreground">
               <ImageIcon className="h-12 w-12" />
             </div>
-            <p className="text-lg font-medium text-foreground">No images yet</p>
+            <p className="text-lg font-medium text-foreground">
+              {hasError && `Something's wrong`}
+              {isLoading && "Loading"}
+              {status === "success" && "No images yet"}
+            </p>
             <p className="text-sm text-muted-foreground">
-              Generated images will appear here
+              {hasError && `${error?.message ?? "unknown error"}`}
+              {isLoading && "Getting your images..."}
+              {status === "success" && "Generated images will appear here"}
             </p>
           </motion.div>
           <Footer />
         </>
       );
     }
-    if (status === "pending" || status === "error") {
-      return (
-        <motion.div ref={ref} {...props} className="grow p-2">
-          <div className="col-span-full flex justify-center p-4">
-            <span className="text-foreground">
-              {status === "pending" ? "Loading..." : `Error: ${error.message}`}
-            </span>
-          </div>
-        </motion.div>
-      );
-    }
 
     return (
       <>
         <motion.div ref={ref} {...props} className="grow p-2">
+          <div className="flex items-center justify-between px-2 md:hidden">
+            <div className="flex items-center gap-2">
+              <Logo />
+            </div>
+
+            <nav className="flex items-center gap-2 rounded-lg p-1">
+              {!isSelectionMode && (
+                <Button
+                  variant="outline"
+                  onClick={() => setIsSelectionMode(true)}
+                >
+                  <Trash2Icon />
+                </Button>
+              )}
+            </nav>
+          </div>
           <div
-            className={`${isSelectionMode ? "sticky top-4 right-0 md:top-16" : "relative top-1"} z-2 mx-auto mb-4 flex max-w-screen-2xl justify-end gap-2 px-4 transition-all`}
+            className={`${isSelectionMode ? "sticky top-4 right-0 md:top-16" : "relative top-1"} z-2 mx-auto mb-4 flex max-w-screen-2xl justify-end gap-2 px-4`}
           >
-            {isSelectionMode ? (
+            {isSelectionMode && (
               <ButtonGroup className="overflow-clip rounded-md bg-background">
                 <Button
                   variant="secondary"
@@ -221,10 +242,12 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
                   <XIcon /> Cancel
                 </Button>
               </ButtonGroup>
-            ) : (
+            )}
+            {!isSelectionMode && (
               <Button
                 variant="outline"
                 onClick={() => setIsSelectionMode(true)}
+                className="hidden md:block"
               >
                 <Trash2Icon />
               </Button>
@@ -236,7 +259,7 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
             className="mx-auto max-w-screen-2xl"
           >
             <Masonry>
-              {data.pages.flatMap((group) =>
+              {data?.pages.flatMap((group) =>
                 group.map((image, i) => (
                   <GalleryItem
                     key={i}

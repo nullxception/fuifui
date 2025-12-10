@@ -42,16 +42,16 @@ interface ImageMetadataProps {
   className: string;
 }
 
-function MetadataChip({
-  data: metadata,
-  metakey,
+function BaseMetadataChip({
+  data,
+  title,
   className = "",
 }: {
-  data: ParsedMetadata;
-  metakey: keyof ParsedMetadata;
+  data?: string | number | boolean | string[];
+  title: string;
   className?: string;
 }) {
-  const value = metadata[metakey];
+  const value = data;
   if (
     typeof value === "undefined" ||
     (Array.isArray(value) && value.length < 1) ||
@@ -64,7 +64,7 @@ function MetadataChip({
       <Label
         className={`mb-1 block text-[10px] tracking-wider text-gray-300 uppercase ${className}`}
       >
-        {metakey.split(/(?=[A-Z])/).join(" ")}
+        {title}
       </Label>
       <p className="text-gray truncate font-mono text-xs whitespace-pre-wrap">
         {Array.isArray(value)
@@ -76,6 +76,24 @@ function MetadataChip({
           : value?.toString()?.trim()}
       </p>
     </div>
+  );
+}
+
+function MetadataChip({
+  data: metadata,
+  metakey,
+  className = "",
+}: {
+  data: ParsedMetadata;
+  metakey: keyof ParsedMetadata;
+  className?: string;
+}) {
+  return (
+    <BaseMetadataChip
+      data={metadata[metakey]}
+      title={metakey.split(/(?=[A-Z])/).join(" ")}
+      className={className}
+    />
   );
 }
 
@@ -91,7 +109,7 @@ export default function ImageMetadata({
   const { setPreviewImage } = useJobs();
   const rpc = useTRPC();
   const { data } = useQuery(rpc.listModels.queryOptions());
-  const metadata = parseDiffusionParams(image.metadata, data);
+  const metadata = parseDiffusionParams(image, data);
 
   const handleRemake = () => {
     if (!metadata) return;
@@ -186,8 +204,8 @@ export default function ImageMetadata({
                 className="text-purple-400"
               />
               <div className="grid grid-cols-2 gap-3">
-                <MetadataChip data={metadata} metakey="width" />
-                <MetadataChip data={metadata} metakey="height" />
+                <BaseMetadataChip data={image.width} title="width" />
+                <BaseMetadataChip data={image.height} title="height" />
                 <MetadataChip data={metadata} metakey="upscaled" />
                 {metadata.upscaled && (
                   <MetadataChip data={metadata} metakey="baseWidth" />
