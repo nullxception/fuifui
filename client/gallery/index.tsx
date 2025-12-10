@@ -185,17 +185,11 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     if (status === "pending" || status === "error") {
       return (
         <motion.div ref={ref} {...props} className="grow p-2">
-          {status === "pending" ? (
-            <div className="col-span-full flex justify-center p-4">
-              <span className="text-foreground">Loading...</span>
-            </div>
-          ) : status === "error" ? (
-            <div className="col-span-full flex justify-center p-4">
-              <span className="text-foreground">Error: {error.message}</span>
-            </div>
-          ) : (
-            <></>
-          )}
+          <div className="col-span-full flex justify-center p-4">
+            <span className="text-foreground">
+              {status === "pending" ? "Loading..." : `Error: ${error.message}`}
+            </span>
+          </div>
         </motion.div>
       );
     }
@@ -242,7 +236,7 @@ const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
             className="mx-auto max-w-screen-2xl"
           >
             <Masonry>
-              {data.pages.map((group) =>
+              {data.pages.flatMap((group) =>
                 group.map((image, i) => (
                   <GalleryItem
                     key={i}

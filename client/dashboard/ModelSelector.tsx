@@ -66,7 +66,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="quantizationType-select">Quantization</Label>
         <Select
-          value={store.params.quantizationType}
+          value={store.params.quantizationType ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("quantizationType");
@@ -94,7 +94,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="vae-select">VAE</Label>
         <Select
-          value={store.params.vae}
+          value={store.params.vae ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("vae");
@@ -123,7 +123,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="clip-l-select">CLIP-L</Label>
         <Select
-          value={store.params.clipL}
+          value={store.params.clipL ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("clipL");
@@ -152,7 +152,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="clip-g-select">CLIP-G</Label>
         <Select
-          value={store.params.clipG}
+          value={store.params.clipG ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("clipG");
@@ -181,7 +181,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="t5xxl-select">T5 XXL</Label>
         <Select
-          value={store.params.t5xxl}
+          value={store.params.t5xxl ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("t5xxl");
@@ -210,7 +210,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="llm-select">LLM</Label>
         <Select
-          value={store.params.llm}
+          value={store.params.llm ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("llm");
@@ -239,7 +239,7 @@ export function ModelSelector() {
       <div className="space-y-2 pt-2">
         <Label htmlFor="upscaleModel-select">Upscaler</Label>
         <Select
-          value={store.params.upscaleModel}
+          value={store.params.upscaleModel ?? ""}
           onValueChange={(e) => {
             if (e === "unset") {
               store.unset("upscaleModel");

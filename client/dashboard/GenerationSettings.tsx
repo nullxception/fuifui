@@ -84,7 +84,7 @@ export function GenerationSettings() {
         <div className="space-y-4">
           <Label>Sampling Method</Label>
           <Select
-            value={store.params.samplingMethod}
+            value={store.params.samplingMethod ?? ""}
             onValueChange={(e) => {
               if (e === "unset") {
                 store.unset("samplingMethod");
@@ -112,7 +112,7 @@ export function GenerationSettings() {
         <div className="space-y-4">
           <Label>Scheduler</Label>
           <Select
-            value={store.params.scheduler}
+            value={store.params.scheduler ?? ""}
             onValueChange={(e) => {
               if (e === "unset") {
                 store.unset("scheduler");
@@ -140,7 +140,7 @@ export function GenerationSettings() {
         <div className="space-y-4">
           <Label>RNG</Label>
           <Select
-            value={store.params.rng}
+            value={store.params.rng ?? ""}
             onValueChange={(e) => store.update("rng", e)}
           >
             <SelectTrigger className="w-full">
@@ -161,7 +161,7 @@ export function GenerationSettings() {
         <div className="space-y-4">
           <Label>Sampler RNG</Label>
           <Select
-            value={store.params.samplerRng}
+            value={store.params.samplerRng ?? ""}
             onValueChange={(e) => store.update("samplerRng", e)}
           >
             <SelectTrigger className="w-full">
@@ -252,7 +252,7 @@ export function GenerationSettings() {
             Verbose console output
           </Label>
           <Switch
-            checked={store.params.verbose}
+            checked={store.params.verbose ?? false}
             onCheckedChange={(e) => store.update("verbose", e)}
           />
         </div>
@@ -261,7 +261,7 @@ export function GenerationSettings() {
             Flash Attention
           </Label>
           <Switch
-            checked={store.params.diffusionFa}
+            checked={store.params.diffusionFa ?? false}
             onCheckedChange={(e) => store.update("diffusionFa", e)}
           />
         </div>
@@ -271,7 +271,7 @@ export function GenerationSettings() {
             Offload weights to (CPU) RAM
           </Label>
           <Switch
-            checked={store.params.offloadToCpu}
+            checked={store.params.offloadToCpu ?? false}
             onCheckedChange={(e) => store.update("offloadToCpu", e)}
           />
         </div>
@@ -281,7 +281,7 @@ export function GenerationSettings() {
             Use SDXL VAE conv scale
           </Label>
           <Switch
-            checked={store.params.forceSdxlVaeConvScale}
+            checked={store.params.forceSdxlVaeConvScale ?? false}
             onCheckedChange={(e) => store.update("forceSdxlVaeConvScale", e)}
           />
         </div>
@@ -291,7 +291,7 @@ export function GenerationSettings() {
             Diffusion ggml_conv2d_direct
           </Label>
           <Switch
-            checked={store.params.diffusionConvDirect}
+            checked={store.params.diffusionConvDirect ?? false}
             onCheckedChange={(e) => store.update("diffusionConvDirect", e)}
           />
         </div>
@@ -301,7 +301,7 @@ export function GenerationSettings() {
             VAE ggml_conv2d_direct
           </Label>
           <Switch
-            checked={store.params.vaeConvDirect}
+            checked={store.params.vaeConvDirect ?? false}
             onCheckedChange={(e) => store.update("vaeConvDirect", e)}
           />
         </div>
