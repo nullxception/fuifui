@@ -128,8 +128,11 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       setShowDeleteDialog(true);
     };
 
-    const confirmDelete = () => {
-      removeImages(Array.from(selectedImages));
+    const onRemoveImages = async () => {
+      await removeImages(Array.from(selectedImages));
+    };
+
+    const onImagesRemoved = async () => {
       setIsSelectionMode(false);
       setSelectedImages(new Set());
       setShowDeleteDialog(false);
@@ -298,7 +301,8 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         >
           <RemoveDialog
             images={images.filter((img) => selectedImages.has(img.url))}
-            onRemove={confirmDelete}
+            onRemove={onRemoveImages}
+            onRemoved={onImagesRemoved}
             onCancel={() => setShowDeleteDialog(false)}
           />
         </Modal>

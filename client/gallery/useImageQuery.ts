@@ -34,16 +34,18 @@ export function useImageQuery() {
 
   const mutation = useMutation(
     rpc.removeImage.mutationOptions({
-      onSettled: () => {
-        const queryKey = rpc.listImages.infiniteQueryKey();
-        return queryClient.invalidateQueries({ queryKey });
+      onSuccess: async () => {
+        const jobs = rpc.listJobs.queryKey();
+        const images = rpc.listImages.infiniteQueryKey();
+        await queryClient.invalidateQueries({ queryKey: images });
+        await queryClient.invalidateQueries({ queryKey: jobs });
       },
     }),
   );
 
-  const removeImages = (urls: string[]) => {
-    mutation.mutate(urls);
+  return {
+    ...query,
+    images,
+    removeImages: (urls: string[]) => mutation.mutateAsync(urls),
   };
-
-  return { ...query, images, removeImages };
 }

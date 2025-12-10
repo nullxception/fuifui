@@ -91,10 +91,13 @@ export default function ImageLightbox() {
     [hasNext, hasPrev, findNewId, page.index, navigate],
   );
 
-  const onRemove = () => {
+  const onRemoveImage = async () => {
     if (image) {
-      removeImages([image.url]);
+      await removeImages([image.url]);
     }
+  };
+
+  const onImageRemoved = () => {
     showRemoveDialog(false);
     setTimeout(() => {
       if (isMd) {
@@ -249,7 +252,8 @@ export default function ImageLightbox() {
           onClose={() => showRemoveDialog(false)}
         >
           <RemoveDialog
-            onRemove={onRemove}
+            onRemove={onRemoveImage}
+            onRemoved={onImageRemoved}
             onCancel={() => showRemoveDialog(false)}
             images={[image]}
           />
