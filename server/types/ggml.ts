@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 export const GGML_WEIGHTS_TYPE = [
-  "bf16",
   "f16",
   "f32",
-  "f64",
   "i16",
   "i32",
   "i64",
