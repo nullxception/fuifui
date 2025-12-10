@@ -64,34 +64,6 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="quantizationType-select">Quantization</Label>
-        <Select
-          value={store.params.quantizationType ?? ""}
-          onValueChange={(e) => {
-            if (e === "unset") {
-              store.unset("quantizationType");
-              return;
-            }
-            store.update("quantizationType", e);
-          }}
-        >
-          <SelectTrigger id="quantizationType-select" className="w-full">
-            <SelectValue placeholder="Select quantization type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="unset">unset</SelectItem>
-              {GGML_WEIGHTS_TYPE.map((it) => (
-                <SelectItem key={it} value={it}>
-                  {it}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2 pt-2">
         <Label htmlFor="vae-select">VAE</Label>
         <Select
           value={store.params.vae ?? ""}
@@ -260,6 +232,34 @@ export function ModelSelector() {
                     {model}
                   </SelectItem>
                 ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2 pt-2">
+        <Label htmlFor="quantizationType">In-place Quantization</Label>
+        <Select
+          value={store.params.quantizationType ?? ""}
+          onValueChange={(e) => {
+            if (e === "unset") {
+              store.unset("quantizationType");
+              return;
+            }
+            store.update("quantizationType", e);
+          }}
+        >
+          <SelectTrigger id="quantizationType" className="w-full">
+            <SelectValue placeholder="Select quantization type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="unset">unset</SelectItem>
+              {GGML_WEIGHTS_TYPE.map((it) => (
+                <SelectItem key={it} value={it}>
+                  {it}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
