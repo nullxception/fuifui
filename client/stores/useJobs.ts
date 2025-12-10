@@ -13,6 +13,7 @@ interface JobStatus {
 interface JobsState {
   jobs: Map<JobType, JobStatus>;
   logs: LogEntry[];
+  eventSource: EventSource | null;
   jobStatus: (type: JobType) => JobStatus | undefined;
   setPreviewImage: (image?: Image) => void;
   setError: (type: JobType, message: string) => void;
@@ -22,12 +23,10 @@ interface JobsState {
   checkJobs: (jobs: Partial<Job>[]) => Promise<void>;
 }
 
-let eventSource: EventSource | null = null;
-const TO_BE_FILLED = "to-be-filled";
-
 export const useJobs = create<JobsState>((set, get) => ({
   jobs: new Map<JobType, JobStatus>(),
   logs: [],
+  eventSource: null,
   jobStatus(type) {
     return get().jobs.get(type);
   },
@@ -35,7 +34,7 @@ export const useJobs = create<JobsState>((set, get) => ({
     set((state) => ({
       jobs: new Map(state.jobs).set("txt2img", {
         image,
-        id: TO_BE_FILLED,
+        id: "",
         isProcessing: false,
       }),
     }));
@@ -67,7 +66,7 @@ export const useJobs = create<JobsState>((set, get) => ({
   },
   setError(type, message) {
     const { jobStatus, addLog } = get();
-    const id = jobStatus(type)?.id ?? TO_BE_FILLED;
+    const id = jobStatus(type)?.id ?? "";
     addLog({
       type: "stderr",
       message: message,
@@ -81,37 +80,39 @@ export const useJobs = create<JobsState>((set, get) => ({
     }));
   },
   connectToJob: (jobId, type) => {
+    const { eventSource } = get();
+    const { addLog, postResult } = get();
+    const { setOutputTab } = useAppStore.getState();
     if (eventSource) {
       eventSource.close();
     }
-    set((state) => ({
-      jobs: new Map(state.jobs).set(type, {
-        id: jobId,
-        isProcessing: true,
-      }),
-      logs: [],
-    }));
-    const es = new EventSource(`/api/jobs/${jobId}`);
-    const { addLog, postResult } = get();
-    const { setOutputTab } = useAppStore.getState();
-    eventSource = es;
-    setOutputTab("console");
-    console.log(JSON.stringify(get().jobs));
 
+    const es = new EventSource(`/api/jobs/${jobId}`);
     const close = (es: EventSource) => {
       es.close();
-      eventSource = null;
       set((state) => ({
         jobs: new Map(state.jobs).set(type, {
           id: jobId,
           isProcessing: false,
         }),
+        eventSource: null,
       }));
     };
 
     let onClosing: Disposable;
+    es.addEventListener("open", () => {
+      set((state) => ({
+        jobs: new Map(state.jobs).set(type, {
+          id: jobId,
+          isProcessing: true,
+        }),
+        logs: [],
+        eventSource: es,
+      }));
+      setOutputTab("console");
+    });
 
-    es.onmessage = (event) => {
+    es.addEventListener("message", (event) => {
       try {
         const log: LogData = JSON.parse(event.data);
         addLog({
@@ -122,14 +123,13 @@ export const useJobs = create<JobsState>((set, get) => ({
       } catch (e) {
         console.error(e);
       }
-    };
-
+    });
     es.addEventListener("complete", (event) => {
       try {
         const result = JSON.parse(event.data);
         postResult(jobId, type, result);
         es.close();
-        eventSource = null;
+        set({ eventSource: es });
       } catch (e) {
         console.error(e);
       }
@@ -159,7 +159,7 @@ export const useJobs = create<JobsState>((set, get) => ({
   checkJobs: async (jobs: Partial<Job>[]) => {
     try {
       const { connectToJob, postResult, jobStatus } = get();
-      const willBeFilled = jobStatus("txt2img")?.id === TO_BE_FILLED;
+      const willBeFilled = jobStatus("txt2img")?.id === "";
 
       if (jobs.length == 0 || willBeFilled) return;
 
