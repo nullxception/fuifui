@@ -93,7 +93,7 @@ function ConverterPanel() {
       <CardContent className="flex flex-col items-stretch justify-center space-y-4">
         <div className="flex flex-col items-stretch justify-between gap-4">
           <div className="flex flex-row items-center justify-between gap-4">
-            <Label>Model</Label>
+            <Label htmlFor="modelTargetSelect">Model</Label>
             <div className="flex flex-row items-center justify-between gap-4">
               <Label htmlFor="filterModel">Hide GGUF Models</Label>
               <Switch
@@ -106,7 +106,7 @@ function ConverterPanel() {
           </div>
 
           <Select value={model} onValueChange={handleModelChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="modelTargetSelect" className="w-full">
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
             <SelectContent>
@@ -120,9 +120,9 @@ function ConverterPanel() {
         </div>
 
         <div className="flex flex-row items-center justify-between gap-4">
-          <Label>Quantization</Label>
+          <Label htmlFor="quantizationTargetSelect">Quantization</Label>
           <Select value={type} onValueChange={handleTypeChange}>
-            <SelectTrigger className="w-1/2">
+            <SelectTrigger id="quantizationTargetSelect" className="w-1/2">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -136,9 +136,10 @@ function ConverterPanel() {
         </div>
 
         <div className="grow space-y-2">
-          <Label>Output</Label>
+          <Label htmlFor="quantizationOutput">Output</Label>
           <InputGroup>
             <InputGroupInput
+              id="quantizationOutput"
               value={output}
               onChange={(e) => setOutput(e.target.value)}
               placeholder={`model.${type}.gguf`}

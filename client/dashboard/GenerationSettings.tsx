@@ -82,7 +82,7 @@ export function GenerationSettings() {
         />
 
         <div className="space-y-4">
-          <Label>Sampling Method</Label>
+          <Label htmlFor="samplingMethodSelect">Sampling Method</Label>
           <Select
             value={store.params.samplingMethod ?? ""}
             onValueChange={(e) => {
@@ -93,7 +93,7 @@ export function GenerationSettings() {
               store.update("samplingMethod", e);
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="samplingMethodSelect" className="w-full">
               <SelectValue placeholder={`Sampling method`} />
             </SelectTrigger>
             <SelectContent>
@@ -110,7 +110,7 @@ export function GenerationSettings() {
         </div>
 
         <div className="space-y-4">
-          <Label>Scheduler</Label>
+          <Label htmlFor="schedulerSelect">Scheduler</Label>
           <Select
             value={store.params.scheduler ?? ""}
             onValueChange={(e) => {
@@ -121,7 +121,7 @@ export function GenerationSettings() {
               store.update("scheduler", e);
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="schedulerSelect" className="w-full">
               <SelectValue placeholder={`Scheduler`} />
             </SelectTrigger>
             <SelectContent>
@@ -138,12 +138,12 @@ export function GenerationSettings() {
         </div>
 
         <div className="space-y-4">
-          <Label>RNG</Label>
+          <Label htmlFor="rngSelect">RNG</Label>
           <Select
             value={store.params.rng ?? ""}
             onValueChange={(e) => store.update("rng", e)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="rngSelect" className="w-full">
               <SelectValue placeholder={`RNG`} />
             </SelectTrigger>
             <SelectContent>
@@ -159,12 +159,12 @@ export function GenerationSettings() {
         </div>
 
         <div className="space-y-4">
-          <Label>Sampler RNG</Label>
+          <Label htmlFor="samplerRng">Sampler RNG</Label>
           <Select
             value={store.params.samplerRng ?? ""}
             onValueChange={(e) => store.update("samplerRng", e)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="samplerRng" className="w-full">
               <SelectValue placeholder={`Sampler RNG`} />
             </SelectTrigger>
             <SelectContent>
@@ -219,7 +219,7 @@ export function GenerationSettings() {
         )}
 
         <div className="flex gap-4">
-          <Label>Seed</Label>
+          <Label htmlFor="seedInput">Seed</Label>
           <InputGroup>
             <InputGroupButton
               type="button"
@@ -232,6 +232,7 @@ export function GenerationSettings() {
               <DicesIcon />
             </InputGroupButton>
             <InputGroupInput
+              id="seedInput"
               type="number"
               value={store.params.seed}
               onChange={(e) => store.update("seed", parseInt(e.target.value))}
@@ -248,59 +249,68 @@ export function GenerationSettings() {
           </InputGroup>
         </div>
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="verbose" className="cursor-pointer">
+          <Label htmlFor="verboseSwitch" className="cursor-pointer">
             Verbose console output
           </Label>
           <Switch
+            id="verboseSwitch"
             checked={store.params.verbose ?? false}
             onCheckedChange={(e) => store.update("verbose", e)}
           />
         </div>
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="diffusionFa" className="cursor-pointer">
+          <Label htmlFor="diffusionFaSwitch" className="cursor-pointer">
             Flash Attention
           </Label>
           <Switch
+            id="diffusionFaSwitch"
             checked={store.params.diffusionFa ?? false}
             onCheckedChange={(e) => store.update("diffusionFa", e)}
           />
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="offloadToCpu" className="cursor-pointer">
+          <Label htmlFor="offloadToCpuSwitch" className="cursor-pointer">
             Offload weights to (CPU) RAM
           </Label>
           <Switch
+            id="offloadToCpuSwitch"
             checked={store.params.offloadToCpu ?? false}
             onCheckedChange={(e) => store.update("offloadToCpu", e)}
           />
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="forceSdxlVaeConvScale" className="cursor-pointer">
+          <Label
+            htmlFor="forceSdxlVaeConvScaleSwitch"
+            className="cursor-pointer"
+          >
             Use SDXL VAE conv scale
           </Label>
           <Switch
+            id="forceSdxlVaeConvScaleSwitch"
             checked={store.params.forceSdxlVaeConvScale ?? false}
             onCheckedChange={(e) => store.update("forceSdxlVaeConvScale", e)}
           />
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="diffusionConvDirect" className="cursor-pointer">
+          <Label htmlFor="diffusionConvDirectSwitch" className="cursor-pointer">
             Diffusion ggml_conv2d_direct
           </Label>
           <Switch
+            id="diffusionConvDirectSwitch"
             checked={store.params.diffusionConvDirect ?? false}
             onCheckedChange={(e) => store.update("diffusionConvDirect", e)}
           />
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="vaeConvDirect" className="cursor-pointer">
+          <Label htmlFor="vaeConvDirectSwitch" className="cursor-pointer">
             VAE ggml_conv2d_direct
           </Label>
           <Switch
+            id="vaeConvDirectSwitch"
             checked={store.params.vaeConvDirect ?? false}
             onCheckedChange={(e) => store.update("vaeConvDirect", e)}
           />

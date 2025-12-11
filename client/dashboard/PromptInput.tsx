@@ -78,6 +78,7 @@ function Prompt({ type }: { type: PromptType }) {
     <div className="space-y-2 px-4">
       <div className="flex items-center justify-between">
         <Label
+          htmlFor={`${type}Text`}
           className={`${type === "prompt" ? "text-blue-500" : "text-pink-500"}`}
         >
           {title}
@@ -92,6 +93,7 @@ function Prompt({ type }: { type: PromptType }) {
         </div>
       </div>
       <Textarea
+        id={`${type}Text`}
         ref={ref}
         value={value}
         onChange={(e) => {

@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 interface SliderProps {
-  label?: string;
+  label: string;
   min: number;
   max: number;
   step?: number;
@@ -27,13 +27,14 @@ export function SliderInput({
   const handleSliderChange = (value: number) => {
     onChange(value);
   };
-
+  const id = label.replaceAll(" ", "") + "Slider";
   return (
     <div className="w-full space-y-4">
       {(label || valueDisplay) && (
         <div className="flex items-center justify-between">
-          {label && <Label>{label}</Label>}
+          {label && <Label htmlFor={id}>{label}</Label>}
           <Input
+            id={id}
             type="number"
             value={value}
             step={step}

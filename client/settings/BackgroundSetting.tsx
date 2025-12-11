@@ -58,7 +58,7 @@ function BackgroundSetting() {
 
   return (
     <Card className="row-span-3 flex w-full flex-col space-y-4 bg-background/60 p-4 backdrop-blur-sm">
-      <Label>Background</Label>
+      <h2 className="text-xs font-semibold uppercase">Background</h2>
 
       {/* Upload Section */}
       <div>
@@ -89,10 +89,11 @@ function BackgroundSetting() {
 
       {/* URL Input */}
       <div className="space-y-2">
-        <Label>Or enter image URL</Label>
+        <Label htmlFor="urlBackgroundInput">Or enter image URL</Label>
         <ButtonGroup className="w-full">
           <InputGroup>
             <InputGroupInput
+              id="urlBackgroundInput"
               type="url"
               placeholder="https://example.com/image.jpg"
               value={imageUrl}

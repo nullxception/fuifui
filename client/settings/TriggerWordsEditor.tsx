@@ -149,6 +149,7 @@ function TriggerWordForm({
       <div className="mb-2 flex gap-2">
         <InputGroup>
           <InputGroupInput
+            name="wordListInsert"
             value={wordInput}
             onChange={(e) => setWordInput(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -179,7 +180,7 @@ function TriggerWordForm({
 
       {entry.type === "lora" && (
         <div className="flex justify-end gap-4 pt-2">
-          <Label>Strength</Label>
+          <Label htmlFor="loraStrengthNumber">Strength</Label>
           <InputGroup className="w-30">
             <InputGroupButton
               onClick={() => handleStrengthChange(loraStrength - 0.1)}
@@ -187,6 +188,7 @@ function TriggerWordForm({
               <MinusIcon />
             </InputGroupButton>
             <InputGroupInput
+              id="loraStrengthNumber"
               type="number"
               min={0}
               max={1}
@@ -317,7 +319,7 @@ function TriggerWordsEditor() {
   return (
     <>
       <Card className="col-span-1 row-span-1 flex flex-row items-center justify-between bg-background/60 p-4 backdrop-blur-sm md:col-span-2">
-        <Label>Trigger Words</Label>
+        <h2>Trigger Words</h2>
         <Button
           onClick={handleAdd}
           variant="outline"

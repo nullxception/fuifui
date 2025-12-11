@@ -20,12 +20,12 @@ export function ModelSelector() {
   return (
     <div className="grid grid-cols-2 gap-2 px-4 md:grid-cols-3">
       <div className="space-y-2 pt-2">
-        <Label htmlFor="model-select">Model</Label>
+        <Label htmlFor="modelSelect">Model</Label>
         <Select
           value={store.params.model}
           onValueChange={(e) => store.update("model", e)}
         >
-          <SelectTrigger id="model-select" className="w-full">
+          <SelectTrigger id="modelSelect" className="w-full">
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
@@ -42,12 +42,12 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="modelType-select">Model Type</Label>
+        <Label htmlFor="modelTypeSelect">Model Type</Label>
         <Select
           value={store.params.modelType}
           onValueChange={(e) => store.update("modelType", e)}
         >
-          <SelectTrigger id="modelType-select" className="w-full">
+          <SelectTrigger id="modelTypeSelect" className="w-full">
             <SelectValue placeholder="Select a model type" />
           </SelectTrigger>
           <SelectContent>
@@ -64,7 +64,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="vae-select">VAE</Label>
+        <Label htmlFor="vaeSelect">VAE</Label>
         <Select
           value={store.params.vae ?? ""}
           onValueChange={(e) => {
@@ -75,7 +75,7 @@ export function ModelSelector() {
             store.update("vae", e);
           }}
         >
-          <SelectTrigger id="vae-select" className="w-full">
+          <SelectTrigger id="vaeSelect" className="w-full">
             <SelectValue placeholder="Select VAE" />
           </SelectTrigger>
           <SelectContent>
@@ -93,7 +93,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="clip-l-select">CLIP-L</Label>
+        <Label htmlFor="clipLSSelect">CLIP-L</Label>
         <Select
           value={store.params.clipL ?? ""}
           onValueChange={(e) => {
@@ -104,7 +104,7 @@ export function ModelSelector() {
             store.update("clipL", e);
           }}
         >
-          <SelectTrigger id="clip-l-select" className="w-full">
+          <SelectTrigger id="clipLSSelect" className="w-full">
             <SelectValue placeholder="Select CLIP-L" />
           </SelectTrigger>
           <SelectContent>
@@ -122,7 +122,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="clip-g-select">CLIP-G</Label>
+        <Label htmlFor="clipGSelect">CLIP-G</Label>
         <Select
           value={store.params.clipG ?? ""}
           onValueChange={(e) => {
@@ -133,7 +133,7 @@ export function ModelSelector() {
             store.update("clipG", e);
           }}
         >
-          <SelectTrigger id="clip-g-select" className="w-full">
+          <SelectTrigger id="clipGSelect" className="w-full">
             <SelectValue placeholder="Select CLIP-G" />
           </SelectTrigger>
           <SelectContent>
@@ -151,7 +151,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="t5xxl-select">T5 XXL</Label>
+        <Label htmlFor="t5xxlSelect">T5 XXL</Label>
         <Select
           value={store.params.t5xxl ?? ""}
           onValueChange={(e) => {
@@ -162,7 +162,7 @@ export function ModelSelector() {
             store.update("t5xxl", e);
           }}
         >
-          <SelectTrigger id="t5xxl-select" className="w-full">
+          <SelectTrigger id="t5xxlSelect" className="w-full">
             <SelectValue placeholder="Select T5 XXL" />
           </SelectTrigger>
           <SelectContent>
@@ -180,7 +180,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="llm-select">LLM</Label>
+        <Label htmlFor="llmSelect">LLM</Label>
         <Select
           value={store.params.llm ?? ""}
           onValueChange={(e) => {
@@ -191,7 +191,7 @@ export function ModelSelector() {
             store.update("llm", e);
           }}
         >
-          <SelectTrigger id="llm-select" className="w-full">
+          <SelectTrigger id="llmSelect" className="w-full">
             <SelectValue placeholder="Select LLM" />
           </SelectTrigger>
           <SelectContent>
@@ -209,7 +209,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="upscaleModel-select">Upscaler</Label>
+        <Label htmlFor="upscaleModelSelect">Upscaler</Label>
         <Select
           value={store.params.upscaleModel ?? ""}
           onValueChange={(e) => {
@@ -220,7 +220,7 @@ export function ModelSelector() {
             store.update("upscaleModel", e);
           }}
         >
-          <SelectTrigger id="upscaleModel-select" className="w-full">
+          <SelectTrigger id="upscaleModelSelect" className="w-full">
             <SelectValue placeholder="Select Upscaler" />
           </SelectTrigger>
           <SelectContent>
@@ -238,7 +238,7 @@ export function ModelSelector() {
       </div>
 
       <div className="space-y-2 pt-2">
-        <Label htmlFor="quantizationType">In-place Quantization</Label>
+        <Label htmlFor="quantizationTypeSelect">In-place Quantization</Label>
         <Select
           value={store.params.quantizationType ?? ""}
           onValueChange={(e) => {
@@ -249,7 +249,7 @@ export function ModelSelector() {
             store.update("quantizationType", e);
           }}
         >
-          <SelectTrigger id="quantizationType" className="w-full">
+          <SelectTrigger id="quantizationTypeSelect" className="w-full">
             <SelectValue placeholder="Select quantization type" />
           </SelectTrigger>
           <SelectContent>
