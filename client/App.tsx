@@ -7,10 +7,10 @@ import {
   splitLink,
 } from "@trpc/client";
 import { AnimatePresence } from "framer-motion";
-import { StrictMode, useState } from "react";
+import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { AppRouter } from "server/rpc";
-import { useRoute } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { BackgroundLayer } from "./components/BackgroundLayer";
 import { Header } from "./components/Header";
 import { MobileNav } from "./components/MobileNav";
@@ -34,13 +34,27 @@ function Routes() {
   const [isGallery] = useRoute("/gallery/*?");
   const [isConverter] = useRoute("/converter");
   const [isIndex] = useRoute("/");
+  const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    containerRef.current?.scrollTo(0, 0);
+  }, [location]);
+
   return (
-    <AnimatePresence>
-      {isGallery && <Gallery {...AnimationSettings} />}
-      {isConverter && <Converter {...AnimationSettings} />}
-      {isIndex && <TextToImage {...AnimationSettings} />}
-      {isSettings && <Settings {...AnimationSettings} />}
-    </AnimatePresence>
+    <div
+      ref={containerRef}
+      className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-scroll font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground"
+    >
+      <Header />
+      <AnimatePresence>
+        {isGallery && <Gallery {...AnimationSettings} />}
+        {isConverter && <Converter {...AnimationSettings} />}
+        {isIndex && <TextToImage {...AnimationSettings} />}
+        {isSettings && <Settings {...AnimationSettings} />}
+      </AnimatePresence>
+      <MobileNav />
+    </div>
   );
 }
 
@@ -62,11 +76,7 @@ function App() {
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
           <BackgroundLayer />
-          <div className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-scroll font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground">
-            <Header />
-            <Routes />
-            <MobileNav />
-          </div>
+          <Routes />
           <div id="modal-root"></div>
         </ThemeProvider>
       </TRPCProvider>
