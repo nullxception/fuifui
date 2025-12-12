@@ -27,7 +27,7 @@ function OutputCard() {
           variant={outputTab === "image" ? "default" : "outline"}
           size="sm"
           onClick={() => setOutputTab("image")}
-          className="w-1/4"
+          className="w-1/2 md:w-1/3"
         >
           <ImageIcon />
           Image
@@ -36,7 +36,7 @@ function OutputCard() {
           variant={outputTab === "console" ? "default" : "outline"}
           size="sm"
           onClick={() => setOutputTab("console")}
-          className="w-1/4"
+          className="w-1/2 md:w-1/3"
         >
           <TerminalIcon />
           Console
@@ -110,19 +110,19 @@ export const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     return (
       <motion.div
         ref={ref}
-        className="container mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col lg:overflow-hidden"
+        className="container mx-auto max-w-screen-2xl p-2 lg:overflow-hidden"
         {...props}
       >
         <div className="flex items-center p-4 md:hidden">
           <Logo />
         </div>
-        <div className="flex flex-col gap-2 p-2 lg:h-full lg:flex-row lg:items-stretch">
-          <div className="flex min-h-0 flex-col overflow-clip rounded-xl border border-border lg:w-1/2">
+        <div className="flex flex-col gap-2 lg:h-full lg:flex-row lg:items-stretch">
+          <div className="flex min-h-0 flex-col overflow-clip rounded-xl border border-border bg-background/60 lg:mb-4 lg:w-1/2">
             <JobQueryProvider type="txt2img">
-              <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden bg-background/20 backdrop-blur-sm">
+              <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden backdrop-blur-sm">
                 <OutputCard />
               </div>
-              <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border bg-background/20 p-2 backdrop-blur-sm">
+              <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border p-2 backdrop-blur-sm">
                 <TextToImageAction />
               </div>
             </JobQueryProvider>

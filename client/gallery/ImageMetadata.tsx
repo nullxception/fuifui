@@ -2,6 +2,7 @@ import { Button } from "client/components/ui/button";
 import { Label } from "client/components/ui/label";
 import { useDiffusionConfig } from "client/dashboard/useDiffusionConfig";
 import { usePreviewImage } from "client/stores/usePreviewImage";
+import { motion } from "framer-motion";
 import {
   ChevronDownIcon,
   DownloadIcon,
@@ -33,7 +34,7 @@ interface ImageMetadataProps {
   image: SDImage;
   onRemove: () => void;
   onClose: () => void;
-  className: string;
+  className?: string;
 }
 
 function BaseMetadataChip({
@@ -91,6 +92,21 @@ function MetadataChip({
   );
 }
 
+const variants = {
+  enter: (w: number) => ({
+    width: w >= 768 ? 0 : "auto",
+    height: w >= 768 ? "auto" : 0,
+  }),
+  animate: {
+    width: "auto",
+    height: "auto",
+  },
+  exit: (w: number) => ({
+    width: w >= 768 ? 0 : "auto",
+    height: w >= 768 ? "auto" : 0,
+  }),
+};
+
 export default function ImageMetadata({
   image,
   onRemove,
@@ -126,22 +142,30 @@ export default function ImageMetadata({
   };
 
   return (
-    <>
+    <motion.div
+      custom={window.innerWidth}
+      variants={variants}
+      initial="enter"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      style={{ overflow: "hidden" }}
+      className="relative"
+    >
+      <Button
+        variant="ghost"
+        size="icon-lg"
+        className="absolute top-4 right-5 z-3 flex bg-background/20 text-background/70 hover:text-foreground lg:hidden"
+        onClick={onClose}
+      >
+        <ChevronDownIcon className="text-foreground" />
+      </Button>
       <div
-        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-2 overflow-y-auto border-l border-border p-4 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-[400px] lg:p-6 ${className}`}
+        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-2 overflow-y-auto rounded-t-lg border-border bg-clip-border px-4 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-[400px] md:rounded-none md:border-l ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
-          <h3 className="p-0 text-xl font-bold text-foreground">Details</h3>
-
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            className="text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
-            onClick={onClose}
-          >
-            <ChevronDownIcon className="text-foreground" />
-          </Button>
+        <div className="flex items-center justify-between py-2 pt-4">
+          <h3 className="p-0 text-lg font-light text-foreground">Details</h3>
         </div>
 
         <div className="space-y-4">
@@ -219,6 +243,6 @@ export default function ImageMetadata({
           )}
         </div>
       </div>
-    </>
+    </motion.div>
   );
 }
