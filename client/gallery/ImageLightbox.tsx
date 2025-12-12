@@ -149,13 +149,17 @@ export default function ImageLightbox() {
       <motion.div
         className="fixed inset-0 z-2 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
         transition={{ duration: 0.3 }}
-        initial={{ opacity: 0, scale: 1.25 }}
+        initial={{ opacity: 0, scale: 1.3 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 1.25 }}
+        exit={{ opacity: 0, scale: 1.3 }}
       >
-        <div
+        <motion.div
           className="relative flex flex-1 items-stretch justify-center overflow-hidden"
           ref={ref}
+          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.5 }}
         >
           <DottedBackground />
           <AnimatePresence initial={false} custom={page}>
@@ -237,16 +241,16 @@ export default function ImageLightbox() {
           >
             <XIcon />
           </Button>
-        </div>
-
-        {image && (
-          <ImageMetadata
-            image={image}
-            onRemove={() => showRemoveDialog(true)}
-            onClose={() => showMetadata(false)}
-            className={`${shouldShowMetadata ? "block" : "hidden"}`}
-          />
-        )}
+        </motion.div>
+        <AnimatePresence initial={false}>
+          {image && shouldShowMetadata && (
+            <ImageMetadata
+              image={image}
+              onRemove={() => showRemoveDialog(true)}
+              onClose={() => showMetadata(false)}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
       {image && (
         <Modal

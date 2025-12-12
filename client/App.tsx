@@ -44,7 +44,7 @@ function Routes() {
   return (
     <div
       ref={containerRef}
-      className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-scroll font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground"
+      className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-scroll pb-18 font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground md:pb-0"
     >
       <Header />
       <AnimatePresence>

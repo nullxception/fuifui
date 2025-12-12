@@ -55,7 +55,7 @@ export function ConsoleOutput({
 
   return (
     <div
-      className={`scrollbar-thin h-[50vh] w-full overflow-auto bg-background/60 p-6 font-mono text-xs break-all scrollbar-thumb-secondary scrollbar-track-transparent lg:h-full ${className}`}
+      className={`scrollbar-thin h-[50vh] w-full overflow-auto p-6 font-mono text-xs break-all scrollbar-thumb-secondary scrollbar-track-transparent lg:h-full ${className}`}
       ref={consoleRef}
     >
       {processedLogs.length === 0 ? (

@@ -186,7 +186,7 @@ export const Converter = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     return (
       <motion.div
         ref={ref}
-        className="container mx-auto flex min-h-0 max-w-screen-2xl flex-1 flex-col lg:overflow-hidden"
+        className="container mx-auto max-w-screen-2xl"
         {...props}
       >
         <div className="flex items-center p-4 md:hidden">
@@ -194,7 +194,7 @@ export const Converter = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         </div>
         <div className="flex flex-auto flex-col gap-2 p-2 lg:h-full lg:flex-row">
           <JobQueryProvider type="convert">
-            <LogsPanel className="lg:w-1/2" />
+            <LogsPanel className="h-[30vh] bg-background/60 lg:h-[80vh] lg:w-1/2" />
             <div className="w-full lg:max-h-screen lg:w-1/2">
               <ConverterPanel />
               <Footer className="col-span-full flex justify-center p-4" />

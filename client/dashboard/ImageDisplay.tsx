@@ -10,7 +10,7 @@ interface ImageDisplayProps {
 
 export function ImageDisplay({ image, isProcessing }: ImageDisplayProps) {
   return (
-    <div className="flex h-[50vh] w-full flex-1 items-center justify-center bg-background/60 lg:h-full">
+    <div className="flex h-[50vh] w-full flex-1 items-center justify-center lg:h-full">
       <DottedBackground />
       {isProcessing ? (
         <div className="p-8 text-center">

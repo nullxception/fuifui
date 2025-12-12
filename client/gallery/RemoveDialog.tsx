@@ -32,29 +32,21 @@ export function RemoveDialog({
   return (
     <Card className="m-4 flex max-w-[90vh] flex-col justify-center overflow-clip shadow-background drop-shadow-lg">
       <CircleAlertIcon className="mt-5 h-10 w-10 self-center text-pink-500" />
-      <p className="p-4 text-center">
+      <p className="px-4 py-2 text-center">
         Are you sure you want to remove{" "}
         {images.length > 1 ? `${images.length} images` : "it"}?
       </p>
-      {images.length < 3 ? (
-        <div className="flex items-center justify-center gap-4 p-4">
+      <ResponsiveMasonry
+        columnsCountBreakPoints={{ 350: images.length > 2 ? 3 : images.length }}
+        gutterBreakPoints={{ 350: "6px" }}
+        className="max-h-[80vh] overflow-y-auto px-4 py-2 text-center"
+      >
+        <Masonry>
           {images.map((img) => (
             <Thumbnail image={img} key={img.name} />
           ))}
-        </div>
-      ) : (
-        <ResponsiveMasonry
-          columnsCountBreakPoints={{ 350: 3 }}
-          gutterBreakPoints={{ 350: "6px" }}
-          className="max-h-[80vh] overflow-y-auto p-4 text-center"
-        >
-          <Masonry>
-            {images.map((img) => (
-              <Thumbnail image={img} key={img.name} />
-            ))}
-          </Masonry>
-        </ResponsiveMasonry>
-      )}
+        </Masonry>
+      </ResponsiveMasonry>
       <div className="mt-2 flex w-full justify-center gap-2 bg-background/40 p-4">
         {!isRemoving && (
           <Button variant="outline" className="w-1/2" onClick={onCancel}>

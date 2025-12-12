@@ -209,7 +209,7 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
               )}
             </Masonry>
           </ResponsiveMasonry>
-          <div ref={observerTarget} className="col-span-full h-10 w-full" />
+          <div ref={observerTarget} className="col-span-full h-5 w-full" />
           {isFetchingNextPage && (
             <div className="col-span-full flex justify-center p-4">
               <span className="text-foreground">Loading more...</span>
