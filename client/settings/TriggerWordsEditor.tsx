@@ -98,69 +98,69 @@ function TriggerWordForm({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-row gap-3">
-        <Select
-          value={entry.type}
-          disabled={isEditing}
-          onValueChange={(e) =>
-            onChange({
-              ...entry,
-              type: e as ExtraDataType,
-              target: "", // Reset target when type changes
-            })
-          }
-        >
-          <SelectTrigger className="shrink-0">
-            <SelectValue placeholder="Select type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="embedding">Embedding</SelectItem>
-              <SelectItem value="lora">LoRA</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <Select
-          value={entry.target}
-          disabled={isEditing}
-          onValueChange={(e) =>
-            onChange({
-              ...entry,
-              target: e,
-            })
-          }
-        >
-          <SelectTrigger className="grow overflow-hidden">
-            <SelectValue placeholder={`Select ${typeLabel}...`} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Select {entry.type}</SelectLabel>
-              {availableTargets.map((target) => (
-                <SelectItem key={target} value={target}>
-                  {target}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      {isEditing ? (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span
+              className={`rounded px-2 py-0.5 text-xs ${
+                entry.type === "embedding"
+                  ? "bg-blue-500/20 text-blue-300"
+                  : "bg-purple-500/20 text-purple-300"
+              }`}
+            >
+              {entry.type === "lora" ? "LoRA" : "Embedding"}
+            </span>
+            <span className="text-xs">{entry.target}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-row gap-3">
+          <Select
+            value={entry.type}
+            onValueChange={(e) =>
+              onChange({
+                ...entry,
+                type: e as ExtraDataType,
+                target: "", // Reset target when type changes
+              })
+            }
+          >
+            <SelectTrigger className="shrink-0">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="embedding">Embedding</SelectItem>
+                <SelectItem value="lora">LoRA</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Select
+            value={entry.target}
+            onValueChange={(e) =>
+              onChange({
+                ...entry,
+                target: e,
+              })
+            }
+          >
+            <SelectTrigger className="grow overflow-hidden">
+              <SelectValue placeholder={`Select ${typeLabel}...`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Select {entry.type}</SelectLabel>
+                {availableTargets.map((target) => (
+                  <SelectItem key={target} value={target}>
+                    {target}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-      <div className="mb-2 flex gap-2">
-        <InputGroup>
-          <InputGroupInput
-            name="wordListInsert"
-            value={wordInput}
-            onChange={(e) => setWordInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Add some word"
-            className="flex-1"
-          />
-          <InputGroupButton onClick={handleAddWord}>
-            <PlusIcon />
-          </InputGroupButton>
-        </InputGroup>
-      </div>
       <div className="flex flex-wrap gap-1">
         {entry.words.map((word, index) => (
           <span
@@ -177,7 +177,21 @@ function TriggerWordForm({
           </span>
         ))}
       </div>
-
+      <div className="mb-2 flex gap-2">
+        <InputGroup>
+          <InputGroupInput
+            name="wordListInsert"
+            value={wordInput}
+            onChange={(e) => setWordInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Add some word"
+            className="flex-1"
+          />
+          <InputGroupButton onClick={handleAddWord}>
+            <PlusIcon />
+          </InputGroupButton>
+        </InputGroup>
+      </div>
       {entry.type === "lora" && (
         <div className="flex justify-end gap-4 pt-2">
           <Label htmlFor="loraStrengthNumber">Strength</Label>
@@ -440,7 +454,7 @@ function TriggerWordsEditor() {
               <p className="text-sm text-muted-foreground">
                 Are you sure you want to delete the trigger word for{" "}
                 <span className="font-medium text-foreground">
-                  {deleteConfirmIndex &&
+                  {deleteConfirmIndex !== null &&
                     triggerWords[deleteConfirmIndex]?.target}
                 </span>
                 ? This action cannot be undone.
