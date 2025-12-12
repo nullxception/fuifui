@@ -233,6 +233,7 @@ function TriggerWordsEditor() {
   const rpc = useTRPC();
   const { data } = useQuery(rpc.listModels.queryOptions());
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingEntry, setEditingEntry] = useState<TriggerWord | null>(null);
   const [newEntry, setNewEntry] = useState<TriggerWord | null>(null);
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(
     null,
@@ -289,7 +290,11 @@ function TriggerWordsEditor() {
   };
 
   const handleEdit = (index: number) => {
-    setEditingIndex(index);
+    const entry = triggerWords[index];
+    if (entry) {
+      setEditingIndex(index);
+      setEditingEntry(entry);
+    }
   };
 
   const handleSaveEdit = (index: number, updated: TriggerWord) => {
@@ -304,10 +309,12 @@ function TriggerWordsEditor() {
     }
     updateTW(index, tw);
     setEditingIndex(null);
+    setEditingEntry(null);
   };
 
   const handleCancelEdit = () => {
     setEditingIndex(null);
+    setEditingEntry(null);
   };
 
   const getAvailableTargets = (type: ExtraDataType) => {
@@ -351,16 +358,15 @@ function TriggerWordsEditor() {
             <Card
               className={`bg-background/60 p-4 backdrop-blur-sm ${editingIndex === index ? "border-primary" : "border-border"}`}
             >
-              {editingIndex === index ? (
+              {editingIndex === index && editingEntry ? (
                 <TriggerWordForm
                   isEditing={true}
-                  entry={entry}
+                  entry={editingEntry}
                   onChange={(updated) => {
-                    // Update in place for editing
-                    updateTW(index, updated);
+                    setEditingEntry(updated);
                   }}
-                  availableTargets={getAvailableTargets(entry.type)}
-                  onSave={() => handleSaveEdit(index, entry)}
+                  availableTargets={getAvailableTargets(editingEntry.type)}
+                  onSave={() => handleSaveEdit(index, editingEntry)}
                   onCancel={handleCancelEdit}
                 />
               ) : (
