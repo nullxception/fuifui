@@ -17,6 +17,7 @@ import {
   createJob,
   getAllJobs,
   getJob,
+  getLogs,
   withJobEvents,
 } from "server/services/jobs";
 import type { DiffusionParams, Models, SDImage } from "server/types";
@@ -131,7 +132,7 @@ export const diffusionProgress: Bun.Serve.Handler<
       };
 
       // Send existing logs
-      job.logs.forEach((log) => {
+      getLogs(jobId)?.forEach((log) => {
         sendEvent("message", log);
       });
 

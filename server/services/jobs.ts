@@ -6,6 +6,7 @@ import type { JobType } from "server/types/jobs";
 const jobEvents = new EventEmitter();
 const activeProcesses = new Map<string, Subprocess>();
 const jobs = new Map<string, Job>();
+const logs = new Map<string, LogData[]>();
 
 export function createJob(type: JobType, id?: string) {
   const job: Job = {
@@ -13,7 +14,6 @@ export function createJob(type: JobType, id?: string) {
     type,
     status: "pending",
     createdAt: Date.now(),
-    logs: [],
   };
 
   jobs.set(job.id, job);
@@ -75,12 +75,16 @@ export function addJobLog(id: string, type: JobType, log: LogData) {
     job = createJob(type, id);
   }
 
-  job?.logs.push(log);
+  logs.set(id, [...(logs.get(id) ?? []), log]);
   jobEvents.emit("log", { jobId: id, log });
 }
 
 export function getAllJobs() {
   return jobs.values();
+}
+
+export function getLogs(id: string) {
+  return logs.get(id);
 }
 
 export function deleteJobByResultFile(filename: string) {

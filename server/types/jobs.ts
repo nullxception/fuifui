@@ -18,7 +18,6 @@ export interface Job {
   startedAt?: number;
   completedAt?: number;
   result?: SDImage | string;
-  logs: LogData[];
 }
 
 export interface LogData {
