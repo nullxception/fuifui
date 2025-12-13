@@ -26,11 +26,15 @@ export const jobSchema = z.object({
   result: dbOptional(z.string()),
 });
 
+export const logTypeSchema = z.literal(["stdout", "stderr"]);
+export const logEntrySchema = z.object({
+  type: logTypeSchema,
+  message: z.string(),
+  jobId: z.string(),
+  timestamp: z.number(),
+});
 export type JobType = z.infer<typeof jobsTypeSchema>;
 export type JobStatus = z.infer<typeof jobStatusSchema>;
 export type Job = z.infer<typeof jobSchema>;
-
-export interface LogData {
-  type: "stdout" | "stderr";
-  message: string;
-}
+export type LogType = z.infer<typeof logTypeSchema>;
+export type LogEntry = z.infer<typeof logEntrySchema>;

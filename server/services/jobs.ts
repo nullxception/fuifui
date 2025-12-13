@@ -1,6 +1,6 @@
 import { randomUUIDv7, type Subprocess } from "bun";
 import { EventEmitter } from "events";
-import type { Job, JobStatus, LogData } from "server/types";
+import type { Job, JobStatus, LogEntry } from "server/types";
 import { jobSchema, type JobType } from "server/types/jobs";
 import db from "../db";
 
@@ -30,7 +30,7 @@ const deleteOldJobs = db.prepare(
   `DELETE FROM jobs WHERE completedAt < $cutoff`,
 );
 
-const logs = new Map<string, LogData[]>();
+const logs = new Map<string, LogEntry[]>();
 
 export function createJob(type: JobType, id?: string) {
   const job: Job = {
@@ -111,14 +111,14 @@ export function updateJobStatus({
   });
 }
 
-export function addJobLog(id: string, type: JobType, log: LogData) {
-  const job = getJob(id);
+export function addJobLog(type: JobType, log: LogEntry) {
+  const job = getJob(log.jobId);
   if (!job) {
-    createJob(type, id);
+    createJob(type, log.jobId);
   }
 
-  logs.set(id, [...(logs.get(id) ?? []), log]);
-  jobEvents.emit("log", { jobId: id, log });
+  logs.set(log.jobId, [...(logs.get(log.jobId) ?? []), log]);
+  jobEvents.emit("log", log);
 }
 
 export function getJobs(type: JobType) {

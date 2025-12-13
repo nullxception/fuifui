@@ -19,7 +19,7 @@ import {
   getLogs,
   withJobEvents,
 } from "server/services/jobs";
-import type { DiffusionParams, Models } from "server/types";
+import type { DiffusionParams, LogEntry, Models } from "server/types";
 
 function putModelFiles(
   file: string,
@@ -119,10 +119,9 @@ export const diffusionProgress: Bun.Serve.Handler<
       const encoder = new TextEncoder();
       const sendEvent = (event: string, data: unknown) => {
         try {
+          data = typeof data === "string" ? data : JSON.stringify(data);
           controller.enqueue(
-            encoder.encode(
-              `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`,
-            ),
+            encoder.encode(`event: ${event}\ndata: ${data}\n\n`),
           );
         } catch {
           // Controller might be closed
@@ -143,8 +142,8 @@ export const diffusionProgress: Bun.Serve.Handler<
       }
 
       // Subscribe to new logs
-      const onLog = ({ jobId: id, log }: { jobId: string; log: unknown }) => {
-        if (id === jobId) {
+      const onLog = (log: LogEntry) => {
+        if (log.jobId === jobId) {
           sendEvent("message", log);
         }
       };

@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "client/query";
 import { usePreviewImage } from "client/stores/usePreviewImage";
-import type { LogEntry } from "client/types";
 import { createContext, useEffect, useRef, useState } from "react";
-import type { LogData } from "server/types";
-import type { JobStatus, JobType } from "server/types/jobs";
+import type { JobStatus, JobType, LogEntry } from "server/types";
+import { logEntrySchema } from "server/types/jobs";
 import { useLocation } from "wouter";
+import z from "zod";
 import { useAppStore } from "../stores/useAppStore";
 
 interface UIJobStatus {
@@ -74,8 +74,7 @@ export const useJobQuery = (type: JobType) => {
 
     es.addEventListener("message", (event) => {
       try {
-        const log: LogData = JSON.parse(event.data);
-        addLog({ jobId: id, message: log.message, type: log.type });
+        addLog(logEntrySchema.parse(JSON.parse(event.data)));
       } catch (e) {
         console.error(e);
       }
@@ -86,24 +85,22 @@ export const useJobQuery = (type: JobType) => {
         const images = rpc.listImages.infiniteQueryKey();
         await queryClient.invalidateQueries({ queryKey: images });
 
-        const result = JSON.parse(event.data);
         setStatus({ id: id, status: "completed" });
-        setPreviewImage(result);
+        setPreviewImage(z.string().parse(event.data));
         close("completed");
       } catch (e) {
         console.error(e);
       }
     });
 
-    es.addEventListener("error", (event) => {
+    es.addEventListener("error", (event: MessageEvent) => {
       try {
-        const ev = event as MessageEvent;
-        if (ev.data) {
-          const message = JSON.parse(ev.data);
-          if (message) {
-            addLog({ jobId: id, type: "stderr", message });
-          }
-        }
+        addLog({
+          jobId: id,
+          type: "stderr",
+          message: z.string().parse(event.data),
+          timestamp: Date.now(),
+        });
       } catch (e) {
         console.error(e);
       }
@@ -138,7 +135,12 @@ export const useJobQuery = (type: JobType) => {
     },
     setError(message: string) {
       setStatus((prev) => {
-        addLog({ type: "stderr", message, jobId: prev?.id ?? "" });
+        addLog({
+          type: "stderr",
+          message,
+          jobId: prev?.id ?? "",
+          timestamp: Date.now(),
+        });
 
         return { ...prev, id: prev?.id ?? "", status: "failed" };
       });
