@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "client/query";
 import { usePreviewImage } from "client/stores/usePreviewImage";
 import type { LogEntry } from "client/types";
@@ -27,6 +27,7 @@ export const useJobQuery = (type: JobType) => {
   const { setOutputTab } = useAppStore();
   const { setPreviewImage } = usePreviewImage();
   const closingRef = useRef<Timeout | null>(null);
+  const queryClient = useQueryClient();
 
   function addLog(log: LogEntry) {
     setLogs((prev) => [...prev, { ...log, timestamp: Date.now() }]);
@@ -40,10 +41,10 @@ export const useJobQuery = (type: JobType) => {
       return;
     }
     const hasJobs = listJobs && listJobs.length > 0;
-    const lastJob = hasJobs && listJobs[listJobs.length - 1];
-    if (!status && lastJob && lastJob.status === "running") {
+    const recentJob = hasJobs && listJobs[0];
+    if (!status && recentJob && recentJob.status === "running") {
       setTimeout(() => {
-        setStatus({ id: lastJob.id, status: "pending" });
+        setStatus({ id: recentJob.id, status: "pending" });
       }, 60);
     }
   }, [listJobs, type, location, status]);
@@ -80,13 +81,14 @@ export const useJobQuery = (type: JobType) => {
       }
     });
 
-    es.addEventListener("complete", (event) => {
+    es.addEventListener("complete", async (event) => {
       try {
+        const images = rpc.listImages.infiniteQueryKey();
+        await queryClient.invalidateQueries({ queryKey: images });
+
         const result = JSON.parse(event.data);
         setStatus({ id: id, status: "completed" });
-        if (typeof result === "object") {
-          setPreviewImage(result);
-        }
+        setPreviewImage(result);
         close("completed");
       } catch (e) {
         console.error(e);
@@ -112,7 +114,7 @@ export const useJobQuery = (type: JobType) => {
         }, 500);
       }
     });
-  }, [setOutputTab, setPreviewImage, status]);
+  }, [queryClient, rpc.listImages, setOutputTab, setPreviewImage, status]);
 
   useEffect(() => {
     return () => {

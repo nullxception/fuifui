@@ -1,7 +1,6 @@
 import { file, spawn } from "bun";
 import { promises as fs } from "fs";
 import path from "path";
-import { getDataFromImage as getImageData } from "server/api/gallery";
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
@@ -331,7 +330,7 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
       updateJobStatus({
         id: jobId,
         status: "completed",
-        result: await getImageData(outputPath),
+        result: path.join("/output", path.relative(OUTPUT_DIR, outputPath)),
       });
     } else if (job?.status !== "cancelled") {
       updateJobStatus({

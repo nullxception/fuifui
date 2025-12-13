@@ -15,13 +15,11 @@ import {
 import { startDiffusion } from "server/services/diffusion";
 import {
   createJob,
-  getAllJobs,
   getJob,
   getLogs,
   withJobEvents,
 } from "server/services/jobs";
-import type { DiffusionParams, Models, SDImage } from "server/types";
-import type { JobType } from "server/types/jobs";
+import type { DiffusionParams, Models } from "server/types";
 
 function putModelFiles(
   file: string,
@@ -156,7 +154,7 @@ export const diffusionProgress: Bun.Serve.Handler<
         data,
       }: {
         jobId: string;
-        data: SDImage | string;
+        data: string;
       }) => {
         if (id === jobId) {
           sendEvent("complete", data);
@@ -205,11 +203,3 @@ export const diffusionProgress: Bun.Serve.Handler<
     },
   });
 };
-
-export async function diffusionJobs(type: JobType) {
-  return getAllJobs()
-    .filter((job) => job.type === type)
-    .map((job) => ({ ...job, logs: [], params: {} }))
-    .toArray()
-    .sort((a, b) => a.createdAt - b.createdAt);
-}
