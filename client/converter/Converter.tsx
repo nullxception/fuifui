@@ -186,7 +186,7 @@ export const Converter = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     return (
       <motion.div
         ref={ref}
-        className="container mx-auto max-w-screen-2xl lg:overflow-hidden"
+        className="container mx-auto max-w-screen-2xl"
         {...props}
       >
         <div className="flex items-center p-4 md:hidden">

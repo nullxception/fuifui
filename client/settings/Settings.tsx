@@ -10,7 +10,7 @@ const Settings = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     return (
       <motion.div
         ref={ref}
-        className="container mx-auto max-w-screen-2xl lg:overflow-hidden"
+        className="container mx-auto max-w-screen-2xl"
         {...props}
       >
         <div className="flex w-full p-4 md:hidden">
