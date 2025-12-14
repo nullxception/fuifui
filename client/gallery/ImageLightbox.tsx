@@ -48,7 +48,7 @@ export default function ImageLightbox() {
     lastImage: undefined,
   });
   const [, navigate] = useLocation();
-  const [, params] = useRoute("/gallery/:id");
+  const [, params] = useRoute("/:page(gallery|result)/:id");
   const { fetchNextPage, isFetching, images, removeImages } = useImageQuery();
   const index = images?.findIndex((x) => x.name === params?.id) || 0;
   const image = images[index] ?? page.lastImage;
@@ -73,8 +73,9 @@ export default function ImageLightbox() {
         showMetadata(false);
       }
     }, 300);
-    navigate(history.state?.from || "~/gallery", { replace: true });
-  }, [image, isMd, navigate, page]);
+    const parent = params?.["page(gallery|result)"] === "gallery";
+    navigate(parent ? "~/gallery" : "~/", { replace: true });
+  }, [image, isMd, navigate, page, params]);
 
   const goto = useCallback(
     (dest: "prev" | "next") => {
@@ -85,9 +86,7 @@ export default function ImageLightbox() {
         index: page.index + (dest === "next" ? 1 : -1),
         direction: dest,
       });
-      navigate(`~/gallery/${findNewId(dest)}`, {
-        state: { from: history.state?.from || "~/gallery" },
-      });
+      navigate(`~/gallery/${findNewId(dest)}`);
     },
     [hasNext, hasPrev, findNewId, page.index, navigate],
   );
@@ -147,7 +146,7 @@ export default function ImageLightbox() {
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-2 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
+        className="fixed inset-0 z-3 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
         transition={{ duration: 0.3 }}
         initial={{ opacity: 0, scale: 1.3 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -162,7 +161,7 @@ export default function ImageLightbox() {
           exit={{ opacity: 0, scale: 0.5 }}
         >
           <DottedBackground />
-          <AnimatePresence initial={false} custom={page}>
+          <AnimatePresence initial={false}>
             {image && (
               <motion.img
                 key={image?.name}

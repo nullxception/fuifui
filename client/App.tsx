@@ -10,7 +10,7 @@ import { AnimatePresence } from "framer-motion";
 import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { AppRouter } from "server/rpc";
-import { useLocation, useRoute } from "wouter";
+import { useRoute } from "wouter";
 import { BackgroundLayer } from "./components/BackgroundLayer";
 import { Header } from "./components/Header";
 import { MobileNav } from "./components/MobileNav";
@@ -18,6 +18,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import { Converter } from "./converter/Converter";
 import { TextToImage } from "./dashboard";
 import { Gallery } from "./gallery";
+import ImageLightbox from "./gallery/ImageLightbox";
 import "./index.css";
 import { queryClient, TRPCProvider } from "./query";
 import Settings from "./settings/Settings";
@@ -31,15 +32,12 @@ const AnimationSettings = {
 
 function Routes() {
   const [isSettings] = useRoute("/settings");
-  const [isGallery] = useRoute("/gallery/*?");
   const [isConverter] = useRoute("/converter");
+  const [isLightbox, lightboxParams] = useRoute("/:page(gallery|result)/:id");
+  const lightboxPage = lightboxParams?.["page(gallery|result)"] ?? "gallery";
+  const [isGallery] = useRoute("/gallery");
   const [isIndex] = useRoute("/");
-  const [location] = useLocation();
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    ref.current?.scrollTo(0, 0);
-  }, [location]);
   const [containerTop, setContainerTop] = useState(0);
 
   const handleScroll = () => {
@@ -62,10 +60,15 @@ function Routes() {
     >
       <Header containerTop={containerTop} />
       <AnimatePresence>
-        {isGallery && <Gallery {...AnimationSettings} />}
-        {isConverter && <Converter {...AnimationSettings} />}
-        {isIndex && <TextToImage {...AnimationSettings} />}
         {isSettings && <Settings {...AnimationSettings} />}
+        {isConverter && <Converter {...AnimationSettings} />}
+        {(isGallery || (isLightbox && lightboxPage === "gallery")) && (
+          <Gallery {...AnimationSettings} />
+        )}
+        {(isIndex || (isLightbox && lightboxPage === "result")) && (
+          <TextToImage {...AnimationSettings} />
+        )}
+        {isLightbox && <ImageLightbox key="imgLightbox" />}
       </AnimatePresence>
       <MobileNav />
     </div>

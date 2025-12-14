@@ -4,12 +4,11 @@ import Modal from "client/components/Modal";
 import { Thumbnail } from "client/components/Thumbnail";
 import { Button } from "client/components/ui/button";
 import { ButtonGroup } from "client/components/ui/button-group";
-import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 import { ImageIcon, Trash2Icon, XIcon } from "lucide-react";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { useLocation, useRoute } from "wouter";
-import ImageLightbox from "./ImageLightbox";
+import { useLocation } from "wouter";
 import { RemoveDialog } from "./RemoveDialog";
 import { useImageQuery } from "./useImageQuery";
 
@@ -26,9 +25,6 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       images,
       removeImages,
     } = useImageQuery();
-    const [match] = useRoute("/gallery");
-    const [, params] = useRoute("/gallery/:id");
-    const [appScrollTop, setAppScrollTop] = useState(0);
     const observerTarget = useRef(null);
     const [, navigate] = useLocation();
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -60,14 +56,6 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       setSelectedImages(new Set());
       setShowDeleteDialog(false);
     };
-
-    useEffect(() => {
-      const app = document.querySelector("#app");
-      if (match && app && appScrollTop > 0) {
-        // scroll saved scrollTop after going back from /gallery/:id
-        app.scrollTop = appScrollTop;
-      }
-    }, [match, appScrollTop]);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -197,11 +185,7 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
                       if (isSelectionMode) {
                         toggleSelection(image.url);
                       } else {
-                        const app = document.querySelector("#app");
-                        setAppScrollTop(app?.scrollTop ?? 0);
-                        navigate(`~/gallery/${image.name}`, {
-                          state: { from: "~/gallery" },
-                        });
+                        navigate(`~/gallery/${image.name}`);
                       }
                     }}
                   />
@@ -217,7 +201,6 @@ export const Gallery = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           )}
           <Footer className="col-span-full flex justify-center p-4" />
         </motion.div>
-        <AnimatePresence>{params?.id && <ImageLightbox />}</AnimatePresence>
         <Modal
           isOpen={showDeleteDialog}
           onClose={() => setShowDeleteDialog(false)}

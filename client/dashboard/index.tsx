@@ -105,7 +105,7 @@ function TextToImageAction() {
         <>
           <ZapIcon />
           Generate
-          {store.params.batchMode && `${store.params.batchCount} images`}
+          {store.params.batchMode && ` ${store.params.batchCount} images`}
         </>
       )}
     </Button>
