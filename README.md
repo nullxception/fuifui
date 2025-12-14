@@ -7,7 +7,10 @@ A simple, modern txt2img web UI for [stable-diffusion.cpp](https://github.com/le
 ## Prerequisites
 
 - **[Bun](https://bun.sh/)** as a runtime and package manager.
-- **[stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp)**: You can place `sd` binary from `stable-diffusion.cpp` in `fuifui` directory or system's `$PATH`.
+- **[stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp)**: You can place `sd-cli` binary from `stable-diffusion.cpp` in:
+  - `bin` directory inside `fuifui`
+  - `fuifui` root directory, or
+  - system's `$PATH`.
 
 ## Installation
 

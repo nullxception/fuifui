@@ -81,10 +81,10 @@ export const filterLogs = (message: string) => {
 };
 
 export async function resolveSD() {
-  // sd at project root (./bin/sd, or ./sd) or from $PATH
+  // sd-cli at project root (./bin/sd-cli, or ./sd-cli) or from $PATH
   const project_sd = [
-    path.join(ROOT_DIR, "bin", "sd"),
-    path.join(ROOT_DIR, "sd"),
+    path.join(ROOT_DIR, "bin", "sd-cli"),
+    path.join(ROOT_DIR, "sd-cli"),
   ];
 
   for (const psd of project_sd) {

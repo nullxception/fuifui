@@ -37,6 +37,8 @@ fuifui.service
 
 # stable-diffusion.cpp binary files
 sd
+sd-cli
+sd-server
 lib*.so
 ggml.txt
 *.cpp.txt

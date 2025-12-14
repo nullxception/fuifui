@@ -56,6 +56,7 @@ export function GenerationSettings() {
     "smoothstep",
     "sgm_uniform",
     "simple",
+    "lcm",
   ];
 
   const rngOptions = ["std_default", "cuda", "cpu"];
