@@ -7,28 +7,26 @@ import db from "../db";
 const jobEvents = new EventEmitter();
 const activeProcesses = new Map<string, Subprocess>();
 
-const insertJob = db.prepare(`
+const insertJob = db.query(`
   INSERT INTO jobs (id, type, status, createdAt)
   VALUES ($id, $type, $status, $createdAt)
 `);
 
-const selectJob = db.prepare(`SELECT * FROM jobs WHERE id = $id`);
-const selectJobsByType = db.prepare(
+const selectJob = db.query(`SELECT * FROM jobs WHERE id = $id`);
+const selectJobsByType = db.query(
   `SELECT * FROM jobs WHERE type = $type ORDER BY createdAt DESC`,
 );
-const updateStatus = db.prepare(`
+const updateStatus = db.query(`
   UPDATE jobs 
   SET status = $status, startedAt = $startedAt, completedAt = $completedAt, result = $result
   WHERE id = $id
 `);
 
-const deleteJobByResult = db.prepare(
+const deleteJobByResult = db.query(
   `DELETE FROM jobs WHERE type = $type and result LIKE $pattern`,
 );
 
-const deleteOldJobs = db.prepare(
-  `DELETE FROM jobs WHERE completedAt < $cutoff`,
-);
+const deleteOldJobs = db.query(`DELETE FROM jobs WHERE completedAt < $cutoff`);
 
 const logs = new Map<string, LogEntry[]>();
 
@@ -41,17 +39,17 @@ export function createJob(type: JobType, id?: string) {
   };
 
   insertJob.run({
-    $id: job.id,
-    $type: job.type,
-    $status: job.status,
-    $createdAt: job.createdAt,
+    id: job.id,
+    type: job.type,
+    status: job.status,
+    createdAt: job.createdAt,
   });
 
   return job;
 }
 
 export const getJob = (id: string) => {
-  return jobSchema.safeParse(selectJob.get({ $id: id })).data;
+  return jobSchema.safeParse(selectJob.get({ id })).data;
 };
 
 export const withJobEvents = (predicate: (events: EventEmitter) => void) =>
@@ -103,11 +101,11 @@ export function updateJobStatus({
   }
 
   updateStatus.run({
-    $id: id,
-    $status: status,
-    $startedAt: startedAt,
-    $completedAt: completedAt,
-    $result: result ? result : null,
+    id,
+    status,
+    startedAt,
+    completedAt,
+    result: result ? result : null,
   });
 }
 
@@ -122,7 +120,7 @@ export function addJobLog(type: JobType, log: LogEntry) {
 }
 
 export function getJobs(type: JobType) {
-  return selectJobsByType.all({ $type: type }).reduce((result: Job[], job) => {
+  return selectJobsByType.all({ type }).reduce((result: Job[], job) => {
     const parsed = jobSchema.safeParse(job).data;
     return parsed ? [...result, parsed] : result;
   }, new Array<Job>());
@@ -133,7 +131,7 @@ export function getLogs(id: string) {
 }
 
 export function removeJob(type: JobType, resultPart: string) {
-  deleteJobByResult.run({ $type: type, $pattern: `%${resultPart}%` });
+  deleteJobByResult.run({ type, pattern: `%${resultPart}%` });
 }
 
 export function stopJob(id?: string) {
@@ -154,5 +152,5 @@ export function stopJobs() {
 
 export function cleanupOldJobs(maxAge: number = 24 * 60 * 60 * 1000) {
   const cutoff = Date.now() - maxAge;
-  deleteOldJobs.run({ $cutoff: cutoff });
+  deleteOldJobs.run({ cutoff });
 }

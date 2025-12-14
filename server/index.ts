@@ -2,6 +2,7 @@ import client from "client/index.html";
 import serveStatic from "./api/assets";
 import { readConfig } from "./api/config";
 import { diffusionProgress } from "./api/diffusion";
+import db from "./db";
 import { ensureDirectories } from "./dirs";
 import { handleRPC } from "./rpc";
 import { stopJobs } from "./services/jobs";
@@ -14,6 +15,8 @@ await readConfig(); // initialize config.yaml if not exists
 function cleanup() {
   console.log("Terminating all active jobs...");
   stopJobs();
+  console.log("Closing database...");
+  db.close(false);
   process.exit(0);
 }
 

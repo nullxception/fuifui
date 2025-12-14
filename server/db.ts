@@ -3,7 +3,7 @@ import path from "path";
 import { ROOT_DIR } from "./dirs";
 
 const DB_PATH = path.join(ROOT_DIR, "db.sqlite");
-export const db = new Database(DB_PATH);
+export const db = new Database(DB_PATH, { strict: true });
 
 db.run(`
   CREATE TABLE IF NOT EXISTS jobs (
