@@ -1,3 +1,4 @@
+import { Footer } from "client/components/Footer";
 import { Logo } from "client/components/Header";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { forwardRef } from "react";
@@ -21,6 +22,7 @@ const Settings = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           <SliderSettings />
           <PromptAttachmentEditor />
         </div>
+        <Footer />
       </motion.div>
     );
   },
