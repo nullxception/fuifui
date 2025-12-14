@@ -8,6 +8,7 @@ import type {
   PromptAttachment,
   UserConfig,
 } from "server/types";
+import { userConfigSchema } from "server/types/userConfig";
 
 type Valuable<T> = {
   [K in keyof T as T[K] extends null | undefined ? never : K]: T[K];
@@ -37,13 +38,14 @@ export async function readConfig() {
         .catch(() => false)
     ) {
       const file = await Bun.file(CONFIG_PATH).text();
-      const conf = Bun.YAML.parse(file) as UserConfig;
+      const conf = userConfigSchema.parse(Bun.YAML.parse(file));
       config.diffusion = conf.diffusion;
       config.settings = conf.settings;
       config.promptAttachment = conf.promptAttachment;
-      return conf as UserConfig;
+      return conf;
     } else {
-      return defaultUserConfig() as UserConfig;
+      saveConfig(); // initialize config.yaml
+      return config;
     }
   } catch (error) {
     console.error("Error reading config:", error);
@@ -55,9 +57,9 @@ export async function readConfig() {
   }
 }
 
-async function saveConfig(conf: UserConfig) {
+async function saveConfig() {
   try {
-    const yml = Bun.YAML.stringify(conf, null, 2);
+    const yml = Bun.YAML.stringify(config, null, 2);
     await Bun.write(CONFIG_PATH, yml);
     return {
       success: true,
@@ -75,17 +77,15 @@ async function saveConfig(conf: UserConfig) {
 
 export async function saveAppSettings(settings: AppSettings) {
   config.settings = getValuable(settings || {});
-  return await saveConfig(config);
+  return await saveConfig();
 }
 
-export async function savePromptAttachment(
-  promptAttachment: PromptAttachment[],
-) {
-  config.promptAttachment = promptAttachment;
-  return await saveConfig(config);
+export async function savePromptAttachment(attachments: PromptAttachment[]) {
+  config.promptAttachment = attachments;
+  return await saveConfig();
 }
 
 export async function saveDiffusionParams(params: DiffusionParams) {
   config.diffusion = getValuable(params || {});
-  return await saveConfig(config);
+  return await saveConfig();
 }

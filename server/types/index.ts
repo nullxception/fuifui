@@ -8,7 +8,7 @@ import type {
   PromptAttachmentType,
 } from "./promptAttachment";
 import type { ConvertParams } from "./quantization";
-import type { AppSettings, UserConfig } from "./userconfig";
+import type { AppSettings, UserConfig } from "./userConfig";
 
 export { GGML_WEIGHTS_TYPE };
 

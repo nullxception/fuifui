@@ -17,7 +17,7 @@ import { diffusionParamsSchema } from "./types/diffusionparams";
 import { jobsTypeSchema } from "./types/jobs";
 import { promptAttachmentSchema } from "./types/promptAttachment";
 import { convertParamsSchema } from "./types/quantization";
-import { appSettingsSchema } from "./types/userconfig";
+import { appSettingsSchema } from "./types/userConfig";
 
 const t = initTRPC.create({
   errorFormatter(opts) {

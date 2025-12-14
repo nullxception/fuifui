@@ -1,5 +1,6 @@
 import client from "client/index.html";
 import serveStatic from "./api/assets";
+import { readConfig } from "./api/config";
 import { diffusionProgress } from "./api/diffusion";
 import { ensureDirectories } from "./dirs";
 import { handleRPC } from "./rpc";
@@ -8,6 +9,7 @@ import { stopJobs } from "./services/jobs";
 const PORT = process.env.PORT || 5141;
 
 await ensureDirectories();
+await readConfig(); // initialize config.yaml if not exists
 
 function cleanup() {
   console.log("Terminating all active jobs...");
