@@ -1,8 +1,12 @@
 import { Footer } from "client/components/Footer";
 import { Card } from "client/components/ui/card";
+import { BatchModeSetting } from "./BatchMode";
 import { GenerationSettings } from "./GenerationSettings";
 import { ModelSelector } from "./ModelSelector";
+import { OtherSetting } from "./OtherSetting";
 import { PromptInput } from "./PromptInput";
+import { RNGSetting } from "./RNGSetting";
+import { UpscalerSetting } from "./UpscalerSetting";
 
 export function ControlPanel({ className }: { className?: string }) {
   return (
@@ -10,7 +14,13 @@ export function ControlPanel({ className }: { className?: string }) {
       <Card className="scrollbar-thin flex-1 space-y-4 overflow-y-auto py-4 backdrop-blur-md scrollbar-thumb-secondary scrollbar-track-transparent lg:max-h-full lg:shrink-0">
         <ModelSelector />
         <PromptInput />
-        <GenerationSettings />
+        <div className="grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2">
+          <GenerationSettings />
+          <RNGSetting />
+          <BatchModeSetting />
+          <UpscalerSetting />
+          <OtherSetting />
+        </div>
       </Card>
       <Footer />
     </div>
