@@ -64,7 +64,7 @@ function OutputCard() {
 
   return (
     <>
-      <div className="flex items-center justify-center gap-2 border-b border-border/40 bg-background/20 p-3">
+      <div className="flex items-center justify-center gap-2 border-b border-border bg-background/20 p-3">
         <nav className="flex w-8/10 items-center justify-center gap-2 rounded-lg border border-border bg-background/50 p-1 md:w-6/10">
           {tabItems.map((item) => (
             <AnimatePresence key={item.target} mode="wait">
@@ -74,6 +74,7 @@ function OutputCard() {
                 setActiveEntry={(entry) => setOutputTab(entry.target)}
                 className="w-1/2"
                 groupName="output-tabs"
+                hideInactiveIcons={false}
               />
             </AnimatePresence>
           ))}

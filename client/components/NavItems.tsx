@@ -13,6 +13,7 @@ export interface NavItemProps<T> {
   isActive: boolean;
   setActiveEntry: (item: NavEntry<T>) => void;
   className?: string;
+  hideInactiveIcons?: boolean;
 }
 
 export function NavItem<T>({
@@ -21,6 +22,7 @@ export function NavItem<T>({
   isActive,
   setActiveEntry,
   className = "",
+  hideInactiveIcons = true,
 }: NavItemProps<T>) {
   const Icon = entry.icon;
   const pillLayoutId = `active-pill-${groupName}`;
@@ -28,19 +30,20 @@ export function NavItem<T>({
   return (
     <div
       onClick={() => setActiveEntry(entry)}
-      className={`relative z-10 flex cursor-pointer flex-row items-center justify-center gap-2 px-2 py-0.5 text-sm font-medium text-white transition-colors duration-300 hover:text-gray-200 ${className}`}
+      className={`relative z-10 flex cursor-pointer flex-row items-center justify-center gap-2 px-2 py-0.5 text-sm font-medium text-white transition-colors duration-300 select-none hover:text-gray-200 ${className}`}
     >
       {isActive && (
         <motion.div
           layoutId={pillLayoutId}
-          className="absolute inset-0 -z-10 rounded-md bg-primary/60"
+          className="absolute inset-0 -z-10 rounded-md bg-primary/50"
         />
       )}
-      {isActive && (
+      {hideInactiveIcons && isActive && (
         <motion.div layoutId={iconLayoutId}>
           <Icon className="w-4" />
         </motion.div>
       )}
+      {!hideInactiveIcons && <Icon className="w-4" />}
       <motion.div layout className="relative z-20">
         {entry.name}
       </motion.div>
