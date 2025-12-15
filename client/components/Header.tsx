@@ -15,8 +15,8 @@ export function Logo({ className = "" }: { className?: string }) {
   );
 }
 
-const navItems = [
-  { name: "Home", target: "/", icon: ZapIcon },
+export const navItems = [
+  { name: "Diffusion", target: "/", icon: ZapIcon },
   { name: "Gallery", target: "/gallery", icon: ImageIcon },
   { name: "Converter", target: "/converter", icon: AtomIcon },
   { name: "Settings", target: "/settings", icon: SettingsIcon },

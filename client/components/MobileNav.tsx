@@ -1,74 +1,34 @@
-import { Button } from "client/components/ui/button";
-import {
-  AtomIcon,
-  ImageIcon,
-  SettingsIcon,
-  ZapIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "wouter";
-
-function NavButton({
-  isActive = false,
-  icon = ImageIcon,
-  ...props
-}: React.ComponentProps<"button"> & {
-  isActive?: boolean;
-  icon?: LucideIcon;
-}) {
-  const Icon = icon;
-  return (
-    <Button
-      variant={isActive ? null : "ghost"}
-      size="sm"
-      className={`flex h-13 items-center justify-center rounded-3xl p-4 ${isActive ? "bg-primary/40 text-foreground" : "text-foreground/50"}`}
-      {...props}
-    >
-      <div className="flex items-center justify-center gap-2">
-        <Icon />
-        {isActive && <span className="text-xs">{props.children}</span>}
-      </div>
-    </Button>
-  );
-}
+import { navItems } from "./Header";
 
 export function MobileNav() {
   const [location, navigate] = useLocation();
 
   return (
-    <>
-      <footer className="fixed -bottom-1 z-1 flex h-18 w-full max-w-screen-2xl items-center justify-center rounded-t-2xl border border-b-0 border-border bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 md:hidden">
-        <NavButton
-          icon={ZapIcon}
-          onClick={() => navigate("/")}
-          isActive={location === "/"}
-        >
-          Diffusion
-        </NavButton>
-        <NavButton
-          icon={ImageIcon}
-          onClick={() => navigate("/gallery")}
-          isActive={location.startsWith("/gallery")}
-        >
-          Gallery
-        </NavButton>
-
-        <NavButton
-          isActive={location.startsWith("/converter")}
-          onClick={() => navigate("/converter")}
-          icon={AtomIcon}
-        >
-          Converter
-        </NavButton>
-
-        <NavButton
-          icon={SettingsIcon}
-          isActive={location === "/settings"}
-          onClick={() => navigate("/settings")}
-        >
-          Settings
-        </NavButton>
-      </footer>
-    </>
+    <footer className="fixed -bottom-1 z-1 flex h-18 w-full max-w-screen-2xl items-center justify-center rounded-t-2xl border border-b-0 border-border bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 md:hidden">
+      {navItems.map((item) => (
+        <AnimatePresence key={item.name} mode="wait">
+          <motion.div
+            layout
+            onClick={() => navigate(item.target)}
+            className={`relative z-10 flex h-11 cursor-pointer flex-row items-center justify-center gap-2 px-4 py-0.5 text-sm font-medium text-white transition-colors duration-300 hover:text-gray-200`}
+          >
+            {location === item.target && (
+              <motion.div
+                layoutId="mobileActivePill"
+                className="absolute inset-0 -z-10 rounded-4xl border border-primary/60 bg-primary/30"
+              />
+            )}
+            <item.icon
+              className={`p-0.5 ${location !== item.target && "opacity-50"}`}
+            />
+            {location === item.target && (
+              <motion.div layoutId="mobileActiveName">{item.name}</motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      ))}
+    </footer>
   );
 }
