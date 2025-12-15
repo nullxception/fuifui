@@ -162,7 +162,7 @@ function TextToImageAction() {
         onClick={handleDiffusion}
         variant="ghost"
         size="lg"
-        className={`my-1 flex w-full cursor-pointer flex-row items-center justify-center gap-2 rounded-xl`}
+        className={`my-1 flex w-full cursor-pointer flex-row items-center justify-center gap-2 rounded-xl hover:bg-background!`}
       >
         {isProcessing ? (
           <>
