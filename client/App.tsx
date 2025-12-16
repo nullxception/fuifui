@@ -6,8 +6,8 @@ import {
   isNonJsonSerializable,
   splitLink,
 } from "@trpc/client";
-import { AnimatePresence } from "framer-motion";
-import { StrictMode, useEffect, useRef, useState } from "react";
+import { AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
+import { StrictMode, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { AppRouter } from "server/rpc";
 import { useRoute } from "wouter";
@@ -37,39 +37,42 @@ function Routes() {
   const lightboxPage = lightboxParams?.["page(gallery|result)"] ?? "gallery";
   const [isGallery] = useRoute("/gallery");
   const [isIndex] = useRoute("/");
+
+  return (
+    <AnimatePresence>
+      {isSettings && <Settings {...AnimationSettings} />}
+      {isConverter && <Converter {...AnimationSettings} />}
+      {(isGallery || (isLightbox && lightboxPage === "gallery")) && (
+        <Gallery {...AnimationSettings} />
+      )}
+      {(isIndex || (isLightbox && lightboxPage === "result")) && (
+        <TextToImage {...AnimationSettings} />
+      )}
+      {isLightbox && <ImageLightbox key="imgLightbox" />}
+    </AnimatePresence>
+  );
+}
+
+function AppLayout() {
   const ref = useRef<HTMLDivElement>(null);
-  const [containerTop, setContainerTop] = useState(0);
+  const { scrollY } = useScroll({ container: ref });
+  const [coversContent, setCoversContent] = useState(false);
 
-  const handleScroll = () => {
-    setContainerTop(ref?.current?.scrollTop ?? 0);
-  };
-
-  useEffect(() => {
-    const container = ref?.current;
-    container?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      container?.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 10 && !coversContent) {
+      setCoversContent(true);
+    } else if (latest <= 10 && coversContent) {
+      setCoversContent(false);
+    }
+  });
 
   return (
     <div
       ref={ref}
       className="scrollbar-thin flex h-screen w-full flex-1 flex-col overflow-y-scroll pb-18 font-sans text-foreground scrollbar-thumb-accent scrollbar-track-transparent selection:bg-primary selection:text-primary-foreground md:pb-0"
     >
-      <Header containerTop={containerTop} />
-      <AnimatePresence>
-        {isSettings && <Settings {...AnimationSettings} />}
-        {isConverter && <Converter {...AnimationSettings} />}
-        {(isGallery || (isLightbox && lightboxPage === "gallery")) && (
-          <Gallery {...AnimationSettings} />
-        )}
-        {(isIndex || (isLightbox && lightboxPage === "result")) && (
-          <TextToImage {...AnimationSettings} />
-        )}
-        {isLightbox && <ImageLightbox key="imgLightbox" />}
-      </AnimatePresence>
+      <Header withBackground={coversContent} />
+      <Routes />
       <MobileNav />
     </div>
   );
@@ -93,7 +96,7 @@ function App() {
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
           <BackgroundLayer />
-          <Routes />
+          <AppLayout />
           <div id="modal-root"></div>
         </ThemeProvider>
       </TRPCProvider>

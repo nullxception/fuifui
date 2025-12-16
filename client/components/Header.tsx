@@ -22,12 +22,12 @@ export const navItems = [
   { name: "Settings", target: "/settings", icon: SettingsIcon },
 ];
 
-export function Header({ containerTop }: { containerTop: number }) {
+export function Header({ withBackground }: { withBackground: boolean }) {
   const [location, navigate] = useLocation();
 
   return (
     <header
-      className={`sticky top-0 z-3 hidden w-full justify-center ${containerTop > 10 && "border-b border-border bg-background/60 backdrop-blur"} md:flex`}
+      className={`sticky top-0 z-3 hidden w-full justify-center ${withBackground && "border-b border-border bg-background/60 backdrop-blur"} md:flex`}
     >
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-2">
         <Logo className="px-4" />
