@@ -9,7 +9,7 @@ import { useTRPC } from "client/query";
 import { useAppStore } from "client/stores/useAppStore";
 import { usePreviewImage } from "client/stores/usePreviewImage";
 import type { Timeout } from "client/types";
-import { differenceInSeconds } from "date-fns";
+import { formatDuration, intervalToDuration } from "date-fns";
 import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import {
   CircleStopIcon,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
+import type { Job } from "server/types";
 import { useShallow } from "zustand/react/shallow";
 import { ConsoleOutput } from "../components/ConsoleOutput";
 import { ControlPanel } from "./ControlPanel";
@@ -32,6 +33,24 @@ const tabItems: Array<NavEntry<TabType>> = [
   { name: "Image", target: "image", icon: ImageIcon },
   { name: "Console", target: "console", icon: TerminalIcon },
 ];
+
+function getCompletionTime(job: Job) {
+  if (!job.completedAt) return;
+  const start = new Date(job.createdAt);
+  const end = new Date(job.completedAt);
+  const duration = intervalToDuration({ start, end });
+  const units = { xHours: "h", xMinutes: "m", xSeconds: "s" };
+  return formatDuration(duration, {
+    format: ["hours", "minutes", "seconds"],
+    delimiter: " ",
+    locale: {
+      formatDistance: (token, count) => {
+        const unit = Object.entries(units).find(([k]) => k === token)?.[1];
+        return unit ? `${count}${unit}` : "";
+      },
+    },
+  });
+}
 
 function OutputCard() {
   const { status: job, logs, listJobs } = useContext(JobQueryContext);
@@ -48,15 +67,9 @@ function OutputCard() {
   const compTimeRef = useRef<Timeout | null>(null);
 
   const last =
-    from === "txt2img" && job?.status === "completed" && listJobs?.[0];
+    from === "txt2img" && job?.status === "completed" ? listJobs?.[0] : null;
   const completionTime =
-    last &&
-    urls &&
-    urls[0] &&
-    last.result?.includes(urls[0]) &&
-    last.createdAt &&
-    last.completedAt &&
-    differenceInSeconds(new Date(last.completedAt), new Date(last.createdAt));
+    urls?.[0] && last?.result?.includes(urls?.[0]) && getCompletionTime(last);
 
   useEffect(() => {
     if (!completionTime || showCompletionTime !== null) return;
@@ -120,7 +133,7 @@ function OutputCard() {
                   exit={{ opacity: 0, width: 0 }}
                   className="overflow-clip text-nowrap"
                 >
-                  Completed in {completionTime}s
+                  Completed in {completionTime}
                 </motion.div>
               )}
             </AnimatePresence>
