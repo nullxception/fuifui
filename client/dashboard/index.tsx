@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
+import { useShallow } from "zustand/react/shallow";
 import { ConsoleOutput } from "../components/ConsoleOutput";
 import { ControlPanel } from "./ControlPanel";
 import { ImageDisplay } from "./ImageDisplay";
@@ -35,8 +36,10 @@ const tabItems: Array<NavEntry<TabType>> = [
 function OutputCard() {
   const { status: job, logs, listJobs } = useContext(JobQueryContext);
   const isProcessing = job?.status === "running";
-  const { outputTab, setOutputTab } = useAppStore();
-  const { urls, from } = usePreviewImage();
+  const outputTab = useAppStore((s) => s.outputTab);
+  const { urls, from } = usePreviewImage(
+    useShallow((s) => ({ urls: s.urls, from: s.from })),
+  );
   const { images } = useImageQuery();
   const resultImages = images.filter((it) => urls?.includes(it.url));
   const [showCompletionTime, setShowCompletionTime] = useState<boolean | null>(
@@ -74,7 +77,9 @@ function OutputCard() {
               <NavItem
                 entry={item}
                 isActive={outputTab === item.target}
-                setActiveEntry={(entry) => setOutputTab(entry.target)}
+                setActiveEntry={(entry) =>
+                  useAppStore.getState().setOutputTab(entry.target)
+                }
                 className="w-1/2"
                 groupName="output-tabs"
                 hideInactiveIcons={false}

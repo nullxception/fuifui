@@ -116,7 +116,6 @@ export default function ImageMetadata({
   const [, navigate] = useLocation();
   const store = useDiffusionConfig();
   const metadata = image.metadata;
-  const { setPreviewImages: setPreviewImage } = usePreviewImage();
 
   const handleRemake = () => {
     if (!metadata) return;
@@ -136,7 +135,7 @@ export default function ImageMetadata({
     });
 
     // Navigate back to generate tab
-    setPreviewImage("gallery", [image.url]);
+    usePreviewImage.getState().setPreviewImages("gallery", [image.url]);
     navigate("~/");
     onClose();
   };

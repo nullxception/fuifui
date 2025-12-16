@@ -42,7 +42,7 @@ function LogsPanel({ className }: { className?: string }) {
 function ConverterPanel() {
   const [model, setModel] = useState("");
   const [output, setOutput] = useState("");
-  const { hideGGUF, setHideGGUF } = useAppStore();
+  const hideGGUF = useAppStore((s) => s.hideGGUF);
   const [type, setType] = useState("q8_0");
   const rpc = useTRPC();
   const { data: models } = useQuery(rpc.listModels.queryOptions());
@@ -103,7 +103,7 @@ function ConverterPanel() {
               <Switch
                 id="filterModel"
                 checked={hideGGUF}
-                onCheckedChange={(e) => setHideGGUF(e)}
+                onCheckedChange={(e) => useAppStore.getState().setHideGGUF(e)}
                 title=""
               />
             </div>

@@ -23,8 +23,6 @@ export const useJobQuery = (type: JobType) => {
   const { data: listJobs } = useQuery(
     rpc.listJobs.queryOptions(type, { staleTime: 0 }),
   );
-  const { setOutputTab } = useAppStore();
-  const { setPreviewImages } = usePreviewImage();
   const closingRef = useRef<Timeout | null>(null);
   const queryClient = useQueryClient();
 
@@ -65,7 +63,7 @@ export const useJobQuery = (type: JobType) => {
     es.addEventListener("open", () => {
       setLogs([]);
       setStatus({ id, status: "running" });
-      setOutputTab("console");
+      useAppStore.getState().setOutputTab("console");
     });
 
     es.addEventListener("message", (event) => {
@@ -88,7 +86,9 @@ export const useJobQuery = (type: JobType) => {
         });
 
         setStatus({ id, status: "completed" });
-        setPreviewImages("txt2img", z.string().parse(event.data).split(","));
+        usePreviewImage
+          .getState()
+          .setPreviewImages("txt2img", z.string().parse(event.data).split(","));
         close("completed");
       } catch (e) {
         console.error(e);
@@ -113,15 +113,7 @@ export const useJobQuery = (type: JobType) => {
         }, 500);
       }
     });
-  }, [
-    listJobs,
-    queryClient,
-    rpc.listImages,
-    rpc.listJobs,
-    setOutputTab,
-    setPreviewImages,
-    status,
-  ]);
+  }, [listJobs, queryClient, rpc.listImages, rpc.listJobs, status]);
 
   useEffect(() => {
     return () => {
