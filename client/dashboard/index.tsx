@@ -53,7 +53,7 @@ function getCompletionTime(job: Job) {
 }
 
 function OutputCard() {
-  const { status: job, logs, recentJob } = useContext(JobQueryContext);
+  const { job, logs } = useContext(JobQueryContext);
   const isProcessing = job?.status === "running";
   const outputTab = useAppStore((s) => s.outputTab);
   const { urls, from } = usePreviewImage(
@@ -66,8 +66,7 @@ function OutputCard() {
   );
   const compTimeRef = useRef<Timeout | null>(null);
 
-  const last =
-    from === "txt2img" && job?.status === "completed" ? recentJob : null;
+  const last = from === "txt2img" && job?.status === "completed" ? job : null;
   const completionTime =
     urls?.[0] && last?.result?.includes(urls?.[0]) && getCompletionTime(last);
 
@@ -146,7 +145,7 @@ function OutputCard() {
 }
 
 function TextToImageAction() {
-  const { status: job, connect, setError } = useContext(JobQueryContext);
+  const { job, connect, setError, stop } = useContext(JobQueryContext);
   const store = useDiffusionConfig();
   const rpc = useTRPC();
   const { data: models } = useQuery(rpc.listModels.queryOptions());
@@ -155,17 +154,29 @@ function TextToImageAction() {
       onError(error) {
         setError(error.message);
       },
-      onSuccess(data) {
-        connect(data.jobId);
+      onSuccess() {
+        connect();
       },
     }),
   );
-  const diffusionStop = useMutation(rpc.stopDiffusion.mutationOptions());
 
+  const diffusionStop = useMutation(
+    rpc.stopDiffusion.mutationOptions({
+      onError(err) {
+        setError(err.message);
+        stop();
+      },
+      onSuccess() {
+        stop();
+      },
+    }),
+  );
+
+  const isProcessing = job?.status === "running" || job?.status === "pending";
   const handleDiffusion = async () => {
-    if (job?.status === "running" && job?.id) {
-      diffusionStop.mutate(job?.id);
-    } else {
+    if (isProcessing && job?.id) {
+      diffusionStop.mutate(job.id);
+    } else if (!isProcessing) {
       await store.updateAll({
         prompt: optimizePrompt(store.params.prompt, models),
         negativePrompt: optimizePrompt(store.params.negativePrompt, models),
@@ -173,7 +184,7 @@ function TextToImageAction() {
       diffusionStart.mutate(store.params);
     }
   };
-  const isProcessing = job?.status === "running" || job?.status === "pending";
+
   return (
     <div className="relative">
       <div

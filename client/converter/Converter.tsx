@@ -29,7 +29,7 @@ import { forwardRef, useContext, useState } from "react";
 import { GGML_WEIGHTS_TYPE } from "server/types";
 
 function LogsPanel({ className }: { className?: string }) {
-  const { status: job, logs } = useContext(JobQueryContext);
+  const { job, logs } = useContext(JobQueryContext);
 
   return (
     <div
@@ -47,19 +47,29 @@ function ConverterPanel() {
   const [type, setType] = useState("q8_0");
   const rpc = useTRPC();
   const { data: models } = useQuery(rpc.listModels.queryOptions());
-  const { status: job, connect, setError } = useContext(JobQueryContext);
+  const { job, connect, setError, stop } = useContext(JobQueryContext);
   const isOutputExists = models?.checkpoints.includes(output);
   const quantizationStart = useMutation(
     rpc.startQuantization.mutationOptions({
       onError(err) {
         setError(err.message);
       },
-      onSuccess(data) {
-        connect(data.jobId);
+      onSuccess() {
+        connect();
       },
     }),
   );
-  const quantizationStop = useMutation(rpc.stopQuantization.mutationOptions());
+  const quantizationStop = useMutation(
+    rpc.stopQuantization.mutationOptions({
+      onError(err) {
+        setError(err.message);
+        stop();
+      },
+      onSuccess() {
+        stop();
+      },
+    }),
+  );
 
   const filteredModels = hideGGUF
     ? models?.checkpoints.filter((m) => !m.endsWith(".gguf"))
