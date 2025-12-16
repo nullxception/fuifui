@@ -1,3 +1,4 @@
+import type { Timeout } from "client/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDiffusionConfig } from "./useDiffusionConfig";
 
@@ -20,7 +21,7 @@ export function usePromptState(type: PromptType) {
     changed: false,
   }));
 
-  const debounceTimerRef = useRef<number>(null);
+  const debounceTimerRef = useRef<Timeout | null>(null);
 
   // Only update if user isn't actively editing and values are different
   if (!state.changed && state.value !== storeValue) {
@@ -62,7 +63,7 @@ export function usePromptState(type: PromptType) {
 
       setState((prev) => ({ ...prev, changed: true }));
 
-      debounceTimerRef.current = window.setTimeout(() => {
+      debounceTimerRef.current = setTimeout(() => {
         saveToStore(value);
         debounceTimerRef.current = null;
       }, DEBOUNCE_DELAY);

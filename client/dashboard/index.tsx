@@ -8,6 +8,7 @@ import { JobQueryContext, JobQueryProvider } from "client/hooks/useJobQuery";
 import { useTRPC } from "client/query";
 import { useAppStore } from "client/stores/useAppStore";
 import { usePreviewImage } from "client/stores/usePreviewImage";
+import type { Timeout } from "client/types";
 import { differenceInSeconds } from "date-fns";
 import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import {
@@ -17,7 +18,7 @@ import {
   TerminalIcon,
   ZapIcon,
 } from "lucide-react";
-import { forwardRef, useContext, useEffect, useState } from "react";
+import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
 import { ConsoleOutput } from "../components/ConsoleOutput";
 import { ControlPanel } from "./ControlPanel";
@@ -41,6 +42,7 @@ function OutputCard() {
   const [showCompletionTime, setShowCompletionTime] = useState<boolean | null>(
     null,
   );
+  const compTimeRef = useRef<Timeout | null>(null);
 
   const last =
     from === "txt2img" && job?.status === "completed" && listJobs?.[0];
@@ -55,7 +57,8 @@ function OutputCard() {
 
   useEffect(() => {
     if (!completionTime || showCompletionTime !== null) return;
-    setTimeout(() => {
+    if (compTimeRef.current) clearTimeout(compTimeRef.current);
+    compTimeRef.current = setTimeout(() => {
       if (showCompletionTime === null) {
         setShowCompletionTime(false);
       }

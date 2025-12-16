@@ -29,7 +29,7 @@ const ExtraSelector: React.FC<{
         if (e) {
           onAddExtra(e);
           // reset value after selecting
-          setTimeout(() => setValue(""));
+          setValue("");
         }
       }}
     >

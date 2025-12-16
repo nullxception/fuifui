@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "client/query";
 import { usePreviewImage } from "client/stores/usePreviewImage";
+import type { Timeout } from "client/types";
 import { createContext, useEffect, useRef, useState } from "react";
 import type { JobStatus, JobType, LogEntry } from "server/types";
 import { logEntrySchema } from "server/types/jobs";
@@ -12,8 +13,6 @@ interface UIJobStatus {
   id: string;
   status: JobStatus;
 }
-
-type Timeout = ReturnType<typeof setTimeout>;
 
 export const useJobQuery = (type: JobType) => {
   const [status, setStatus] = useState<UIJobStatus | null>(null);
@@ -42,22 +41,19 @@ export const useJobQuery = (type: JobType) => {
     }
     const hasJobs = listJobs && listJobs.length > 0;
     const recentJob = hasJobs && listJobs[0];
-    if (!status && recentJob && recentJob.status === "running") {
-      setTimeout(() => {
-        setStatus({ id: recentJob.id, status: "pending" });
-      }, 60);
+    let active = status;
+    if (!active && recentJob && recentJob.status === "running") {
+      active = { id: recentJob.id, status: "pending" };
     }
-  }, [listJobs, type, location, status]);
 
-  useEffect(() => {
-    if (!status || status.status !== "pending" || !status.id.includes("-")) {
+    if (!active || active.status !== "pending" || !active.id.includes("-")) {
       return;
     }
 
     if (esRef.current) {
       esRef.current.close();
     }
-    const id = status.id;
+    const id = active.id;
     const es = new EventSource(`/api/jobs/${id}`);
     esRef.current = es;
 
@@ -74,6 +70,9 @@ export const useJobQuery = (type: JobType) => {
 
     es.addEventListener("message", (event) => {
       try {
+        if (status?.status !== "running") {
+          setStatus({ id, status: "running" });
+        }
         addLog(logEntrySchema.parse(JSON.parse(event.data)));
       } catch (e) {
         console.error(e);
@@ -115,6 +114,7 @@ export const useJobQuery = (type: JobType) => {
       }
     });
   }, [
+    listJobs,
     queryClient,
     rpc.listImages,
     rpc.listJobs,
@@ -140,7 +140,7 @@ export const useJobQuery = (type: JobType) => {
     addLog,
     connect(id: string) {
       if (status?.id === id && status.status === "pending") return;
-      esRef.current?.close();
+      esRef.current?.close?.();
       esRef.current = null;
       setStatus({ id, status: "pending" });
     },

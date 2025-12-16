@@ -69,11 +69,9 @@ export default function ImageLightbox() {
 
   const close = useCallback(() => {
     setPage({ ...page, lastImage: image });
-    setTimeout(() => {
-      if (isMd) {
-        showMetadata(false);
-      }
-    }, 300);
+    if (isMd) {
+      showMetadata(false);
+    }
 
     navigate(fromResult ? "~/" : "~/gallery", { replace: true });
   }, [fromResult, image, isMd, navigate, page]);
@@ -101,11 +99,6 @@ export default function ImageLightbox() {
 
   const onImageRemoved = () => {
     showRemoveDialog(false);
-    setTimeout(() => {
-      if (isMd) {
-        showMetadata(false);
-      }
-    }, 300);
     if (hasNext) {
       goto("next");
     } else if (hasPrev) {
