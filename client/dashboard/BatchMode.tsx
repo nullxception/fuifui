@@ -1,4 +1,4 @@
-import { SliderInput } from "client/components/SliderInput";
+import { NumberInput } from "client/components/NumberInput";
 import { Label } from "client/components/ui/label";
 import { Switch } from "client/components/ui/switch";
 import { useDiffusionConfig } from "./useDiffusionConfig";
@@ -18,15 +18,23 @@ export function BatchModeSetting() {
           onCheckedChange={(e) => store.update("batchMode", e)}
         />
       </div>
-      <SliderInput
-        label="Batch size"
-        valueDisplay={store.params.batchCount}
-        min={2}
-        max={100}
-        value={store.params.batchCount ?? 2}
-        onChange={(e) => store.update("batchCount", e)}
-        disabled={!store.params.batchMode}
-      />
+      <div className="flex items-center justify-between">
+        <Label
+          htmlFor="batchCount"
+          className={!store.params.batchMode ? "opacity-50" : ""}
+        >
+          Batch size
+        </Label>
+        <NumberInput
+          id="batchCount"
+          min={2}
+          step={1}
+          value={store.params.batchCount ?? 2}
+          onChange={(e) => store.update("batchCount", e)}
+          className="w-30"
+          disabled={!store.params.batchMode}
+        />
+      </div>
     </>
   );
 }
