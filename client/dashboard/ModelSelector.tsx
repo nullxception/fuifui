@@ -28,7 +28,7 @@ export function ModelSelector() {
           <SelectTrigger id="modelSelect" className="w-full">
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               {data &&
                 data.checkpoints.map((model) => (
@@ -50,7 +50,7 @@ export function ModelSelector() {
           <SelectTrigger id="modelTypeSelect" className="w-full">
             <SelectValue placeholder="Select a model type" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem key="standalone" value="standalone">
                 Standalone Model
@@ -78,7 +78,7 @@ export function ModelSelector() {
           <SelectTrigger id="vaeSelect" className="w-full">
             <SelectValue placeholder="Select VAE" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {data &&
@@ -107,7 +107,7 @@ export function ModelSelector() {
           <SelectTrigger id="clipLSSelect" className="w-full">
             <SelectValue placeholder="Select CLIP-L" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {data &&
@@ -136,7 +136,7 @@ export function ModelSelector() {
           <SelectTrigger id="clipGSelect" className="w-full">
             <SelectValue placeholder="Select CLIP-G" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {data &&
@@ -165,7 +165,7 @@ export function ModelSelector() {
           <SelectTrigger id="t5xxlSelect" className="w-full">
             <SelectValue placeholder="Select T5 XXL" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {data &&
@@ -194,7 +194,7 @@ export function ModelSelector() {
           <SelectTrigger id="llmSelect" className="w-full">
             <SelectValue placeholder="Select LLM" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {data &&
@@ -223,7 +223,7 @@ export function ModelSelector() {
           <SelectTrigger id="quantizationTypeSelect" className="w-full">
             <SelectValue placeholder="Select quantization type" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {GGML_WEIGHTS_TYPE.map((it) => (

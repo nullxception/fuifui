@@ -33,12 +33,12 @@ const ExtraSelector: React.FC<{
         }
       }}
     >
-      <SelectTrigger className="w-full" indicator="plus">
+      <SelectTrigger className="w-full">
         <SelectValue
           placeholder={`Add ${type === "lora" ? "LoRA" : "Embedding"}`}
         />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
         {extras.map((extra) => (
           <SelectItem key={extra} value={extra}>
             {extra}

@@ -157,7 +157,7 @@ function PromptAttachmentForm({
               <SelectTrigger className="shrink-0">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
                 <SelectGroup>
                   <SelectItem value="embedding">Embedding</SelectItem>
                   <SelectItem value="lora">LoRA</SelectItem>
@@ -173,7 +173,7 @@ function PromptAttachmentForm({
               <SelectTrigger className="grow overflow-hidden">
                 <SelectValue placeholder={`Select ${typeLabel}...`} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
                 <SelectGroup>
                   <SelectLabel>Select {entry.type}</SelectLabel>
                   {availableTargets.map((target) => (

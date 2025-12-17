@@ -101,7 +101,7 @@ export function GenerationSettings() {
           <SelectTrigger id="samplingMethodSelect" className="w-full">
             <SelectValue placeholder={`Sampling method`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {samplingMethods.map((method) => (
@@ -129,7 +129,7 @@ export function GenerationSettings() {
           <SelectTrigger id="schedulerSelect" className="w-full">
             <SelectValue placeholder={`Scheduler`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {schedulers.map((sched) => (

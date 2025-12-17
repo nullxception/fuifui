@@ -40,7 +40,7 @@ export function UpscalerSetting() {
           <SelectTrigger id="upscaleModelSelect" className="w-full">
             <SelectValue placeholder="Select Upscaler" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               <SelectItem value="unset">unset</SelectItem>
               {models?.upscalers.map((model) => (

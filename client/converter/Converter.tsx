@@ -124,7 +124,7 @@ function ConverterPanel() {
             <SelectTrigger id="modelTargetSelect" className="w-full">
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
               {filteredModels?.map((m) => (
                 <SelectItem key={m} value={m}>
                   {m}
@@ -140,7 +140,7 @@ function ConverterPanel() {
             <SelectTrigger id="quantizationTargetSelect" className="w-1/2">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
               {GGML_WEIGHTS_TYPE.map((t) => (
                 <SelectItem key={t} value={t}>
                   {t}

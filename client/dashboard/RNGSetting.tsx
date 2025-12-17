@@ -30,7 +30,7 @@ export function RNGSetting() {
           <SelectTrigger id="rngSelect" className="w-full">
             <SelectValue placeholder={`RNG`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               {rngOptions.map((rng) => (
                 <SelectItem key={rng} value={rng}>
@@ -51,7 +51,7 @@ export function RNGSetting() {
           <SelectTrigger id="samplerRng" className="w-full">
             <SelectValue placeholder={`Sampler RNG`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
             <SelectGroup>
               {rngOptions.map((rng) => (
                 <SelectItem key={rng} value={rng}>
