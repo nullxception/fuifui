@@ -33,7 +33,7 @@ function LogsPanel({ className }: { className?: string }) {
 
   return (
     <div
-      className={`overflow-clip rounded-xl border border-border backdrop-blur-md lg:mb-4 ${className}`}
+      className={`overflow-clip rounded-xl border border-border backdrop-blur-xs lg:mb-4 ${className}`}
     >
       <ConsoleOutput logs={logs.filter((log) => log.jobId === job?.id)} />
     </div>
@@ -101,7 +101,7 @@ function ConverterPanel() {
   };
 
   return (
-    <Card className="scrollbar-thin w-full flex-1 grow gap-0 space-y-4 overflow-y-auto py-4 backdrop-blur-md scrollbar-thumb-secondary scrollbar-track-transparent lg:max-h-full lg:shrink-0">
+    <Card className="scrollbar-thin w-full flex-1 grow gap-0 space-y-4 overflow-y-auto py-4 backdrop-blur-xs scrollbar-thumb-secondary scrollbar-track-transparent lg:max-h-full lg:shrink-0">
       <CardHeader>
         <CardTitle>Model Weight Converter</CardTitle>
       </CardHeader>

@@ -177,7 +177,7 @@ export default function ImageMetadata({
         <ChevronDownIcon className="text-foreground" />
       </Button>
       <div
-        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-2 overflow-y-auto rounded-t-lg border-border bg-clip-border px-4 backdrop-blur-sm scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-100 md:rounded-none md:border-l ${className}`}
+        className={`bg-surface/95 scrollbar-thin flex h-[65vh] w-full flex-col gap-2 overflow-y-auto rounded-t-lg border-border bg-clip-border px-4 backdrop-blur-xs scrollbar-thumb-secondary scrollbar-track-transparent md:h-full md:w-100 md:rounded-none md:border-l ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between py-2 pt-4">

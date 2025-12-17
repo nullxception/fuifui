@@ -142,19 +142,19 @@ export default function ImageLightbox() {
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-3 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
+        className="fixed inset-0 z-3 flex h-full w-screen flex-col overflow-hidden bg-background/90 shadow-2xl backdrop-blur-xs md:h-screen md:flex-row"
         transition={{ duration: 0.3 }}
-        initial={{ opacity: 0, scale: 1.3, filter: "blur(10px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 1.3, filter: "blur(10px)" }}
+        initial={{ opacity: 0, scale: 1.3 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 1.3 }}
       >
         <motion.div
           className="relative flex flex-1 items-stretch justify-center overflow-hidden"
           ref={ref}
           transition={{ duration: 0.3 }}
-          initial={{ opacity: 0, scale: 0.6, filter: "blur(10px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, scale: 0.6, filter: "blur(10px)" }}
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.6 }}
         >
           <DottedBackground />
           <AnimatePresence initial={false}>

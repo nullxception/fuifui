@@ -355,13 +355,14 @@ export function PromptAttachmentEditor() {
 
   return (
     <>
-      <div className="col-span-1 row-span-1 flex flex-row items-center justify-between bg-background/60 px-2 py-2 backdrop-blur-sm md:col-span-2">
+      <div className="col-span-1 row-span-1 flex flex-row items-center justify-between px-2 py-1 pt-2 md:col-span-2">
         <h2>Prompt Attachment</h2>
         <Button
           onClick={handleAdd}
           variant="outline"
           size="sm"
           disabled={newEntry !== null}
+          className="bg-background/75!"
         >
           <PlusIcon />
           Add Entry
@@ -395,7 +396,7 @@ export function PromptAttachmentEditor() {
           {promptAttachment?.map((entry, index) => (
             <motion.div
               layout
-              className="w-full rounded-none border-2 border-dashed bg-background/60 p-4 backdrop-blur-sm"
+              className="w-full rounded-none border-2 border-dashed bg-background/60 p-4 backdrop-blur-xs"
             >
               <Modal
                 isOpen={editingIndex === index && editingEntry !== null}

@@ -22,7 +22,7 @@ export default function Modal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           ref={ref}
-          className="fixed inset-0 z-5 flex items-center-safe justify-center bg-background/60 backdrop-blur-sm"
+          className="fixed inset-0 z-5 flex items-center-safe justify-center bg-background/75 backdrop-blur-xs"
           onClick={(e) => {
             if (e.target === ref.current) {
               onClose();
@@ -32,9 +32,9 @@ export default function Modal({
           <motion.div
             layoutId="rootModalFadeZoom"
             transition={{ duration: 0.3 }}
-            initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+            initial={{ opacity: 0, scale: 0.8, filter: "blur(4px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0)" }}
-            exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+            exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)" }}
             ref={ref}
             className="flex items-center-safe justify-center"
             onClick={(e) => {

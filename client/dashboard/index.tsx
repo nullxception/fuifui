@@ -108,7 +108,7 @@ function OutputCard() {
             onClick={() =>
               setShowCompTime(showCompTime === null ? false : !showCompTime)
             }
-            className={`absolute right-2 bottom-2 z-2 flex cursor-pointer flex-row items-center justify-center gap-2 rounded-xl border border-primary bg-primary/50 px-1.5 py-0.5 text-xs font-semibold backdrop-blur-md select-none ${
+            className={`absolute right-2 bottom-2 z-2 flex cursor-pointer flex-row items-center justify-center gap-2 rounded-xl border border-primary bg-primary/50 px-1.5 py-0.5 text-xs font-semibold backdrop-blur-xs select-none ${
               showCompTime !== false
                 ? "opacity-100"
                 : "opacity-50 hover:opacity-100"
@@ -217,10 +217,10 @@ export const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         <div className="flex flex-col gap-2 lg:h-full lg:flex-row lg:items-stretch">
           <div className="flex min-h-0 flex-col overflow-clip rounded-xl border border-border bg-background/60 lg:mb-4 lg:w-1/2">
             <JobQueryProvider type="txt2img">
-              <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden backdrop-blur-sm">
+              <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden backdrop-blur-xs">
                 <OutputCard />
               </div>
-              <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border p-2 backdrop-blur-sm">
+              <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border p-2 backdrop-blur-xs">
                 <TextToImageAction />
               </div>
             </JobQueryProvider>
