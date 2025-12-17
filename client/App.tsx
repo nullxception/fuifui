@@ -6,7 +6,7 @@ import {
   isNonJsonSerializable,
   splitLink,
 } from "@trpc/client";
-import { AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
+import { AnimatePresence, useMotionValueEvent, useScroll } from "motion/react";
 import { StrictMode, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { AppRouter } from "server/rpc";

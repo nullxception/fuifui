@@ -1,6 +1,6 @@
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Header";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { motion, type HTMLMotionProps } from "motion/react";
 import { forwardRef } from "react";
 import BackgroundSetting from "./BackgroundSetting";
 import { PromptAttachmentEditor } from "./PromptAttachment";

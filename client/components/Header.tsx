@@ -1,5 +1,5 @@
-import { AnimatePresence } from "framer-motion";
 import { AtomIcon, ImageIcon, SettingsIcon, ZapIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { useLocation } from "wouter";
 import { NavItem } from "./NavItems";
 

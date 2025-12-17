@@ -1,12 +1,12 @@
 import Modal from "@/components/Modal";
 import { Button } from "@/components/ui/button";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   InfoIcon,
   XIcon,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SDImage } from "server/types";
 import { useLocation, useRoute } from "wouter";

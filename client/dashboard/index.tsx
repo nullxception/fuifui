@@ -10,7 +10,6 @@ import { usePreviewImage } from "@/stores/usePreviewImage";
 import type { Timeout } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { formatDuration, intervalToDuration } from "date-fns";
-import { AnimatePresence, motion, type HTMLMotionProps } from "framer-motion";
 import {
   CircleStopIcon,
   ClockIcon,
@@ -18,6 +17,7 @@ import {
   TerminalIcon,
   ZapIcon,
 } from "lucide-react";
+import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
 import type { Job } from "server/types";

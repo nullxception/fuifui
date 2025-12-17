@@ -1,6 +1,6 @@
 import { Thumbnail } from "@/components/Thumbnail";
-import { motion } from "framer-motion";
 import { ImageIcon } from "lucide-react";
+import { motion } from "motion/react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import type { SDImage } from "server/types";
 import { useLocation } from "wouter";

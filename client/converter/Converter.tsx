@@ -23,8 +23,8 @@ import { JobQueryContext, JobQueryProvider } from "@/hooks/useJobQuery";
 import { useTRPC } from "@/query";
 import { useAppStore } from "@/stores/useAppStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { motion, type HTMLMotionProps } from "framer-motion";
 import { AlertTriangleIcon, CircleStopIcon, ZapIcon } from "lucide-react";
+import { motion, type HTMLMotionProps } from "motion/react";
 import { forwardRef, useContext, useState } from "react";
 import { GGML_WEIGHTS_TYPE } from "server/types";
 

@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useDiffusionConfig } from "@/dashboard/useDiffusionConfig";
 import { usePreviewImage } from "@/stores/usePreviewImage";
-import { motion } from "framer-motion";
 import {
   ChevronDownIcon,
   DownloadIcon,
   RefreshCcwIcon,
   TrashIcon,
 } from "lucide-react";
+import { motion } from "motion/react";
 import type { SDImage } from "server/types";
 import type { SDImageParams } from "server/types/image";
 import { useLocation } from "wouter";
