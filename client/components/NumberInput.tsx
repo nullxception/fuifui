@@ -30,7 +30,10 @@ export function NumberInput({
       <ButtonGroupText
         className={`bg-input/50 ${disabled && "opacity-50"}`}
         asChild
-        onClick={() => !disabled && onChange(Math.max(min, value - step))}
+        onClick={(e) => {
+          e.preventDefault();
+          if (!disabled) onChange(Math.max(min, value - step));
+        }}
       >
         <Label htmlFor={id}>-</Label>
       </ButtonGroupText>
@@ -49,7 +52,10 @@ export function NumberInput({
       <ButtonGroupText
         className={`bg-input/50 ${disabled && "opacity-50"}`}
         asChild
-        onClick={() => !disabled && onChange(value + step)}
+        onClick={(e) => {
+          e.preventDefault();
+          if (!disabled) onChange(value + step);
+        }}
       >
         <Label htmlFor={id}>+</Label>
       </ButtonGroupText>
