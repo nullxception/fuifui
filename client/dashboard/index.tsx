@@ -2,7 +2,6 @@ import { DottedBackground } from "@/components/DottedBackground";
 import { Logo } from "@/components/Header";
 import { NavItem, type NavEntry } from "@/components/NavItems";
 import { Button } from "@/components/ui/button";
-import { useImageQuery } from "@/gallery/useImageQuery";
 import { JobQueryContext, JobQueryProvider } from "@/hooks/useJobQuery";
 import { useTRPC } from "@/query";
 import { useAppStore } from "@/stores/useAppStore";
@@ -59,26 +58,22 @@ function OutputCard() {
   const { urls, from } = usePreviewImage(
     useShallow((s) => ({ urls: s.urls, from: s.from })),
   );
-  const { images } = useImageQuery();
-  const resultImages = images.filter((it) => urls?.includes(it.url));
-  const [showCompletionTime, setShowCompletionTime] = useState<boolean | null>(
-    null,
-  );
+  const [showCompTime, setShowCompTime] = useState<boolean | null>(null);
   const compTimeRef = useRef<Timeout | null>(null);
 
   const last = from === "txt2img" && job?.status === "completed" ? job : null;
-  const completionTime =
+  const compTime =
     urls?.[0] && last?.result?.includes(urls?.[0]) && getCompletionTime(last);
 
   useEffect(() => {
-    if (!completionTime || showCompletionTime !== null) return;
+    if (!compTime || showCompTime !== null) return;
     if (compTimeRef.current) clearTimeout(compTimeRef.current);
     compTimeRef.current = setTimeout(() => {
-      if (showCompletionTime === null) {
-        setShowCompletionTime(false);
+      if (showCompTime === null) {
+        setShowCompTime(false);
       }
     }, 2000);
-  }, [from, completionTime, showCompletionTime]);
+  }, [from, compTime, showCompTime]);
 
   return (
     <>
@@ -103,36 +98,31 @@ function OutputCard() {
 
       <div className="relative min-h-0 w-full flex-1">
         <DottedBackground />
-        {outputTab === "image" ? (
-          <ImageDisplay
-            images={resultImages}
-            isProcessing={isProcessing ?? false}
-          />
+        {outputTab === "image" && urls ? (
+          <ImageDisplay imageUrls={urls} isProcessing={isProcessing ?? false} />
         ) : (
           <ConsoleOutput logs={logs.filter((x) => x.jobId === job?.id)} />
         )}
-        {completionTime && (
+        {compTime && (
           <div
             onClick={() =>
-              setShowCompletionTime(
-                showCompletionTime === null ? false : !showCompletionTime,
-              )
+              setShowCompTime(showCompTime === null ? false : !showCompTime)
             }
             className={`absolute right-2 bottom-2 z-2 flex cursor-pointer flex-row items-center justify-center gap-2 rounded-xl border border-primary bg-primary/50 px-1.5 py-0.5 text-xs font-semibold backdrop-blur-md select-none ${
-              showCompletionTime !== false
+              showCompTime !== false
                 ? "opacity-100"
                 : "opacity-50 hover:opacity-100"
             } transition-opacity duration-300`}
           >
             <AnimatePresence>
-              {showCompletionTime !== false && (
+              {showCompTime !== false && (
                 <motion.div
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
                   className="overflow-clip text-nowrap"
                 >
-                  Completed in {completionTime}
+                  Completed in {compTime}
                 </motion.div>
               )}
             </AnimatePresence>
