@@ -29,7 +29,7 @@ const deleteOldJobs = db.query(`DELETE FROM jobs WHERE completedAt < $cutoff`);
 
 const logs = new Map<string, LogEntry[]>();
 
-function cleanupFailedJobs() {
+export function cleanupFailedJobs() {
   db.query(
     `DELETE FROM jobs WHERE status = "cancelled" OR status = "failed"`,
   ).run();

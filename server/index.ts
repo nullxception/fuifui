@@ -5,11 +5,12 @@ import { diffusionProgress } from "./api/diffusion";
 import db from "./db";
 import { ensureDirectories } from "./dirs";
 import { handleRPC } from "./rpc";
-import { stopJobs } from "./services/jobs";
+import { cleanupFailedJobs, stopJobs } from "./services/jobs";
 
 const PORT = process.env.PORT || 5141;
 
 await ensureDirectories();
+cleanupFailedJobs();
 await readConfig(); // initialize config.yaml if not exists
 
 function cleanup() {
