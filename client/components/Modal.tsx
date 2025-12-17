@@ -32,9 +32,9 @@ export default function Modal({
           <motion.div
             layoutId="rootModalFadeZoom"
             transition={{ duration: 0.3 }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0)" }}
+            exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
             ref={ref}
             className="flex items-center-safe justify-center"
             onClick={(e) => {

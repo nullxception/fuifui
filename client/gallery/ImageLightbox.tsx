@@ -32,7 +32,6 @@ const variants = {
     opacity: 1,
   },
   exit: (page: PageDirection) => ({
-    zIndex: 0,
     x: page.direction === "prev" ? "100%" : "-100%",
     opacity: 0,
   }),
@@ -145,17 +144,17 @@ export default function ImageLightbox() {
       <motion.div
         className="fixed inset-0 z-3 flex h-full w-screen flex-col overflow-hidden bg-background/50 shadow-2xl backdrop-blur-lg md:h-screen md:flex-row"
         transition={{ duration: 0.3 }}
-        initial={{ opacity: 0, scale: 1.3 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 1.3 }}
+        initial={{ opacity: 0, scale: 1.3, filter: "blur(10px)" }}
+        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        exit={{ opacity: 0, scale: 1.3, filter: "blur(10px)" }}
       >
         <motion.div
           className="relative flex flex-1 items-stretch justify-center overflow-hidden"
           ref={ref}
           transition={{ duration: 0.3 }}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.5 }}
+          initial={{ opacity: 0, scale: 0.6, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.6, filter: "blur(10px)" }}
         >
           <DottedBackground />
           <AnimatePresence initial={false}>
