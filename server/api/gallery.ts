@@ -4,7 +4,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { OUTPUT_DIR, THUMBS_DIR } from "server/dirs";
 import { parseDiffusionParams } from "server/lib/metadataParser";
-import { removeJob } from "server/services/jobs";
+import { removeJobResult } from "server/services/jobs";
 import type { SDImage } from "server/types";
 import type { ExifImage } from "server/types/image";
 import { listDiffusionModels } from "./diffusion";
@@ -106,7 +106,7 @@ export async function removeImages(images: string[]) {
       console.log(`removing ${img}`);
       await Bun.file(img).delete();
       cleanupThumbnails(img);
-      removeJob("txt2img", image);
+      removeJobResult("txt2img", image);
     }
 
     return { message: "Image(s) removed" };

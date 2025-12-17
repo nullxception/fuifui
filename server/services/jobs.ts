@@ -20,14 +20,10 @@ const selectRecentJobByType = db.query(
   `SELECT * FROM jobs WHERE type = $type ORDER BY createdAt DESC LIMIT 1`,
 );
 const updateStatus = db.query(`
-  UPDATE jobs 
+  UPDATE jobs
   SET status = $status, startedAt = $startedAt, completedAt = $completedAt, result = $result
   WHERE id = $id
 `);
-
-const deleteJobByResult = db.query(
-  `DELETE FROM jobs WHERE type = $type and result LIKE $pattern`,
-);
 
 const deleteOldJobs = db.query(`DELETE FROM jobs WHERE completedAt < $cutoff`);
 
@@ -137,8 +133,37 @@ export function getLogs(id: string) {
   return logs.get(id);
 }
 
-export function removeJob(type: JobType, resultPart: string) {
-  deleteJobByResult.run({ type, pattern: `%${resultPart}%` });
+const selectJobsByResult = db.query(
+  `SELECT * FROM jobs WHERE type = $type AND result LIKE $pattern`,
+);
+const deleteJob = db.query(`DELETE FROM jobs WHERE id = $id`);
+const updateJobResult = db.query(
+  `UPDATE jobs SET result = $result WHERE id = $id`,
+);
+
+export function removeJobResult(type: JobType, resultPart: string) {
+  const jobs = selectJobsByResult
+    .all({
+      type,
+      pattern: `%${resultPart}%`,
+    })
+    .reduce((acc: Job[], job) => {
+      const parsed = jobSchema.safeParse(job).data;
+      return parsed ? [...acc, parsed] : acc;
+    }, []);
+
+  for (const job of jobs) {
+    if (!job.result) continue;
+
+    const results = job.result.split(",");
+    const newResults = results.filter((r) => r.trim() !== resultPart);
+
+    if (newResults.length === 0) {
+      deleteJob.run({ id: job.id });
+    } else {
+      updateJobResult.run({ id: job.id, result: newResults.join(",") });
+    }
+  }
 }
 
 export function stopJob(id?: string) {
