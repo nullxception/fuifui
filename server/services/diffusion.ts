@@ -52,19 +52,25 @@ function hasValidNum(
 ) {
   try {
     if (typeof value === "undefined") return [false, value] as const;
-    let num = Number(value);
-    if (min) {
-      num = Math.max(value, min);
-    }
-    if (max) {
-      num = Math.min(value, max);
-    }
 
+    let num = Number(value);
     if (frac && frac > 0) {
       let t = num.toString();
       t = t.indexOf(".") >= 0 ? t.slice(0, t.indexOf(".") + 1 + frac) : t;
       num = Number(t);
     }
+
+    if (typeof min !== "undefined") {
+      if (num < min) {
+        return [false, value] as const;
+      }
+      num = Math.max(value, min);
+    }
+
+    if (typeof max !== "undefined") {
+      num = Math.min(value, max);
+    }
+
     return [true, num] as const;
   } catch {
     return [false, value] as const;
@@ -258,9 +264,9 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
   const outputPath = path.join(OUTPUT_DIR, "txt2img", `${outputName}.png`);
   args.push("-o", outputPath);
 
-  const [hasBatchMode, batchCount] = hasValidNum(params.batchCount, { min: 2 });
-  if (params.batchMode && hasBatchMode) {
-    args.push("--batch-count", batchCount);
+  const [hasBatchSize, batchSize] = hasValidNum(params.batchCount, { min: 2 });
+  if (params.batchMode && hasBatchSize) {
+    args.push("--batch-count", batchSize);
   }
 
   if (params.verbose) {
@@ -348,9 +354,9 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     if (code === 0) {
       let result = path.join("/output", path.relative(OUTPUT_DIR, outputPath));
 
-      if (hasBatchMode) {
+      if (params.batchMode && hasBatchSize) {
         const resultFiles = [outputName];
-        for (let i = 2; i <= batchCount; i++) {
+        for (let i = 2; i <= batchSize; i++) {
           resultFiles.push(`${outputName}_${i}`);
         }
         result = resultFiles
