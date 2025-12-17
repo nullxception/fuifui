@@ -92,6 +92,9 @@ export const useJobQuery = (type: JobType) => {
         closingRef.current = setTimeout(() => {
           es.close();
           closingRef.current = null;
+          queryClient.invalidateQueries({
+            queryKey: rpc.recentJob.queryKey(type),
+          });
         }, 500);
       }
     });
