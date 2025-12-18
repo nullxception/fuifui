@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { LogEntry } from "server/types";
 
 function formatTime(timestamp: number) {
@@ -12,6 +12,10 @@ const AnimationSettings = {
   exit: { opacity: 0, x: -100 },
 };
 
+function isAtBottom(el: HTMLElement, threshold = 100) {
+  return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
+}
+
 export function ConsoleOutput({
   logs,
   className,
@@ -20,12 +24,41 @@ export function ConsoleOutput({
   className?: string;
 }) {
   const consoleRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
-    if (consoleRef.current) {
-      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
-    }
-  }, [logs]);
+    const el = consoleRef.current;
+    if (!el) return;
+
+    let last = autoScroll;
+
+    const onScroll = () => {
+      const next = isAtBottom(el);
+      if (next !== last) {
+        last = next;
+        setAutoScroll(next);
+      }
+    };
+
+    el.addEventListener("scroll", onScroll);
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      el.removeEventListener("scroll", onScroll);
+    };
+  }, [autoScroll]);
+
+  useEffect(() => {
+    if (!autoScroll) return;
+    const el = consoleRef.current;
+    if (!el) return;
+
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+
+    rafId.current = requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  }, [logs, autoScroll]);
 
   const processedLogs = useMemo(() => {
     const result: Array<
@@ -42,9 +75,10 @@ export function ConsoleOutput({
       const isProgress = /\|=*.*\| \d+\/\d+/.test(message);
 
       if (isProgress) {
-        if (lastProgressIndex >= 0) {
+        const lastProg = result[lastProgressIndex];
+        if (lastProgressIndex >= 0 && lastProg) {
           // Update the last progress line
-          result[lastProgressIndex] = { ...log, isProgress: true };
+          Object.assign(lastProg, log, { isProgress: true });
         } else {
           // Add new progress line
           result.push({ ...log, isProgress: true });
