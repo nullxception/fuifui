@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { Glob } from "bun";
 import path from "path";
-
 import {
   CHECKPOINT_DIR,
   EMBEDDING_DIR,
@@ -13,13 +12,8 @@ import {
   VAE_DIR,
 } from "server/dirs";
 import { startDiffusion } from "server/services/diffusion";
-import {
-  createJob,
-  getJob,
-  getLogs,
-  withJobEvents,
-} from "server/services/jobs";
-import type { DiffusionParams, LogEntry, Models } from "server/types";
+import { createJob } from "server/services/jobs";
+import type { DiffusionParams, Models } from "server/types";
 
 function putModelFiles(
   file: string,
@@ -97,108 +91,3 @@ export async function diffusionStart(params: DiffusionParams) {
     });
   }
 }
-
-export const diffusionProgress: Bun.Serve.Handler<
-  Bun.BunRequest<"/api/jobs/:id">,
-  Bun.Server<undefined>,
-  Response
-> = async (req: Bun.BunRequest<"/api/jobs/:id">) => {
-  const jobId = req.params.id;
-
-  if (!jobId) {
-    return Response.json({ error: "Job ID is required" }, { status: 400 });
-  }
-
-  const job = getJob(jobId);
-  if (!job) {
-    return Response.json({ error: "Job not found" }, { status: 404 });
-  }
-
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder();
-      const sendEvent = (event: string, data: unknown) => {
-        try {
-          data = typeof data === "string" ? data : JSON.stringify(data);
-          controller.enqueue(
-            encoder.encode(`event: ${event}\ndata: ${data}\n\n`),
-          );
-        } catch {
-          // Controller might be closed
-        }
-      };
-
-      // Send existing logs
-      getLogs(jobId)?.forEach((log) => {
-        sendEvent("message", log);
-      });
-
-      // Send current result/error if job is done
-      if (job.result) {
-        sendEvent(
-          job.status === "completed" ? "complete" : "error",
-          job.result,
-        );
-      }
-
-      // Subscribe to new logs
-      const onLog = (log: LogEntry) => {
-        if (log.jobId === jobId) {
-          sendEvent("message", log);
-        }
-      };
-
-      const onComplete = ({
-        jobId: id,
-        data,
-      }: {
-        jobId: string;
-        data: string;
-      }) => {
-        if (id === jobId) {
-          sendEvent("complete", data);
-        }
-      };
-
-      const onError = ({
-        jobId: id,
-        data,
-      }: {
-        jobId: string;
-        data: string;
-      }) => {
-        if (id === jobId) {
-          sendEvent("error", data);
-        }
-      };
-
-      withJobEvents((events) => {
-        events.on("log", onLog);
-        events.on("complete", onComplete);
-        events.on("error", onError);
-
-        // Cleanup on close
-        req.signal.addEventListener("abort", () => {
-          events.off("log", onLog);
-          events.off("complete", onComplete);
-          events.off("error", onError);
-          try {
-            controller.close();
-          } catch {
-            // Ignore
-          }
-        });
-      });
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Cache-Control",
-    },
-  });
-};

@@ -1,7 +1,7 @@
 import client from "@/index.html";
 import serveStatic from "./api/assets";
 import { readConfig } from "./api/config";
-import { diffusionProgress } from "./api/diffusion";
+import { serveJobProgress } from "./api/jobs";
 import db from "./db";
 import { ensureDirectories } from "./dirs";
 import { handleRPC } from "./rpc";
@@ -42,7 +42,7 @@ Bun.serve({
   },
   routes: {
     "/rpc/*": handleRPC,
-    "/api/jobs/:id": diffusionProgress,
+    "/api/jobs/:id": serveJobProgress,
     // Serve static files from public directory (user-uploaded images)
     "/upload/*": serveStatic,
     // Serve output images

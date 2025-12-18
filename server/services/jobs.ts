@@ -103,7 +103,7 @@ export function updateJobStatus({
     completedAt = Date.now();
     const event = status === "completed" ? "complete" : "error";
     if (jobEvents.listenerCount(event) > 0) {
-      jobEvents.emit(event, { jobId: id, data: result });
+      jobEvents.emit(event, { id, data: result });
     }
   }
 
