@@ -2,6 +2,7 @@ import { DottedBackground } from "@/components/DottedBackground";
 import Modal from "@/components/Modal";
 import { RemoveImagesDialog } from "@/components/RemoveImagesDialog";
 import { Button } from "@/components/ui/button";
+import { useImagePreload } from "@/hooks/useImagePreload";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -50,21 +51,16 @@ export default function ImageLightbox() {
   const [, params] = useRoute("/:page(gallery|result)/:id");
   const fromResult = params?.["page(gallery|result)"] === "result";
   const { fetchNextPage, isFetching, images, removeImages } = useImageQuery();
+  const preload = useImagePreload((state) => state.preload);
   const index = images?.findIndex((x) => x.name === params?.id) || 0;
   const image = images[index] ?? page.lastImage;
   const hasPrev = index != 0;
   const hasNext = index + 1 != images.length;
 
-  const findNewId = useCallback(
-    (dest: "prev" | "next") => {
-      if (dest === "next") {
-        return images[index + 1]?.name;
-      } else {
-        return images[index - 1]?.name;
-      }
-    },
-    [images, index],
-  );
+  useEffect(() => {
+    preload(images[index + 1]);
+    preload(images[index - 1]);
+  }, [images, index, preload]);
 
   const close = useCallback(() => {
     setPage({ ...page, lastImage: image });
@@ -77,17 +73,16 @@ export default function ImageLightbox() {
 
   const goto = useCallback(
     (dest: "prev" | "next") => {
-      if ((dest === "next" && !hasNext) || (dest === "prev" && !hasPrev)) {
-        return;
+      const newImage = dest === "next" ? images[index + 1] : images[index - 1];
+      if (newImage?.name) {
+        setPage({
+          index: page.index + (dest === "next" ? 1 : -1),
+          direction: dest,
+        });
+        navigate(`~/${fromResult ? "result" : "gallery"}/${newImage.name}`);
       }
-      setPage({
-        index: page.index + (dest === "next" ? 1 : -1),
-        direction: dest,
-      });
-
-      navigate(`~/${fromResult ? "result" : "gallery"}/${findNewId(dest)}`);
     },
-    [hasNext, hasPrev, page.index, navigate, fromResult, findNewId],
+    [images, index, page.index, navigate, fromResult],
   );
 
   const onImageRemoved = () => {

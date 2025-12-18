@@ -1,5 +1,6 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useImagePreload } from "@/hooks/useImagePreload";
 import { Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { SDImage } from "server/types";
@@ -41,6 +42,7 @@ export function Thumbnail({
 }: ThumbnailProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const [isLoaded, setIsLoaded] = useState(false);
+  const preload = useImagePreload((state) => state.preload);
 
   // derive appropriate thumbnail size based on real width
   const size = (() => {
@@ -61,6 +63,8 @@ export function Thumbnail({
           src={`${image.url}?width=${size}`}
           alt={image.name}
           loading="lazy"
+          onMouseEnter={() => preload(image)}
+          onTouchStart={() => preload(image)}
           onLoad={() => setIsLoaded(true)}
           className={`h-full w-full object-cover transition-transform duration-300 ${
             typeof onClick === "function" && "group-hover:scale-105"
