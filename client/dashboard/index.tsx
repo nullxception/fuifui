@@ -60,6 +60,7 @@ function OutputCard() {
   );
   const [showCompTime, setShowCompTime] = useState<boolean | null>(null);
   const compTimeRef = useRef<Timeout | null>(null);
+  const [showLogTime, setShowLogTime] = useState(true);
 
   const last = from === "txt2img" && job?.status === "completed" ? job : null;
   const compTime =
@@ -78,7 +79,7 @@ function OutputCard() {
   return (
     <>
       <div className="flex items-center justify-center gap-2 border-b border-border bg-background/20 p-3">
-        <nav className="flex w-8/10 items-center justify-center gap-2 rounded-lg border border-border bg-background/50 p-1 md:w-6/10">
+        <nav className="flex w-8/11 items-center justify-center gap-2 rounded-lg border border-border bg-background/50 p-1 md:w-6/10">
           {tabItems.map((item) => (
             <AnimatePresence key={item.target} mode="wait">
               <NavItem
@@ -94,6 +95,16 @@ function OutputCard() {
             </AnimatePresence>
           ))}
         </nav>
+        {outputTab === "console" && (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            onClick={() => setShowLogTime(!showLogTime)}
+            className={`absolute right-4 ${showLogTime && "border-primary! bg-primary/25!"}`}
+          >
+            <ClockIcon />
+          </Button>
+        )}
       </div>
 
       <div className="relative min-h-0 w-full flex-1">
@@ -104,7 +115,10 @@ function OutputCard() {
             isProcessing={isProcessing ?? false}
           />
         ) : (
-          <ConsoleOutput logs={logs.filter((x) => x.jobId === job?.id)} />
+          <ConsoleOutput
+            logs={logs.filter((x) => x.jobId === job?.id)}
+            showLogTime={showLogTime}
+          />
         )}
         {compTime && (
           <div

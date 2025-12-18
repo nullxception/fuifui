@@ -19,9 +19,11 @@ function isAtBottom(el: HTMLElement, threshold = 100) {
 export function ConsoleOutput({
   logs,
   className,
+  showLogTime = true,
 }: {
   logs: LogEntry[] | undefined;
   className?: string;
+  showLogTime?: boolean;
 }) {
   const consoleRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -109,7 +111,9 @@ export function ConsoleOutput({
       ) : (
         processedLogs.map((log, index) => (
           <motion.div key={index} {...AnimationSettings}>
-            <span className="mr-2 text-muted-foreground select-none">
+            <span
+              className={`mr-2 text-muted-foreground select-none ${!showLogTime && "hidden"}`}
+            >
               {log.timestamp && `[${formatTime(log.timestamp)}]`}
             </span>
             <span
