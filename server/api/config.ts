@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import merge from "deepmerge";
 import { promises as fs } from "fs";
 import { defaultUserConfig } from "server/defaults";
 import { CONFIG_PATH } from "server/dirs";
@@ -38,7 +39,12 @@ export async function readConfig() {
         .catch(() => false)
     ) {
       const file = await Bun.file(CONFIG_PATH).text();
-      const conf = userConfigSchema.parse(Bun.YAML.parse(file));
+      const conf = userConfigSchema.parse(
+        merge(
+          defaultUserConfig(),
+          Bun.YAML.parse(file) as Partial<DiffusionParams>,
+        ),
+      );
       config.diffusion = conf.diffusion;
       config.settings = conf.settings;
       config.promptAttachment = conf.promptAttachment;
