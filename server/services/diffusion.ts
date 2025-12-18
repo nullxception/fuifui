@@ -14,6 +14,7 @@ import {
   VAE_DIR,
 } from "server/dirs";
 import type { DiffusionParams, LogType } from "server/types";
+import z from "zod";
 import { addJobLog, getJob, updateJobStatus } from "./jobs";
 
 function printableArgs(args: (string | number)[]) {
@@ -39,42 +40,6 @@ function filename(timestamp: number) {
   const minute = pad(date.getMinutes());
   const second = pad(date.getSeconds());
   return `${year}${month}${day}-${hour}${minute}${second}`;
-}
-
-function hasValue(value: string | undefined) {
-  if (typeof value !== "string") return false;
-  return value?.trim()?.length ?? 0 > 0;
-}
-
-function hasValidNum(
-  value: number | undefined,
-  { min, max, frac }: { min?: number; max?: number; frac?: number },
-) {
-  try {
-    if (typeof value === "undefined") return [false, value] as const;
-
-    let num = Number(value);
-    if (frac && frac > 0) {
-      let t = num.toString();
-      t = t.indexOf(".") >= 0 ? t.slice(0, t.indexOf(".") + 1 + frac) : t;
-      num = Number(t);
-    }
-
-    if (typeof min !== "undefined") {
-      if (num < min) {
-        return [false, value] as const;
-      }
-      num = Math.max(value, min);
-    }
-
-    if (typeof max !== "undefined") {
-      num = Math.min(value, max);
-    }
-
-    return [true, num] as const;
-  } catch {
-    return [false, value] as const;
-  }
 }
 
 export const filterLogs = (message: string) => {
@@ -107,11 +72,10 @@ export async function resolveSD() {
 
 /**
  * Starts the diffusion process in the background.
- * @param jobId The unique job ID.
+ * @param id The unique job ID.
  * @params params Diffusion parameters.
  */
-export async function startDiffusion(jobId: string, params: DiffusionParams) {
-  const timestamp = Date.now();
+export async function startDiffusion(id: string, params: DiffusionParams) {
   const modelPath = path.join(CHECKPOINT_DIR, params.model || "");
 
   const positivePrompt = params.prompt ?? "";
@@ -137,94 +101,88 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     args.push("--lora-model-dir", LORA_DIR);
   }
 
-  if (hasValue(params.vae)) {
+  if (z.string().min(1).safeParse(params.vae).success) {
     const vaePath = path.join(VAE_DIR, params.vae || "");
     args.push("--vae", vaePath);
   }
 
-  if (hasValue(params.upscaleModel)) {
+  if (z.string().min(1).safeParse(params.upscaleModel).success) {
     const upscaleModelPath = path.join(UPSCALER_DIR, params.upscaleModel || "");
     args.push("--upscale-model", upscaleModelPath);
-    const [hasUpscaleRepeats, upscaleRepeats] = hasValidNum(
-      params.upscaleRepeats,
-      { min: 1 },
-    );
-    if (hasUpscaleRepeats) {
-      args.push("--upscale-repeats", upscaleRepeats);
+    const upscaleRepeats = z.number().min(2).safeParse(params.upscaleRepeats);
+    if (upscaleRepeats.success) {
+      args.push("--upscale-repeats", upscaleRepeats.data);
     }
-    const [hasUpscaleTileSize, upscaleTileSize] = hasValidNum(
-      params.upscaleTileSize,
-      { min: 0 },
-    );
-    if (hasUpscaleTileSize) {
-      args.push("--upscale-tile-size", upscaleTileSize);
+    const upscaleTileSize = z.number().min(0).safeParse(params.upscaleTileSize);
+    if (upscaleTileSize.success) {
+      args.push("--upscale-tile-size", upscaleTileSize.data);
     }
   }
 
-  if (hasValue(params.clipL)) {
+  if (z.string().min(1).safeParse(params.clipL).success) {
     const clipLPath = path.join(TEXT_ENCODER_DIR, params.clipL || "");
     args.push("--clip_l", clipLPath);
   }
 
-  if (hasValue(params.clipG)) {
+  if (z.string().min(1).safeParse(params.clipG).success) {
     const clipGPath = path.join(TEXT_ENCODER_DIR, params.clipG || "");
     args.push("--clip_g", clipGPath);
   }
 
-  if (hasValue(params.t5xxl)) {
+  if (z.string().min(1).safeParse(params.t5xxl).success) {
     const t5xxlPath = path.join(TEXT_ENCODER_DIR, params.t5xxl || "");
     args.push("--t5xxl", t5xxlPath);
   }
 
-  if (hasValue(params.llm)) {
+  if (z.string().min(1).safeParse(params.llm).success) {
     const llmPath = path.join(LLM_DIR, params.llm || "");
     args.push("--llm", llmPath);
   }
 
-  if (hasValue(positivePrompt)) {
+  if (z.string().min(1).safeParse(positivePrompt).success) {
     args.push("-p", positivePrompt);
   }
 
-  if (hasValue(negativePrompt)) {
+  if (z.string().min(1).safeParse(negativePrompt).success) {
     args.push("-n", negativePrompt);
   }
 
-  if (hasValue(params.samplingMethod)) {
+  if (z.string().min(1).safeParse(params.samplingMethod).success) {
     args.push("--sampling-method", params.samplingMethod ?? "euler");
   }
 
-  if (hasValue(params.scheduler)) {
+  if (z.string().min(1).safeParse(params.scheduler).success) {
     args.push("--scheduler", params.scheduler ?? "discrete");
   }
 
-  const [hasCfgScale, cfgScale] = hasValidNum(params.cfgScale, { min: 0 });
-  if (hasCfgScale) {
-    args.push("--cfg-scale", cfgScale);
+  const cfgScale = z.number().min(1).safeParse(params.cfgScale);
+  if (cfgScale.success) {
+    args.push("--cfg-scale", cfgScale.data);
   }
 
-  const [hasWidth, width] = hasValidNum(params.width, { min: 0 });
-  if (hasWidth) {
-    args.push("-W", width);
+  const width = z.number().min(64).safeParse(params.width);
+  if (width.success) {
+    args.push("-W", width.data);
   }
 
-  const [hasHeight, height] = hasValidNum(params.height, { min: 0 });
-  if (hasHeight) {
-    args.push("-H", height);
+  const height = z.number().min(64).safeParse(params.height);
+  if (height.success) {
+    args.push("-H", height.data);
   }
 
-  const [hasSteps, steps] = hasValidNum(params.steps, { min: 0 });
-  if (hasSteps) {
-    args.push("--steps", steps);
+  const steps = z.number().min(1).safeParse(params.steps);
+  if (steps.success) {
+    args.push("--steps", steps.data);
   }
 
-  const [hasClipSkip, clipSkip] = hasValidNum(params.clipSkip, { min: -1 });
-  if (hasClipSkip) {
-    args.push("--clip-skip", clipSkip);
+  const clipSkip = z.number().min(-1).safeParse(params.clipSkip);
+  if (clipSkip.success) {
+    args.push("--clip-skip", clipSkip.data);
   }
 
-  const [hasSeed, seed] = hasValidNum(params.seed, { min: -1 });
-  if (hasSeed) {
-    args.push("-s", seed);
+  const seed = z.number().min(-1).safeParse(params.seed);
+  if (seed.success) {
+    args.push("-s", seed.data);
   }
 
   if (params.rng) {
@@ -247,9 +205,9 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     args.push("--vae-conv-direct");
   }
 
-  const [hasThreads, threads] = hasValidNum(params.threads, { min: -1 });
-  if (hasThreads && threads > 0) {
-    args.push("--threads", threads);
+  const threads = z.number().min(1).safeParse(params.threads);
+  if (threads.success) {
+    args.push("--threads", threads.data);
   }
 
   if (params.offloadToCpu) {
@@ -259,14 +217,14 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
   if (params.forceSdxlVaeConvScale) {
     args.push("--force-sdxl-vae-conv-scale");
   }
-
-  const outputName = filename(timestamp);
+  const job = getJob(id);
+  const outputName = filename(job?.createdAt ?? Date.now());
   const outputPath = path.join(OUTPUT_DIR, "txt2img", `${outputName}.png`);
   args.push("-o", outputPath);
 
-  const [hasBatchSize, batchSize] = hasValidNum(params.batchCount, { min: 2 });
-  if (params.batchMode && hasBatchSize) {
-    args.push("--batch-count", batchSize);
+  const batchSize = z.number().min(2).safeParse(params.batchCount);
+  if (params.batchMode && batchSize.success) {
+    args.push("--batch-count", batchSize.data);
   }
 
   if (params.verbose) {
@@ -279,7 +237,7 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     } else {
       console.log(message);
     }
-    addJobLog("txt2img", { type, message, jobId, timestamp: Date.now() });
+    addJobLog("txt2img", { type, message, jobId: id, timestamp: Date.now() });
   };
   const exec = await resolveSD();
   sendLog(
@@ -293,12 +251,12 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
     stdout: "pipe",
     stderr: "pipe",
   });
-  updateJobStatus({ id: jobId, status: "running", process: sdProcess });
+  updateJobStatus({ id, status: "running", process: sdProcess });
 
   // Check for errors related to process creation
   if (sdProcess.exitCode != null) {
     updateJobStatus({
-      id: jobId,
+      id,
       status: "failed",
       result: `Process spawn failed (${sdProcess.exitCode})`,
     });
@@ -350,13 +308,12 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
 
     // Wait for all stream reading to finish
     await Promise.allSettled([stdoutPromise, stderrPromise]);
-    const job = getJob(jobId);
     if (code === 0) {
       let result = path.join("/output", path.relative(OUTPUT_DIR, outputPath));
 
-      if (params.batchMode && hasBatchSize) {
+      if (params.batchMode && batchSize.success) {
         const resultFiles = [outputName];
-        for (let i = 2; i <= batchSize; i++) {
+        for (let i = 2; i <= batchSize.data; i++) {
           resultFiles.push(`${outputName}_${i}`);
         }
         result = resultFiles
@@ -371,24 +328,16 @@ export async function startDiffusion(jobId: string, params: DiffusionParams) {
           )
           .join(",");
       }
-      updateJobStatus({
-        id: jobId,
-        status: "completed",
-        result,
-      });
+      updateJobStatus({ id, status: "completed", result });
     } else if (job?.status !== "cancelled") {
       updateJobStatus({
-        id: jobId,
+        id,
         status: "failed",
         result: `Diffusion failed with exit code: ${code}`,
       });
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    updateJobStatus({
-      id: jobId,
-      status: "failed",
-      result: `Process error: ${msg}`,
-    });
+    updateJobStatus({ id, status: "failed", result: `Process error: ${msg}` });
   }
 }
