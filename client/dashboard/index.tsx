@@ -79,9 +79,10 @@ function OutputCard() {
     <>
       <div className="flex items-center justify-center gap-2 border-b border-border bg-background/20 p-3">
         <nav className="flex w-8/11 items-center justify-center gap-2 rounded-lg border border-border bg-background/50 p-1 md:w-6/10">
-          {tabItems.map((item) => (
-            <AnimatePresence key={item.target} mode="wait">
+          <AnimatePresence>
+            {tabItems.map((item) => (
               <NavItem
+                key={item.target}
                 entry={item}
                 isActive={outputTab === item.target}
                 setActiveEntry={(entry) =>
@@ -91,8 +92,8 @@ function OutputCard() {
                 groupName="output-tabs"
                 hideInactiveIcons={false}
               />
-            </AnimatePresence>
-          ))}
+            ))}
+          </AnimatePresence>
         </nav>
         {outputTab === "console" && (
           <Button

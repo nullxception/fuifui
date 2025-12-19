@@ -34,16 +34,17 @@ export function Header({ withBackground }: { withBackground: boolean }) {
         <Logo className="px-4" />
 
         <nav className="hidden items-center gap-2 rounded-lg border border-border bg-background/50 p-1 md:flex">
-          {navItems.map((item) => (
-            <AnimatePresence key={item.name} mode="wait">
+          <AnimatePresence>
+            {navItems.map((item) => (
               <NavItem
+                key={item.name}
                 groupName="header-nav"
                 entry={item}
                 isActive={location === item.target}
                 setActiveEntry={(item) => navigate(item.target)}
               />
-            </AnimatePresence>
-          ))}
+            ))}
+          </AnimatePresence>
         </nav>
       </div>
     </header>

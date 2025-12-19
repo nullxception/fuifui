@@ -7,9 +7,10 @@ export function MobileNav() {
 
   return (
     <footer className="fixed -bottom-1 z-1 flex h-18 w-full max-w-screen-2xl items-center justify-center rounded-t-2xl border border-b-0 border-border bg-background/95 px-4 backdrop-blur select-none supports-backdrop-filter:bg-background/60 md:hidden">
-      {navItems.map((item) => (
-        <AnimatePresence key={item.name} mode="wait">
+      <AnimatePresence>
+        {navItems.map((item) => (
           <div
+            key={item.name}
             onClick={() => navigate(item.target)}
             className={`relative z-10 flex h-11 cursor-pointer flex-row items-center justify-center gap-2 px-4 py-0.5 text-sm font-medium text-white transition-colors duration-300 hover:text-gray-200`}
           >
@@ -28,8 +29,8 @@ export function MobileNav() {
               <motion.span layoutId="mActiveName">{item.name}</motion.span>
             )}
           </div>
-        </AnimatePresence>
-      ))}
+        ))}
+      </AnimatePresence>
     </footer>
   );
 }
