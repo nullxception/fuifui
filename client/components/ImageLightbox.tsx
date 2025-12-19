@@ -39,13 +39,11 @@ const variants = {
 };
 
 export function ImageLightbox() {
-  const isMd = window.innerWidth < 768;
-  const [shouldShowRemoveDialog, showRemoveDialog] = useState(false);
-  const [shouldShowMetadata, showMetadata] = useState(!isMd);
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [showMetadata, setShowMetadata] = useState(window.innerWidth >= 768);
   const [page, setPage] = useState<PageDirection>({
     index: 0,
     direction: "next",
-    lastImage: undefined,
   });
   const [, navigate] = useLocation();
   const [, params] = useRoute("/:page(gallery|result)/:id");
@@ -58,18 +56,25 @@ export function ImageLightbox() {
   const hasNext = index + 1 != images.length;
 
   useEffect(() => {
+    const handleResize = () => {
+      if (!showMetadata && window.innerWidth >= 768) {
+        setShowMetadata(true);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [showMetadata]);
+
+  useEffect(() => {
     preload(images[index + 1]);
     preload(images[index - 1]);
   }, [images, index, preload]);
 
   const close = useCallback(() => {
     setPage({ ...page, lastImage: image });
-    if (isMd) {
-      showMetadata(false);
-    }
-
+    setShowMetadata(false);
     navigate(fromResult ? "~/" : "~/gallery", { replace: true });
-  }, [fromResult, image, isMd, navigate, page]);
+  }, [fromResult, image, navigate, page]);
 
   const goto = useCallback(
     (dest: "prev" | "next") => {
@@ -86,7 +91,7 @@ export function ImageLightbox() {
   );
 
   const onImageRemoved = () => {
-    showRemoveDialog(false);
+    setShowRemoveDialog(false);
     if (hasNext) {
       goto("next");
     } else if (hasPrev) {
@@ -128,6 +133,8 @@ export function ImageLightbox() {
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
+  if (!image) return null;
+
   return (
     <>
       <motion.div
@@ -145,39 +152,37 @@ export function ImageLightbox() {
         >
           <DottedBackground />
           <AnimatePresence initial={false}>
-            {image && (
-              <motion.img
-                key={image?.name}
-                className="absolute h-full w-full object-contain"
-                src={`${image.url}?preview`}
-                alt="preview"
-                custom={page}
-                variants={variants}
-                inherit={false}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "tween", ease: "circOut" },
-                }}
-                drag="x"
-                dragConstraints={{
-                  left: hasNext ? undefined : 0,
-                  right: hasPrev ? undefined : 0,
-                }}
-                dragElastic={0.2}
-                onDragEnd={(e, { offset, velocity }) => {
-                  const swipeThreshold = 50;
-                  const swipePower = Math.abs(offset.x) * velocity.x;
+            <motion.img
+              key={image.name}
+              className="absolute h-full w-full object-contain"
+              src={`${image.url}?preview`}
+              alt="preview"
+              custom={page}
+              variants={variants}
+              inherit={false}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "tween", ease: "circOut" },
+              }}
+              drag="x"
+              dragConstraints={{
+                left: hasNext ? undefined : 0,
+                right: hasPrev ? undefined : 0,
+              }}
+              dragElastic={0.2}
+              onDragEnd={(e, { offset, velocity }) => {
+                const swipeThreshold = 50;
+                const swipePower = Math.abs(offset.x) * velocity.x;
 
-                  if (swipePower < -swipeThreshold || offset.x < -100) {
-                    goto("next");
-                  } else if (swipePower > swipeThreshold || offset.x > 100) {
-                    goto("prev");
-                  }
-                }}
-              />
-            )}
+                if (swipePower < -swipeThreshold || offset.x < -100) {
+                  goto("next");
+                } else if (swipePower > swipeThreshold || offset.x > 100) {
+                  goto("prev");
+                }
+              }}
+            />
           </AnimatePresence>
           <div
             className={`absolute top-1/2 left-0 z-1 flex h-full w-15 -translate-y-1/2 cursor-pointer items-center justify-center from-transparent to-background/35 select-none hover:-bg-linear-90`}
@@ -201,14 +206,14 @@ export function ImageLightbox() {
               <ChevronRightIcon className={`h-8 w-8 text-foreground/70`} />
             )}
           </div>
-          {!shouldShowMetadata && (
+          {!showMetadata && (
             <Button
               variant="ghost"
               size="icon-lg"
               className="absolute right-5 bottom-5 z-1 h-12 rounded-full text-background/70 hover:bg-foreground/10 hover:text-foreground lg:hidden"
               onClick={(e) => {
                 e.stopPropagation();
-                showMetadata(true);
+                setShowMetadata(true);
               }}
             >
               <InfoIcon className="text-foreground" />
@@ -224,31 +229,29 @@ export function ImageLightbox() {
           </Button>
         </motion.div>
         <AnimatePresence initial={false}>
-          {image && shouldShowMetadata && (
+          {showMetadata && (
             <ImageMetadata
               image={image}
-              onRemove={() => showRemoveDialog(true)}
-              onClose={() => showMetadata(false)}
+              onRemove={() => setShowRemoveDialog(true)}
+              onClose={() => setShowMetadata(false)}
             />
           )}
         </AnimatePresence>
       </motion.div>
-      {image && (
-        <Modal
-          isOpen={shouldShowRemoveDialog}
-          onClose={() => showRemoveDialog(false)}
-        >
-          <RemoveImagesDialog
-            onRemove={async () => {
-              if (!image) return;
-              await removeImages([image.url]);
-            }}
-            onRemoved={onImageRemoved}
-            onCancel={() => showRemoveDialog(false)}
-            images={[image]}
-          />
-        </Modal>
-      )}
+      <Modal
+        isOpen={showRemoveDialog}
+        onClose={() => setShowRemoveDialog(false)}
+      >
+        <RemoveImagesDialog
+          onRemove={async () => {
+            if (!image) return;
+            await removeImages([image.url]);
+          }}
+          onRemoved={onImageRemoved}
+          onCancel={() => setShowRemoveDialog(false)}
+          images={[image]}
+        />
+      </Modal>
     </>
   );
 }
