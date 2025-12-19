@@ -111,15 +111,18 @@ export function ImageLightbox() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!image) return;
+      if (showRemoveDialog) return;
 
       if (e.key === "Escape") close();
       if (e.key === "ArrowRight") goto("next");
       if (e.key === "ArrowLeft") goto("prev");
+      if (e.key === "Delete" || e.key === "Backspace")
+        setShowRemoveDialog(true);
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [image, goto, close]);
+  }, [image, goto, close, showRemoveDialog]);
 
   // prevent scroll on preview canvas
   const ref = useRef<HTMLDivElement>(null);
