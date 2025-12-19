@@ -31,6 +31,14 @@ function putModelFiles(
   }
 }
 
+function sortPath(a: string, b: string) {
+  const aInSub = a.includes(path.sep);
+  const bInSub = b.includes(path.sep);
+  if (aInSub && !bInSub) return 1;
+  if (!aInSub && bInSub) return -1;
+  return a.localeCompare(b);
+}
+
 export async function listDiffusionModels() {
   try {
     const glob = new Glob("**/*");
@@ -60,6 +68,10 @@ export async function listDiffusionModels() {
       putModelFiles(file, rUpscaler, models.upscalers);
       putModelFiles(file, rLlm, models.llms);
       putModelFiles(file, rTextEncoder, models.textEncoders);
+    }
+
+    for (const key in models) {
+      models[key as keyof Models].sort(sortPath);
     }
 
     return models;
