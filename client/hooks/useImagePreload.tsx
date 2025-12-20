@@ -9,14 +9,17 @@ interface ImagePreloadStore {
 export const useImagePreload = create<ImagePreloadStore>((set, get) => ({
   preloaded: new Set<string>(),
 
-  preload: (image: string | SDImage | undefined) => {
+  preload: (
+    image: string | SDImage | undefined,
+    param: string = "?preview",
+  ) => {
     const { preloaded } = get();
     const url = typeof image === "string" ? image : image?.url;
 
     if (typeof url === "undefined" || preloaded.has(url)) return;
 
     const img = new Image();
-    img.src = url;
+    img.src = url + param;
 
     set((state) => ({
       preloaded: new Set(state.preloaded).add(url),
