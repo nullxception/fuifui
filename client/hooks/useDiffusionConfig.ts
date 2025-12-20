@@ -16,7 +16,23 @@ export function useDiffusionConf<K extends keyof DiffusionParams>(paramKey: K) {
         const queryKey = rpc.conf.diffusion.queryKey(paramKey);
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
-        queryClient.setQueryData(queryKey, { [paramKey]: newConf.paramValue });
+        queryClient.setQueryData(queryKey, newConf);
+        return { lastConf, newConf };
+      },
+      onSettled: () => {
+        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        return queryClient.invalidateQueries({ queryKey });
+      },
+    }),
+  );
+
+  const removal = useMutation(
+    rpc.conf.unsetDiffusion.mutationOptions({
+      onMutate: async (newConf) => {
+        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        await queryClient.cancelQueries({ queryKey });
+        const lastConf = queryClient.getQueryData(queryKey);
+        queryClient.setQueryData(queryKey, { [paramKey]: undefined });
         return { lastConf, newConf };
       },
       onSettled: () => {
@@ -29,7 +45,7 @@ export function useDiffusionConf<K extends keyof DiffusionParams>(paramKey: K) {
   return {
     value,
     update: (newValue: DiffusionParams[K]) =>
-      mutation.mutateAsync({ paramKey, paramValue: newValue }),
-    unset: () => mutation.mutate({ paramKey, paramValue: undefined }),
+      mutation.mutateAsync({ [paramKey]: newValue }),
+    unset: () => removal.mutate(paramKey),
   };
 }

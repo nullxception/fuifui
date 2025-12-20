@@ -111,16 +111,18 @@ export async function savePromptAttachment(attachments: PromptAttachment[]) {
   return await saveConfig();
 }
 
-export async function saveDiffusion<K extends keyof DiffusionParams>(
-  paramKey: keyof DiffusionParams,
-  value: DiffusionParams[K],
-) {
-  config.diffusion = { ...config.diffusion, [paramKey]: value };
+export async function saveDiffusion(part: Partial<DiffusionParams>) {
+  config.diffusion = { ...config.diffusion, ...part };
   return await saveConfig();
 }
 
 export async function batchSaveDiffusion(params: Partial<DiffusionParams>) {
   config.diffusion = getValuable({ ...config.diffusion, ...params });
+  return await saveConfig();
+}
+
+export async function unsetDiffusion(k: keyof DiffusionParams) {
+  config.diffusion = { ...config.diffusion, [k]: undefined };
   return await saveConfig();
 }
 

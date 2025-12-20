@@ -8,6 +8,7 @@ import {
   saveAppSettings,
   saveDiffusion,
   savePromptAttachment,
+  unsetDiffusion,
 } from "./api/config";
 import { quantizationStart } from "./api/converter";
 import { diffusionStart, listDiffusionModels } from "./api/diffusion";
@@ -47,24 +48,15 @@ export const router = t.router({
   conf: t.router({
     diffusion: t.procedure
       .input(diffusionParamsSchema.keyof())
-      .query(async (opt) => ({
-        [opt.input]: (await readConfig()).diffusion[opt.input],
+      .query(async (opts) => ({
+        [opts.input]: (await readConfig()).diffusion[opts.input],
       })),
     saveDiffusion: t.procedure
-      .input(
-        z.object({
-          paramKey: diffusionParamsSchema.keyof(),
-          paramValue: z.union([
-            z.string(),
-            z.number(),
-            z.boolean(),
-            z.undefined(),
-          ]),
-        }),
-      )
-      .mutation((opts) =>
-        saveDiffusion(opts.input.paramKey, opts.input.paramValue),
-      ),
+      .input(diffusionParamsSchema.partial())
+      .mutation((opts) => saveDiffusion(opts.input)),
+    unsetDiffusion: t.procedure
+      .input(diffusionParamsSchema.keyof())
+      .mutation((opts) => unsetDiffusion(opts.input)),
     batchSaveDiffusion: t.procedure
       .input(diffusionParamsSchema.partial())
       .mutation((opts) => batchSaveDiffusion(opts.input)),
