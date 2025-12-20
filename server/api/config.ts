@@ -126,10 +126,7 @@ export async function unsetDiffusion(k: keyof DiffusionParams) {
   return await saveConfig();
 }
 
-export async function saveAppSettings<K extends keyof AppSettings>(
-  paramKey: keyof AppSettings,
-  value: AppSettings[K],
-) {
-  config.settings = { ...config.settings, [paramKey]: value };
+export async function saveAppSettings(part: Partial<AppSettings>) {
+  config.settings = { ...config.settings, ...part };
   return await saveConfig();
 }

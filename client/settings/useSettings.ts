@@ -16,7 +16,7 @@ export function useSettings<K extends keyof AppSettings>(paramKey: K) {
         const queryKey = rpc.conf.settings.queryKey(paramKey);
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
-        queryClient.setQueryData(queryKey, { [paramKey]: newConf.paramValue });
+        queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
@@ -29,6 +29,6 @@ export function useSettings<K extends keyof AppSettings>(paramKey: K) {
   return {
     value,
     update: (newValue: AppSettings[K]) =>
-      mutation.mutateAsync({ paramKey, paramValue: newValue }),
+      mutation.mutateAsync({ [paramKey]: newValue }),
   };
 }
