@@ -1,4 +1,4 @@
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { optimizePrompt } from "server/lib/metadataParser";
 import type { PromptAttachment, PromptAttachmentType } from "server/types";
@@ -7,20 +7,21 @@ export function usePromptAttachment() {
   const rpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const { data, isFetched } = useQuery(rpc.promptAttachment.queryOptions());
+  const { data, isFetched } = useQuery(
+    rpc.conf.promptAttachments.queryOptions(),
+  );
 
   const mutation = useMutation(
-    rpc.savePromptAttachment.mutationOptions({
+    rpc.conf.savePromptAttachments.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.promptAttachment.queryKey();
+        const queryKey = rpc.conf.promptAttachments.queryKey();
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
-
         queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.promptAttachment.queryKey();
+        const queryKey = rpc.conf.promptAttachments.queryKey();
         return queryClient.invalidateQueries({ queryKey });
       },
     }),

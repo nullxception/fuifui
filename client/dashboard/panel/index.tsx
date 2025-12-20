@@ -1,11 +1,11 @@
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { BatchModeSetting } from "./BatchMode";
+import { BatchCountSetting, BatchModeSetting } from "./BatchMode";
 import { GenerationSettings } from "./GenerationSettings";
 import { ModelSelector } from "./ModelSelector";
 import { OtherSetting } from "./OtherSetting";
 import { PromptInput } from "./PromptInput";
-import { RNGSetting } from "./RNGSetting";
+import { RNGSetting, SamplerRngSetting, SeedSetting } from "./RNGSetting";
 import { UpscalerSetting } from "./UpscalerSetting";
 
 export function ControlPanel({ className }: { className?: string }) {
@@ -17,7 +17,10 @@ export function ControlPanel({ className }: { className?: string }) {
         <div className="grid gap-4 px-4 sm:grid-cols-1 md:grid-cols-2">
           <GenerationSettings />
           <RNGSetting />
+          <SamplerRngSetting />
+          <SeedSetting />
           <BatchModeSetting />
+          <BatchCountSetting />
           <UpscalerSetting />
           <OtherSetting />
         </div>

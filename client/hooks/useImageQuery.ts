@@ -1,5 +1,5 @@
 import { usePreviewImage } from "@/hooks/usePreviewImage";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import {
   useInfiniteQuery,
   useMutation,
@@ -12,7 +12,7 @@ const limit = 20;
 export function useImageQuery() {
   const rpc = useTRPC();
   const query = useInfiniteQuery(
-    rpc.listImages.infiniteQueryOptions(
+    rpc.images.bygPage.infiniteQueryOptions(
       { limit },
       {
         getNextPageParam(lastPage, _allPages, lastPageParam) {
@@ -34,10 +34,10 @@ export function useImageQuery() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
-    rpc.removeImage.mutationOptions({
+    rpc.images.remove.mutationOptions({
       onSuccess: async () => {
-        const job = rpc.recentJob.queryKey("txt2img");
-        const images = rpc.listImages.infiniteQueryKey();
+        const job = rpc.info.lastJob.queryKey("txt2img");
+        const images = rpc.images.bygPage.infiniteQueryKey();
         await queryClient.invalidateQueries({ queryKey: images });
         await queryClient.invalidateQueries({ queryKey: job });
       },

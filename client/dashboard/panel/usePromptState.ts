@@ -1,6 +1,6 @@
+import { useDiffusionConf } from "@/hooks/useDiffusionConfig";
 import type { Timeout } from "@/types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDiffusionConfig } from "./useDiffusionConfig";
 
 type PromptType = "prompt" | "negativePrompt";
 
@@ -12,21 +12,19 @@ interface PromptState {
 const DEBOUNCE_DELAY = 500;
 
 export function usePromptState(type: PromptType) {
-  const store = useDiffusionConfig();
-  const storeValue =
-    type === "prompt" ? store.params.prompt : store.params.negativePrompt;
+  const store = useDiffusionConf(type);
 
   const [state, setState] = useState<PromptState>(() => ({
-    value: storeValue,
+    value: store.value,
     changed: false,
   }));
 
   const debounceTimerRef = useRef<Timeout | null>(null);
 
   // Only update if user isn't actively editing and values are different
-  if (!state.changed && state.value !== storeValue) {
+  if (!state.changed && state.value !== store.value) {
     setState({
-      value: storeValue,
+      value: store.value,
       changed: false,
     });
   }
@@ -43,7 +41,7 @@ export function usePromptState(type: PromptType) {
   const saveToStore = useCallback(
     async (value?: string) => {
       try {
-        store.update(type, value);
+        store.update(value);
         setState((prev) => ({
           ...prev,
           changed: false,
@@ -52,7 +50,7 @@ export function usePromptState(type: PromptType) {
         console.error("Failed to save prompt:", error);
       }
     },
-    [store, type],
+    [store],
   );
 
   const debouncedSave = useCallback(

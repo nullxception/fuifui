@@ -1,4 +1,4 @@
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
@@ -7,7 +7,7 @@ export function Footer({
 }: React.HTMLAttributes<HTMLDivElement>) {
   const rpc = useTRPC();
 
-  const { data: sysinfo } = useQuery(rpc.sysInfo.queryOptions());
+  const { data: sysinfo } = useQuery(rpc.info.sys.queryOptions());
 
   return (
     <footer className={`mx-auto max-w-7xl px-8 py-4 text-center ${className}`}>

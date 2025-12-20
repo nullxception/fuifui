@@ -8,7 +8,7 @@ export const { TRPCProvider, useTRPC, useTRPCClient } =
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 1000,
+      staleTime: 60 * 1000,
     },
   },
 });

@@ -20,7 +20,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/hooks/useAppStore";
 import { JobQueryContext, JobQueryProvider } from "@/hooks/useJobQuery";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AlertTriangleIcon, CircleStopIcon, ZapIcon } from "lucide-react";
 import { motion, type HTMLMotionProps } from "motion/react";
@@ -45,11 +45,11 @@ function ConverterPanel() {
   const hideGGUF = useAppStore((s) => s.hideGGUF);
   const [type, setType] = useState("q8_0");
   const rpc = useTRPC();
-  const { data: models } = useQuery(rpc.listModels.queryOptions());
+  const { data: models } = useQuery(rpc.info.models.queryOptions());
   const { job, connect, setError, stop } = useContext(JobQueryContext);
   const isOutputExists = models?.checkpoints.includes(output);
   const quantizationStart = useMutation(
-    rpc.startQuantization.mutationOptions({
+    rpc.quantization.start.mutationOptions({
       onError(err) {
         setError(err.message);
       },
@@ -59,7 +59,7 @@ function ConverterPanel() {
     }),
   );
   const quantizationStop = useMutation(
-    rpc.stopQuantization.mutationOptions({
+    rpc.quantization.stop.mutationOptions({
       onError(err) {
         setError(err.message);
         stop();

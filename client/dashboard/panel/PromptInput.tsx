@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { usePromptAttachment } from "@/settings/usePromptAttachment";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -58,7 +58,7 @@ function autoResize(el: HTMLTextAreaElement) {
 
 function Prompt({ type }: { type: PromptType }) {
   const rpc = useTRPC();
-  const { data } = useQuery(rpc.listModels.queryOptions());
+  const { data } = useQuery(rpc.info.models.queryOptions());
   const { value, changed, updatePrompt, forceSave } = usePromptState(type);
   const ref = useRef<HTMLTextAreaElement>(null);
   const { buildPrompt } = usePromptAttachment();

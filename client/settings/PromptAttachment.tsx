@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeftIcon,
@@ -261,7 +261,7 @@ function PromptAttachmentForm({
 export function PromptAttachmentEditor() {
   const { promptAttachment, addTW, updateTW, deleteTW } = usePromptAttachment();
   const rpc = useTRPC();
-  const { data } = useQuery(rpc.listModels.queryOptions());
+  const { data } = useQuery(rpc.info.models.queryOptions());
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingEntry, setEditingEntry] = useState<PromptAttachment | null>(
     null,

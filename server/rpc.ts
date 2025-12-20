@@ -3,16 +3,17 @@ import { createBunHttpHandler } from "trpc-bun-adapter";
 import z, { ZodError } from "zod";
 import { uploadBackground } from "./api/background";
 import {
+  batchSaveDiffusion,
   readConfig,
   saveAppSettings,
-  saveDiffusionParams,
+  saveDiffusion,
   savePromptAttachment,
 } from "./api/config";
 import { quantizationStart } from "./api/converter";
 import { diffusionStart, listDiffusionModels } from "./api/diffusion";
 import { getImagesInfo, listImages, removeImages } from "./api/gallery";
 import system from "./api/system";
-import { getJobs, getRecentJob, stopJob } from "./services/jobs";
+import { getRecentJob, stopJob } from "./services/jobs";
 import { diffusionParamsSchema } from "./types/diffusionparams";
 import { jobsTypeSchema } from "./types/jobs";
 import { promptAttachmentSchema } from "./types/promptAttachment";
@@ -36,55 +37,75 @@ const t = initTRPC.create({
 });
 
 export const router = t.router({
-  sysInfo: t.procedure.query(system.info),
-  listModels: t.procedure.query(listDiffusionModels),
-  config: t.procedure.query(readConfig),
-  diffusionParams: t.procedure.query(
-    async () => (await readConfig()).diffusion,
-  ),
-  saveDiffusionParams: t.procedure
-    .input(diffusionParamsSchema)
-    .mutation((opts) => saveDiffusionParams(opts.input)),
-  settings: t.procedure.query(async () => (await readConfig()).settings),
-  saveSettings: t.procedure
-    .input(appSettingsSchema)
-    .mutation((opts) => saveAppSettings(opts.input)),
-  promptAttachment: t.procedure.query(
-    async () => (await readConfig()).promptAttachment,
-  ),
-  savePromptAttachment: t.procedure
-    .input(z.array(promptAttachmentSchema))
-    .mutation((opts) => savePromptAttachment(opts.input)),
-  listImages: t.procedure
-    .input(z.object({ limit: z.number(), cursor: z.number().optional() }))
-    .query((opts) => listImages(opts.input.limit, opts.input.cursor)),
-  getImagesInfo: t.procedure
-    .input(z.array(z.string()))
-    .query((opts) => getImagesInfo(opts.input)),
-  recentJob: t.procedure
-    .input(jobsTypeSchema)
-    .query((opts) => getRecentJob(opts.input)),
-  listJobs: t.procedure
-    .input(jobsTypeSchema)
-    .query((opts) => getJobs(opts.input)),
-  removeImage: t.procedure
-    .input(z.array(z.string()))
-    .mutation((opts) => removeImages(opts.input)),
-  updateBackground: t.procedure
-    .input(z.instanceof(FormData).optional())
-    .mutation((opts) => uploadBackground(opts.input)),
-  startDiffusion: t.procedure
-    .input(diffusionParamsSchema)
-    .mutation((opts) => diffusionStart(opts.input)),
-  stopDiffusion: t.procedure
-    .input(z.string())
-    .mutation((opts) => stopJob(opts.input)),
-  startQuantization: t.procedure
-    .input(convertParamsSchema)
-    .mutation((opts) => quantizationStart(opts.input)),
-  stopQuantization: t.procedure
-    .input(z.string())
-    .mutation((opts) => stopJob(opts.input)),
+  info: t.router({
+    sys: t.procedure.query(system.info),
+    models: t.procedure.query(listDiffusionModels),
+    lastJob: t.procedure
+      .input(jobsTypeSchema)
+      .query((opts) => getRecentJob(opts.input)),
+  }),
+  conf: t.router({
+    diffusion: t.procedure
+      .input(diffusionParamsSchema.keyof())
+      .query(async (opt) => ({
+        [opt.input]: (await readConfig()).diffusion[opt.input],
+      })),
+    saveDiffusion: t.procedure
+      .input(
+        z.object({
+          paramKey: diffusionParamsSchema.keyof(),
+          paramValue: z.union([
+            z.string(),
+            z.number(),
+            z.boolean(),
+            z.undefined(),
+          ]),
+        }),
+      )
+      .mutation((opts) =>
+        saveDiffusion(opts.input.paramKey, opts.input.paramValue),
+      ),
+    batchSaveDiffusion: t.procedure
+      .input(diffusionParamsSchema.partial())
+      .mutation((opts) => batchSaveDiffusion(opts.input)),
+    settings: t.procedure.query(async () => (await readConfig()).settings),
+    saveSettings: t.procedure
+      .input(appSettingsSchema)
+      .mutation((opts) => saveAppSettings(opts.input)),
+    updateBackground: t.procedure
+      .input(z.instanceof(FormData).optional())
+      .mutation((opts) => uploadBackground(opts.input)),
+    promptAttachments: t.procedure.query(
+      async () => (await readConfig()).promptAttachment,
+    ),
+    savePromptAttachments: t.procedure
+      .input(z.array(promptAttachmentSchema))
+      .mutation((opts) => savePromptAttachment(opts.input)),
+  }),
+  txt2img: t.router({
+    start: t.procedure.mutation(async () => {
+      const config = await readConfig();
+      return diffusionStart(config.diffusion);
+    }),
+    stop: t.procedure.input(z.string()).mutation((opts) => stopJob(opts.input)),
+  }),
+  quantization: t.router({
+    start: t.procedure
+      .input(convertParamsSchema)
+      .mutation((opts) => quantizationStart(opts.input)),
+    stop: t.procedure.input(z.string()).mutation((opts) => stopJob(opts.input)),
+  }),
+  images: t.router({
+    byUrls: t.procedure
+      .input(z.array(z.string()))
+      .query((opts) => getImagesInfo(opts.input)),
+    bygPage: t.procedure
+      .input(z.object({ limit: z.number(), cursor: z.number().optional() }))
+      .query((opts) => listImages(opts.input.limit, opts.input.cursor)),
+    remove: t.procedure
+      .input(z.array(z.string()))
+      .mutation((opts) => removeImages(opts.input)),
+  }),
 });
 
 export type AppRouter = typeof router;

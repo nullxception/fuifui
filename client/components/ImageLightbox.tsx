@@ -3,6 +3,7 @@ import Modal from "@/components/Modal";
 import { RemoveImagesDialog } from "@/components/RemoveImagesDialog";
 import { Button } from "@/components/ui/button";
 import { useImagePreload } from "@/hooks/useImagePreload";
+import { useImageQuery } from "@/hooks/useImageQuery";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -13,7 +14,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SDImage } from "server/types";
 import { useLocation, useRoute } from "wouter";
-import { useImageQuery } from "../hooks/useImageQuery";
 import ImageMetadata from "./ImageMetadata";
 
 interface PageDirection {

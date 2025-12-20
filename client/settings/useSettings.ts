@@ -1,4 +1,4 @@
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { defaultUserConfig } from "server/defaults";
 import type { AppSettings } from "server/types";
@@ -8,24 +8,23 @@ export function useSettings() {
   const queryClient = useQueryClient();
   const defaults = defaultUserConfig().settings;
   const { data } = useQuery(
-    rpc.settings.queryOptions(undefined, {
+    rpc.conf.settings.queryOptions(undefined, {
       placeholderData: defaults,
     }),
   );
   const settings = data ?? defaults;
 
   const mutation = useMutation(
-    rpc.saveSettings.mutationOptions({
+    rpc.conf.saveSettings.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.settings.queryKey();
+        const queryKey = rpc.conf.settings.queryKey();
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
-
         queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.settings.queryKey();
+        const queryKey = rpc.conf.settings.queryKey();
         return queryClient.invalidateQueries({ queryKey });
       },
     }),

@@ -1,5 +1,5 @@
 import { usePreviewImage } from "@/hooks/usePreviewImage";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import type { Timeout } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useEffect, useRef, useState } from "react";
@@ -10,7 +10,7 @@ import { useAppStore } from "./useAppStore";
 
 export const useJobQuery = (type: JobType) => {
   const rpc = useTRPC();
-  const { data: job } = useQuery(rpc.recentJob.queryOptions(type));
+  const { data: job } = useQuery(rpc.info.lastJob.queryOptions(type));
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const esRef = useRef<EventSource | null>(null);
   const closingRef = useRef<Timeout | null>(null);
@@ -52,15 +52,15 @@ export const useJobQuery = (type: JobType) => {
     es.addEventListener("complete", async (event) => {
       try {
         await queryClient.invalidateQueries({
-          queryKey: rpc.recentJob.queryKey(type),
+          queryKey: rpc.info.lastJob.queryKey(type),
         });
         if (type === "convert") {
           await queryClient.invalidateQueries({
-            queryKey: rpc.listModels.queryKey(),
+            queryKey: rpc.info.models.queryKey(),
           });
         } else {
           await queryClient.invalidateQueries({
-            queryKey: rpc.listImages.infiniteQueryKey(),
+            queryKey: rpc.images.bygPage.infiniteQueryKey(),
           });
           usePreviewImage
             .getState()
@@ -93,7 +93,7 @@ export const useJobQuery = (type: JobType) => {
           es.close();
           closingRef.current = null;
           queryClient.invalidateQueries({
-            queryKey: rpc.recentJob.queryKey(type),
+            queryKey: rpc.info.lastJob.queryKey(type),
           });
         }, 500);
       }
@@ -110,9 +110,9 @@ export const useJobQuery = (type: JobType) => {
     hasLogs,
     type,
     queryClient,
-    rpc.listModels,
-    rpc.listImages,
-    rpc.recentJob,
+    rpc.info.models,
+    rpc.images.bygPage,
+    rpc.info.lastJob,
   ]);
 
   return {
@@ -122,7 +122,7 @@ export const useJobQuery = (type: JobType) => {
     async connect() {
       if (job?.status === "pending" || job?.status === "running") return;
       await queryClient.invalidateQueries({
-        queryKey: rpc.recentJob.queryKey(type),
+        queryKey: rpc.info.lastJob.queryKey(type),
       });
     },
     setError(message: string) {
@@ -135,7 +135,7 @@ export const useJobQuery = (type: JobType) => {
     },
     stop() {
       queryClient.invalidateQueries({
-        queryKey: rpc.recentJob.queryKey(type),
+        queryKey: rpc.info.lastJob.queryKey(type),
       });
     },
   };

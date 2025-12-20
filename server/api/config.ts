@@ -47,6 +47,10 @@ function dedup(entries: PromptAttachment[]): PromptAttachment[] {
 }
 
 export async function readConfig() {
+  if (config.diffusion.model.length > 1) {
+    return config;
+  }
+
   try {
     if (
       await fs
@@ -112,7 +116,15 @@ export async function savePromptAttachment(attachments: PromptAttachment[]) {
   return await saveConfig();
 }
 
-export async function saveDiffusionParams(params: DiffusionParams) {
-  config.diffusion = getValuable(params || {});
+export async function saveDiffusion<K extends keyof DiffusionParams>(
+  paramKey: keyof DiffusionParams,
+  value: DiffusionParams[K],
+) {
+  config.diffusion = { ...config.diffusion, [paramKey]: value };
+  return await saveConfig();
+}
+
+export async function batchSaveDiffusion(params: Partial<DiffusionParams>) {
+  config.diffusion = getValuable({ ...config.diffusion, ...params });
   return await saveConfig();
 }

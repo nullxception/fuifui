@@ -3,7 +3,7 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Card } from "@/components/ui/card";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useMutation } from "@tanstack/react-query";
 import { CloudUploadIcon } from "lucide-react";
 import React, { useState } from "react";
@@ -14,7 +14,7 @@ function BackgroundSetting() {
   const [imageUrl, setImageUrl] = useState("");
   const rpc = useTRPC();
   const mutation = useMutation(
-    rpc.updateBackground.mutationOptions({
+    rpc.conf.updateBackground.mutationOptions({
       onError(error) {
         alert("Failed to update background: " + error);
       },

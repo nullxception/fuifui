@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/context-menu";
 import { useImageQuery } from "@/hooks/useImageQuery";
 import { saveImage } from "@/lib/image";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import { useQuery } from "@tanstack/react-query";
 import {
   DownloadIcon,
@@ -40,7 +40,7 @@ const AnimationSettings = {
 export function ImageResult({ urls, isProcessing }: ImageResultProps) {
   const [, navigate] = useLocation();
   const rpc = useTRPC();
-  const { data } = useQuery(rpc.getImagesInfo.queryOptions(urls));
+  const { data } = useQuery(rpc.images.byUrls.queryOptions(urls));
   const images = data ?? [];
   const { removeImages } = useImageQuery();
   const [selectedImages, setSelectedImages] = useState<Array<string>>([]);

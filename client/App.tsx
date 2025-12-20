@@ -25,7 +25,7 @@ import { Converter } from "./converter/Converter";
 import { TextToImage } from "./dashboard";
 import { Gallery } from "./gallery";
 import "./index.css";
-import { queryClient, TRPCProvider } from "./query";
+import { queryClient, TRPCProvider } from "./lib/query";
 import { Settings } from "./settings";
 
 const AnimationSettings = {
@@ -88,7 +88,10 @@ function App() {
     createTRPCClient<AppRouter>({
       links: [
         splitLink({
-          condition: (op) => isNonJsonSerializable(op.input),
+          condition: (op) =>
+            isNonJsonSerializable(op.input) ||
+            op.path.startsWith("conf.") ||
+            op.path.startsWith("images."),
           true: httpLink({ url: "/rpc" }),
           false: httpBatchLink({ url: "/rpc" }),
         }),

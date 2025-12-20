@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { CopyButton } from "@/components/ui/shadcn-io/copy-button";
-import { useDiffusionConfig } from "@/dashboard/useDiffusionConfig";
 import { usePreviewImage } from "@/hooks/usePreviewImage";
 import { saveImage } from "@/lib/image";
+import { useTRPC } from "@/lib/query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ChevronDownIcon,
   DownloadIcon,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import type { SDImage } from "server/types";
+import { diffusionParamsSchema } from "server/types/diffusionparams";
 import type { SDImageParams } from "server/types/image";
 import { useLocation } from "wouter";
 
@@ -108,6 +110,10 @@ const variants = {
   }),
 };
 
+function safeEntries<T extends object>(obj: T) {
+  return Object.entries(obj) as [keyof T, T[keyof T]][];
+}
+
 export default function ImageMetadata({
   image,
   onRemove,
@@ -115,14 +121,42 @@ export default function ImageMetadata({
   className = "",
 }: ImageMetadataProps) {
   const [, navigate] = useLocation();
-  const store = useDiffusionConfig();
+  const rpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    rpc.conf.batchSaveDiffusion.mutationOptions({
+      onMutate: async (newConf) => {
+        const partConf = diffusionParamsSchema
+          .partial()
+          .safeParse(newConf).data;
+        if (!partConf) return;
+        for (const [key, value] of safeEntries(partConf)) {
+          const queryKey = rpc.conf.diffusion.queryKey(key);
+          await queryClient.cancelQueries({ queryKey });
+          queryClient.setQueryData(queryKey, { [key]: value });
+        }
+
+        return { newConf };
+      },
+      onSettled: async (_data, _error, _variables, onMutateResult) => {
+        const partConf = onMutateResult?.newConf;
+        if (!partConf) return;
+        for (const [key] of safeEntries(partConf)) {
+          const queryKey = rpc.conf.diffusion.queryKey(key);
+          queryClient.invalidateQueries({ queryKey });
+        }
+      },
+    }),
+  );
+
   const metadata = image.metadata;
 
   const handleRemake = () => {
     if (!metadata) return;
 
     // Map parsed metadata to diffusion config parameters
-    store.updateAll({
+    mutation.mutateAsync({
       prompt: metadata.prompt,
       negativePrompt: metadata.negativePrompt,
       steps: metadata.steps,

@@ -3,9 +3,10 @@ import { DottedBackground } from "@/components/DottedBackground";
 import { NavItem, type NavEntry } from "@/components/NavItems";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/hooks/useAppStore";
+import { useDiffusionConf } from "@/hooks/useDiffusionConfig";
 import { JobQueryContext, JobQueryProvider } from "@/hooks/useJobQuery";
 import { usePreviewImage } from "@/hooks/usePreviewImage";
-import { useTRPC } from "@/query";
+import { useTRPC } from "@/lib/query";
 import type { Timeout } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { formatDuration, intervalToDuration } from "date-fns";
@@ -21,9 +22,8 @@ import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
 import type { Job } from "server/types";
 import { useShallow } from "zustand/react/shallow";
-import { ControlPanel } from "./ControlPanel";
 import { ImageResult } from "./ImageResult";
-import { useDiffusionConfig } from "./useDiffusionConfig";
+import { ControlPanel } from "./panel";
 
 type TabType = "image" | "console";
 
@@ -148,13 +148,26 @@ function OutputCard() {
   );
 }
 
+function GenerateButton() {
+  const batchModeStore = useDiffusionConf("batchMode");
+  const batchCountStore = useDiffusionConf("batchCount");
+  return (
+    <>
+      <ZapIcon className="text-primary" />
+      Generate
+      {batchModeStore.value && ` ${batchCountStore.value} images`}
+    </>
+  );
+}
+
 function TextToImageAction() {
   const { job, connect, setError, stop } = useContext(JobQueryContext);
-  const store = useDiffusionConfig();
+  const promptStore = useDiffusionConf("prompt");
+  const negativePromptStore = useDiffusionConf("negativePrompt");
   const rpc = useTRPC();
-  const { data: models } = useQuery(rpc.listModels.queryOptions());
+  const { data: models } = useQuery(rpc.info.models.queryOptions());
   const diffusionStart = useMutation(
-    rpc.startDiffusion.mutationOptions({
+    rpc.txt2img.start.mutationOptions({
       onError(error) {
         setError(error.message);
       },
@@ -165,7 +178,7 @@ function TextToImageAction() {
   );
 
   const diffusionStop = useMutation(
-    rpc.stopDiffusion.mutationOptions({
+    rpc.txt2img.stop.mutationOptions({
       onError(err) {
         setError(err.message);
         stop();
@@ -181,11 +194,11 @@ function TextToImageAction() {
     if (isProcessing && job?.id) {
       diffusionStop.mutate(job.id);
     } else if (!isProcessing) {
-      await store.updateAll({
-        prompt: optimizePrompt(store.params.prompt, models),
-        negativePrompt: optimizePrompt(store.params.negativePrompt, models),
-      });
-      diffusionStart.mutate(store.params);
+      await negativePromptStore.update(
+        optimizePrompt(negativePromptStore.value, models),
+      );
+      await promptStore.update(optimizePrompt(promptStore.value, models));
+      diffusionStart.mutate();
     }
   };
 
@@ -206,11 +219,7 @@ function TextToImageAction() {
             Stop
           </>
         ) : (
-          <>
-            <ZapIcon className="text-primary" />
-            Generate
-            {store.params.batchMode && ` ${store.params.batchCount} images`}
-          </>
+          <GenerateButton />
         )}
       </Button>
     </div>
