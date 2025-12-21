@@ -15,6 +15,7 @@ export const SDImageMetadataSchema = z.object({
   scheduler: z.string(),
   version: z.string(),
   vae: z.string().optional(),
+  llm: z.string().optional(),
   textEncoders: z.array(z.string()).optional(),
 });
 

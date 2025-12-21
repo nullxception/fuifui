@@ -218,7 +218,8 @@ function parsePairs(
             ? [...data.textEncoders, value]
             : [value];
           data.textEncoders = encoders.map(
-            (enc) => models?.vaes.find((path) => path.endsWith(enc)) ?? enc,
+            (enc) =>
+              models?.textEncoders.find((path) => path.endsWith(enc)) ?? enc,
           );
         }
         break;
@@ -332,6 +333,19 @@ export function parseDiffusionParams(
       negativePrompt.replace(/['"]+/g, ""),
       models,
     );
+    const te =
+      data.textEncoders?.map((enc) => {
+        const asLLM = models?.llms.find((path) => path.endsWith(enc));
+        return {
+          type: asLLM ? "llm" : "te",
+          model: asLLM ?? enc,
+        };
+      }) ?? [];
+    data.llm = te.find((it) => it.type === "llm")?.model;
+    data.textEncoders = te
+      .filter((it) => it.type !== "llm")
+      .map((it) => it.model);
+
     return data;
   } catch (e) {
     console.error("Failed to parse parameters", e);

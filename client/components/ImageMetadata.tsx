@@ -166,7 +166,11 @@ export default function ImageMetadata({
       samplingMethod: metadata.samplingMethod,
       scheduler: metadata.scheduler,
       model: metadata.model,
-      vae: metadata.vae,
+      // Let's assume that if image has LLM as Text Encoder, it was a standalone model
+      modelType: metadata.llm ? "standalone" : "full",
+      // force unset with empty string instead of passing undefined due to JSON.stringify() limitations
+      llm: metadata.llm ?? "",
+      vae: metadata.vae ?? "",
     });
 
     // Navigate back to generate tab
@@ -243,6 +247,11 @@ export default function ImageMetadata({
               <MetadataChip
                 data={metadata}
                 metakey="vae"
+                className="text-purple-400"
+              />
+              <MetadataChip
+                data={metadata}
+                metakey="llm"
                 className="text-purple-400"
               />
               <MetadataChip
