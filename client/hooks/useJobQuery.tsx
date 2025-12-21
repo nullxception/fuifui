@@ -9,9 +9,10 @@ import { useAppStore } from "./useAppStore";
 
 export const useJobQuery = (type: JobType) => {
   const rpc = useTRPC();
-  const { data: job } = useQuery(rpc.info.lastJob.queryOptions(type));
+  const { data } = useQuery(rpc.info.lastJob.queryOptions(type));
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const queryClient = useQueryClient();
+  const { job } = data ?? {};
 
   function addLog(log: LogEntry) {
     setLogs((prev) => [...prev, log]);

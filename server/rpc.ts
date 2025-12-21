@@ -44,7 +44,7 @@ export const router = t.router({
     models: t.procedure.query(listDiffusionModels),
     lastJob: t.procedure
       .input(jobsTypeSchema)
-      .query((opts) => getRecentJob(opts.input)),
+      .query((opts) => ({ job: getRecentJob(opts.input) })),
   }),
   conf: t.router({
     diffusion: t.procedure
