@@ -119,73 +119,74 @@ function PromptAttachmentForm({
       onSave();
     }
   };
+  const invalidTarget = !availableTargets.includes(entry.target);
 
   return (
     <Card className="lg:min-w[30vw] max-w-[95vw] gap-0 space-y-2 md:min-w-[40vw]">
       <motion.div
         layout
         layoutId={`attachmentTitle--${entry.target}`}
-        className="flex flex-row gap-2 px-4"
+        className="flex flex-row items-center-safe gap-2 px-4"
       >
         {isEditing ? (
-          <>
-            <span
-              className={`rounded px-2 py-0.5 text-xs ${
-                entry.type === "embedding"
-                  ? "bg-blue-500/20 text-blue-300"
-                  : "bg-purple-500/20 text-purple-300"
-              }`}
-            >
-              {entry.type === "lora" ? "LoRA" : "Embedding"}
-            </span>
-            <span className="text-xs">{entry.target}</span>
-          </>
+          <span
+            className={`rounded px-2 py-0.5 text-xs ${
+              entry.type === "embedding"
+                ? "bg-blue-500/20 text-blue-300"
+                : "bg-purple-500/20 text-purple-300"
+            }`}
+          >
+            {entry.type === "lora" ? "LoRA" : "Embedding"}
+          </span>
         ) : (
-          <div className="flex w-full flex-row gap-3">
-            <Select
-              value={entry.type}
-              onValueChange={(e) =>
-                onChange({
-                  entry: {
-                    ...entry,
-                    type: promptAttachmentTypeSchema.parse(e),
-                    target: "", // Reset target when type changes
-                  },
-                })
-              }
-            >
-              <SelectTrigger className="shrink-0">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
-                <SelectGroup>
-                  <SelectItem value="embedding">Embedding</SelectItem>
-                  <SelectItem value="lora">LoRA</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Select
-              value={entry.target}
-              onValueChange={(e) =>
-                onChange({ entry: { ...entry, target: e } })
-              }
-            >
-              <SelectTrigger className="grow overflow-hidden">
-                <SelectValue placeholder={`Select ${typeLabel}...`} />
-              </SelectTrigger>
-              <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
-                <SelectGroup>
-                  <SelectLabel>Select {entry.type}</SelectLabel>
-                  {availableTargets.map((target) => (
-                    <SelectItem key={target} value={target}>
-                      {target}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select
+            value={entry.type}
+            onValueChange={(e) =>
+              onChange({
+                entry: {
+                  ...entry,
+                  type: promptAttachmentTypeSchema.parse(e),
+                  target: "", // Reset target when type changes
+                },
+              })
+            }
+          >
+            <SelectTrigger className="shrink-0">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
+              <SelectGroup>
+                <SelectItem value="embedding">Embedding</SelectItem>
+                <SelectItem value="lora">LoRA</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         )}
+
+        <Select
+          value={invalidTarget ? "" : entry.target}
+          onValueChange={(e) => onChange({ entry: { ...entry, target: e } })}
+        >
+          <SelectTrigger
+            className={`grow overflow-hidden ${invalidTarget && "text-xs ring-1 ring-destructive"}`}
+          >
+            <SelectValue
+              placeholder={
+                invalidTarget ? `${entry.target}` : `Select ${typeLabel}...`
+              }
+            />
+          </SelectTrigger>
+          <SelectContent className="bg-background/80 p-1 backdrop-blur-xs">
+            <SelectGroup>
+              <SelectLabel>Select {entry.type}</SelectLabel>
+              {availableTargets.map((target) => (
+                <SelectItem key={target} value={target}>
+                  {target}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </motion.div>
       <motion.div
         layout
