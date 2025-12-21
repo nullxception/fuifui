@@ -92,7 +92,7 @@ export function updateJobStatus({
     completedAt = Date.now();
     emitEvent({
       id,
-      type: job.result === "complete" ? "result" : "stderr",
+      type: status === "complete" ? "result" : "stderr",
       message: result ?? "",
       timestamp: completedAt,
     });
