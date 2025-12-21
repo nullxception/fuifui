@@ -27,18 +27,6 @@ import { motion, type HTMLMotionProps } from "motion/react";
 import { forwardRef, useContext, useState } from "react";
 import { GGML_WEIGHTS_TYPE } from "server/types";
 
-function LogsPanel({ className }: { className?: string }) {
-  const { job, logs } = useContext(JobQueryContext);
-
-  return (
-    <div
-      className={`overflow-clip rounded-xl border border-border backdrop-blur-xs lg:mb-4 ${className}`}
-    >
-      <ConsoleOutput logs={logs.filter((log) => log.jobId === job?.id)} />
-    </div>
-  );
-}
-
 function ConverterPanel() {
   const [model, setModel] = useState("");
   const [output, setOutput] = useState("");
@@ -203,7 +191,9 @@ export const Converter = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
       >
         <div className="flex flex-auto flex-col gap-2 p-2 lg:h-full lg:flex-row">
           <JobQueryProvider type="convert">
-            <LogsPanel className="h-[30vh] bg-background/60 lg:h-[80vh] lg:w-1/2" />
+            <div className="h-[30vh] overflow-clip rounded-xl border border-border bg-background/60 backdrop-blur-xs lg:mb-4 lg:h-[80vh] lg:w-1/2">
+              <ConsoleOutput />
+            </div>
             <div className="w-full lg:max-h-screen lg:w-1/2">
               <ConverterPanel />
               <Footer className="col-span-full flex justify-center p-4" />
