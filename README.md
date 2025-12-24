@@ -56,10 +56,12 @@ cp .env.example .env
 
 ### Available Settings
 
-| Variable         | Default    |
-| ---------------- | ---------- |
-| `PORT`           | `5141`     |
-| `FUI_MODELS_DIR` | `./models` |
+| Variable             | Default                                |
+| -------------------- | -------------------------------------- |
+| `HOST`               | none (bun's default 0.0.0.0/localhost) |
+| `PORT`               | `5141`                                 |
+| `FUI_MODELS_DIR`     | `models`                               |
+| `FUI_THUMBNAILS_DIR` | `.thumbs`                              |
 
 ### Directory Layout
 

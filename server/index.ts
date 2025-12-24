@@ -7,8 +7,6 @@ import { ensureDirectories, PUBLIC_DIR, ROOT_DIR } from "./dirs";
 import { handleRPC } from "./rpc";
 import { cleanupFailedJobs, stopJobs } from "./services/jobs";
 
-const PORT = process.env.PORT || 5141;
-
 await ensureDirectories();
 cleanupFailedJobs();
 await readConfig(); // initialize config.yaml if not exists
@@ -50,8 +48,9 @@ async function serveDist(req: Bun.BunRequest) {
 
 const isProd = process.env.NODE_ENV === "production";
 
-Bun.serve({
-  port: PORT,
+const server = Bun.serve({
+  hostname: process.env.HOST,
+  port: process.env.PORT ?? 5141,
   idleTimeout: 0, // Disable timeout for long-running diffusion processes
   development: !isProd && {
     hmr: true,
@@ -65,4 +64,4 @@ Bun.serve({
   },
 });
 
-console.log(`Server running at http://localhost:${PORT}`);
+console.log(`Server running at http://${server.hostname}:${server.port}`);
