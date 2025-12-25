@@ -1,5 +1,11 @@
 import path from "path";
-import { OUTPUT_DIR, THUMBS_DIR, UPLOAD_DIR } from "server/dirs";
+import {
+  OUTPUT_DIR,
+  PUBLIC_DIR,
+  ROOT_DIR,
+  THUMBS_DIR,
+  UPLOAD_DIR,
+} from "server/dirs";
 import sharp from "sharp";
 
 const assetsCacheControl = "public, max-age=31536000, immutable";
@@ -32,7 +38,7 @@ async function serveThumbnail(filepath: string, size: number) {
   }
 }
 
-async function serveStatic(req: Request) {
+export async function serveStatic(req: Request) {
   const url = new URL(req.url);
   const pathname = url.pathname;
 
@@ -64,4 +70,17 @@ async function serveStatic(req: Request) {
   return new Response("Not found", { status: 404 });
 }
 
-export default serveStatic;
+export async function serveApp(req: Bun.BunRequest) {
+  const target = new URL(req.url).pathname;
+  const dist = path.join(ROOT_DIR, "dist");
+  const distFile = Bun.file(path.join(dist, target));
+  if (await distFile.exists()) {
+    return new Response(distFile);
+  }
+
+  const pubFile = Bun.file(path.join(PUBLIC_DIR, target));
+  if (await pubFile.exists()) {
+    return new Response(pubFile);
+  }
+  return new Response(Bun.file(path.join(dist, "index.html")));
+}
