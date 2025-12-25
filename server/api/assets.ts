@@ -74,13 +74,17 @@ export async function serveApp(req: Bun.BunRequest) {
   const target = new URL(req.url).pathname;
   const dist = path.join(ROOT_DIR, "dist");
   const distFile = Bun.file(path.join(dist, target));
-  if (await distFile.exists()) {
-    return new Response(distFile);
+  if ((await distFile.exists()) && !target.endsWith("/")) {
+    return new Response(distFile, {
+      headers: { "Cache-Control": assetsCacheControl },
+    });
   }
 
   const pubFile = Bun.file(path.join(PUBLIC_DIR, target));
   if (await pubFile.exists()) {
-    return new Response(pubFile);
+    return new Response(pubFile, {
+      headers: { "Cache-Control": assetsCacheControl },
+    });
   }
   return new Response(Bun.file(path.join(dist, "index.html")));
 }
