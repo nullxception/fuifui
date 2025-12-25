@@ -125,14 +125,14 @@ export default function ImageMetadata({
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
-    rpc.conf.batchSaveDiffusion.mutationOptions({
+    rpc.conf.diffusion.sets.mutationOptions({
       onMutate: async (newConf) => {
         const partConf = diffusionParamsSchema
           .partial()
           .safeParse(newConf).data;
         if (!partConf) return;
         for (const [key, value] of safeEntries(partConf)) {
-          const queryKey = rpc.conf.diffusion.queryKey(key);
+          const queryKey = rpc.conf.diffusion.get.queryKey(key);
           await queryClient.cancelQueries({ queryKey });
           queryClient.setQueryData(queryKey, { [key]: value });
         }
@@ -143,7 +143,7 @@ export default function ImageMetadata({
         const partConf = onMutateResult?.newConf;
         if (!partConf) return;
         for (const [key] of safeEntries(partConf)) {
-          const queryKey = rpc.conf.diffusion.queryKey(key);
+          const queryKey = rpc.conf.diffusion.get.queryKey(key);
           queryClient.invalidateQueries({ queryKey });
         }
       },

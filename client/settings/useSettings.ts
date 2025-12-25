@@ -7,20 +7,20 @@ export function useSettings<K extends keyof AppSettings>(paramKey: K) {
   const rpc = useTRPC();
   const queryClient = useQueryClient();
   const defaultValue = defaultUserConfig().settings[paramKey];
-  const { data } = useQuery(rpc.conf.settings.queryOptions(paramKey));
+  const { data } = useQuery(rpc.conf.settings.get.queryOptions(paramKey));
   const value = (data?.[paramKey] ?? defaultValue) as AppSettings[K];
 
   const mutation = useMutation(
-    rpc.conf.saveSettings.mutationOptions({
+    rpc.conf.settings.set.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.conf.settings.queryKey(paramKey);
+        const queryKey = rpc.conf.settings.get.queryKey(paramKey);
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
         queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.conf.settings.queryKey(paramKey);
+        const queryKey = rpc.conf.settings.get.queryKey(paramKey);
         return queryClient.invalidateQueries({ queryKey });
       },
     }),

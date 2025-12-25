@@ -14,7 +14,7 @@ function BackgroundSetting() {
   const [imageUrl, setImageUrl] = useState("");
   const rpc = useTRPC();
   const mutation = useMutation(
-    rpc.conf.updateBackground.mutationOptions({
+    rpc.conf.background.set.mutationOptions({
       onError(error) {
         alert("Failed to update background: " + error);
       },

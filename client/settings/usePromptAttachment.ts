@@ -8,20 +8,20 @@ export function usePromptAttachment() {
   const queryClient = useQueryClient();
 
   const { data, isFetched } = useQuery(
-    rpc.conf.promptAttachments.queryOptions(),
+    rpc.conf.promptAttachments.get.queryOptions(),
   );
 
   const mutation = useMutation(
-    rpc.conf.savePromptAttachments.mutationOptions({
+    rpc.conf.promptAttachments.set.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.conf.promptAttachments.queryKey();
+        const queryKey = rpc.conf.promptAttachments.get.queryKey();
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
         queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.conf.promptAttachments.queryKey();
+        const queryKey = rpc.conf.promptAttachments.get.queryKey();
         return queryClient.invalidateQueries({ queryKey });
       },
     }),

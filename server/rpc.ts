@@ -47,37 +47,41 @@ export const router = t.router({
       .query((opts) => ({ job: getRecentJob(opts.input) })),
   }),
   conf: t.router({
-    diffusion: t.procedure
-      .input(diffusionParamsSchema.keyof())
-      .query(async (opts) => ({
-        [opts.input]: (await readConfig()).diffusion[opts.input],
-      })),
-    saveDiffusion: t.procedure
-      .input(diffusionParamsSchema.partial())
-      .mutation((opts) => saveDiffusion(opts.input)),
-    unsetDiffusion: t.procedure
-      .input(diffusionParamsSchema.keyof())
-      .mutation((opts) => unsetDiffusion(opts.input)),
-    batchSaveDiffusion: t.procedure
-      .input(diffusionParamsSchema.partial())
-      .mutation((opts) => batchSaveDiffusion(opts.input)),
-    settings: t.procedure
-      .input(appSettingsSchema.keyof())
-      .query(async (opts) => ({
+    diffusion: t.router({
+      get: t.procedure
+        .input(diffusionParamsSchema.keyof())
+        .query(async (opts) => ({
+          [opts.input]: (await readConfig()).diffusion[opts.input],
+        })),
+      set: t.procedure
+        .input(diffusionParamsSchema.partial())
+        .mutation((opts) => saveDiffusion(opts.input)),
+      remove: t.procedure
+        .input(diffusionParamsSchema.keyof())
+        .mutation((opts) => unsetDiffusion(opts.input)),
+      sets: t.procedure
+        .input(diffusionParamsSchema.partial())
+        .mutation((opts) => batchSaveDiffusion(opts.input)),
+    }),
+    settings: t.router({
+      get: t.procedure.input(appSettingsSchema.keyof()).query(async (opts) => ({
         [opts.input]: (await readConfig()).settings[opts.input],
       })),
-    saveSettings: t.procedure
-      .input(appSettingsSchema.partial())
-      .mutation((opts) => saveAppSettings(opts.input)),
-    updateBackground: t.procedure
-      .input(z.instanceof(FormData).optional())
-      .mutation((opts) => uploadBackground(opts.input)),
-    promptAttachments: t.procedure.query(
-      async () => (await readConfig()).promptAttachment,
-    ),
-    savePromptAttachments: t.procedure
-      .input(z.array(promptAttachmentSchema))
-      .mutation((opts) => savePromptAttachment(opts.input)),
+      set: t.procedure
+        .input(appSettingsSchema.partial())
+        .mutation((opts) => saveAppSettings(opts.input)),
+    }),
+    background: t.router({
+      set: t.procedure
+        .input(z.instanceof(FormData).optional())
+        .mutation((opts) => uploadBackground(opts.input)),
+    }),
+    promptAttachments: t.router({
+      get: t.procedure.query(async () => (await readConfig()).promptAttachment),
+      set: t.procedure
+        .input(z.array(promptAttachmentSchema))
+        .mutation((opts) => savePromptAttachment(opts.input)),
+    }),
   }),
   txt2img: t.router({
     start: t.procedure.mutation(async () => {

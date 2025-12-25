@@ -7,36 +7,36 @@ export function useDiffusionConf<K extends keyof DiffusionParams>(paramKey: K) {
   const rpc = useTRPC();
   const queryClient = useQueryClient();
   const defaultValue = defaultUserConfig().diffusion[paramKey];
-  const { data } = useQuery(rpc.conf.diffusion.queryOptions(paramKey));
+  const { data } = useQuery(rpc.conf.diffusion.get.queryOptions(paramKey));
   const value = (data?.[paramKey] ?? defaultValue) as DiffusionParams[K];
 
   const mutation = useMutation(
-    rpc.conf.saveDiffusion.mutationOptions({
+    rpc.conf.diffusion.set.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        const queryKey = rpc.conf.diffusion.get.queryKey(paramKey);
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
         queryClient.setQueryData(queryKey, newConf);
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        const queryKey = rpc.conf.diffusion.get.queryKey(paramKey);
         return queryClient.invalidateQueries({ queryKey });
       },
     }),
   );
 
   const removal = useMutation(
-    rpc.conf.unsetDiffusion.mutationOptions({
+    rpc.conf.diffusion.remove.mutationOptions({
       onMutate: async (newConf) => {
-        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        const queryKey = rpc.conf.diffusion.get.queryKey(paramKey);
         await queryClient.cancelQueries({ queryKey });
         const lastConf = queryClient.getQueryData(queryKey);
         queryClient.setQueryData(queryKey, { [paramKey]: undefined });
         return { lastConf, newConf };
       },
       onSettled: () => {
-        const queryKey = rpc.conf.diffusion.queryKey(paramKey);
+        const queryKey = rpc.conf.diffusion.get.queryKey(paramKey);
         return queryClient.invalidateQueries({ queryKey });
       },
     }),
