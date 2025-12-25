@@ -16,7 +16,7 @@ import { BackgroundLayer } from "./components/BackgroundLayer";
 import { Header } from "./components/Header";
 import { ImageLightbox } from "./components/ImageLightbox";
 import { MobileNav } from "./components/MobileNav";
-import { Converter } from "./converter/Converter";
+import { Converter } from "./converter";
 import { TextToImage } from "./dashboard";
 import { Gallery } from "./gallery";
 import "./index.css";

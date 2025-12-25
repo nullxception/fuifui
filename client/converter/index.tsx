@@ -24,7 +24,7 @@ import { useTRPC } from "@/lib/query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AlertTriangleIcon, CircleStopIcon, ZapIcon } from "lucide-react";
 import { motion, type HTMLMotionProps } from "motion/react";
-import { forwardRef, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { GGML_WEIGHTS_TYPE } from "server/types";
 
 function ConverterPanel() {
@@ -181,26 +181,20 @@ function ConverterPanel() {
   );
 }
 
-export const Converter = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
-  (props, ref) => {
-    return (
-      <motion.div
-        ref={ref}
-        className="container mx-auto max-w-screen-2xl"
-        {...props}
-      >
-        <div className="flex flex-auto flex-col gap-2 p-2 lg:h-full lg:flex-row">
-          <JobQueryProvider type="convert">
-            <div className="h-[30vh] overflow-clip rounded-xl border border-border bg-background/60 backdrop-blur-xs lg:mb-4 lg:h-[80vh] lg:w-1/2">
-              <ConsoleOutput />
-            </div>
-            <div className="w-full lg:max-h-screen lg:w-1/2">
-              <ConverterPanel />
-              <Footer className="col-span-full flex justify-center p-4" />
-            </div>
-          </JobQueryProvider>
-        </div>
-      </motion.div>
-    );
-  },
-);
+export function Converter({ ...props }: HTMLMotionProps<"div">) {
+  return (
+    <motion.div className="container mx-auto max-w-screen-2xl" {...props}>
+      <div className="flex flex-auto flex-col gap-2 p-2 lg:h-full lg:flex-row">
+        <JobQueryProvider type="convert">
+          <div className="h-[30vh] overflow-clip rounded-xl border border-border bg-background/60 backdrop-blur-xs lg:mb-4 lg:h-[80vh] lg:w-1/2">
+            <ConsoleOutput />
+          </div>
+          <div className="w-full lg:max-h-screen lg:w-1/2">
+            <ConverterPanel />
+            <Footer className="col-span-full flex justify-center p-4" />
+          </div>
+        </JobQueryProvider>
+      </div>
+    </motion.div>
+  );
+}

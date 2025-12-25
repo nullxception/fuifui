@@ -15,7 +15,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
-import { forwardRef, useContext } from "react";
+import { useContext } from "react";
 import { optimizePrompt } from "server/lib/metadataParser";
 import { useShallow } from "zustand/react/shallow";
 import { ImageResult } from "./ImageResult";
@@ -190,28 +190,25 @@ function TextToImageAction() {
   );
 }
 
-export const TextToImage = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
-  (props, ref) => {
-    return (
-      <motion.div
-        ref={ref}
-        className="container mx-auto max-w-screen-2xl p-2 lg:overflow-hidden"
-        {...props}
-      >
-        <div className="flex flex-col gap-2 lg:h-full lg:flex-row lg:items-stretch">
-          <div className="flex min-h-0 flex-col overflow-clip rounded-xl border border-border bg-background/60 lg:mb-4 lg:w-1/2">
-            <JobQueryProvider type="txt2img">
-              <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden backdrop-blur-xs">
-                <OutputCard />
-              </div>
-              <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border p-2 backdrop-blur-xs">
-                <TextToImageAction />
-              </div>
-            </JobQueryProvider>
-          </div>
-          <ControlPanel className="lg:w-1/2" />
+export function TextToImage({ ...props }: HTMLMotionProps<"div">) {
+  return (
+    <motion.div
+      className="container mx-auto max-w-screen-2xl p-2 lg:overflow-hidden"
+      {...props}
+    >
+      <div className="flex flex-col gap-2 lg:h-full lg:flex-row lg:items-stretch">
+        <div className="flex min-h-0 flex-col overflow-clip rounded-xl border border-border bg-background/60 lg:mb-4 lg:w-1/2">
+          <JobQueryProvider type="txt2img">
+            <div className="flex min-h-[50vh] flex-1 flex-col overflow-hidden backdrop-blur-xs">
+              <OutputCard />
+            </div>
+            <div className="rounded-xl border border-r-0 border-b-0 border-l-0 border-border p-2 backdrop-blur-xs">
+              <TextToImageAction />
+            </div>
+          </JobQueryProvider>
         </div>
-      </motion.div>
-    );
-  },
-);
+        <ControlPanel className="lg:w-1/2" />
+      </div>
+    </motion.div>
+  );
+}
