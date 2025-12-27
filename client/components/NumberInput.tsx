@@ -14,7 +14,7 @@ export function NumberInput({
   inputClassName = "",
   disabled = false,
 }: {
-  min: number;
+  min?: number;
   step: number;
   max?: number;
   placeholder?: string;
@@ -32,7 +32,12 @@ export function NumberInput({
         asChild
         onClick={(e) => {
           e.preventDefault();
-          if (!disabled) onChange(Math.max(min, value - step));
+          if (disabled) return;
+          if (typeof min === "number") {
+            onChange(Math.max(min, value - step));
+          } else {
+            onChange(value - step);
+          }
         }}
       >
         <Label htmlFor={id}>-</Label>

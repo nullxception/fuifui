@@ -55,7 +55,9 @@ interface PromptAttachmentFormProps {
   onCancel: () => void;
 }
 const normalizeFP = (num?: number) => {
-  let t = num?.toString() || "1";
+  num = typeof num !== "number" ? 1 : num;
+  if (num === 1) return 1;
+  let t = num.toString();
   t = t.indexOf(".") >= 0 ? t.slice(0, t.indexOf(".") + 3) : t;
   return Number(t);
 };
@@ -92,11 +94,9 @@ function PromptAttachmentForm({
   };
 
   const handleStrengthChange = (value: number) => {
-    if (value < 0.01) value = 0.01;
     onChange({ entry: { ...entry, strength: normalizeFP(value) } });
   };
 
-  const loraStrength = entry.strength ?? 1;
   const typeLabel = entry.type === "lora" ? "LoRA" : "Embedding";
 
   const isSaveable = () => {
@@ -104,7 +104,7 @@ function PromptAttachmentForm({
     const hasWords = entry.words.length > 0 || newWords.length > 0;
     if (entry.type === "embedding" && !hasWords) return false;
     if (entry.type === "lora") {
-      if (!hasWords && loraStrength <= 0.01) return false;
+      if (!hasWords) return false;
     }
     return true;
   };
@@ -229,9 +229,8 @@ function PromptAttachmentForm({
             <Label htmlFor="loraStrengthNumber">Strength</Label>
             <NumberInput
               id="loraStrengthNumber"
-              min={0}
               step={0.01}
-              value={loraStrength}
+              value={typeof entry.strength !== "number" ? 1 : entry.strength}
               onChange={(e) => {
                 handleStrengthChange(e);
               }}
@@ -283,12 +282,11 @@ export function PromptAttachmentEditor() {
 
   const saveNewEntry = (entry: PromptAttachment | null) => {
     if (!entry) return;
-    const loraStrength = entry.strength ?? 1;
-    const isSaveable = entry.words.length > 0 || loraStrength > 0.0;
+    const isSaveable = entry.words.length > 0;
     if (entry && entry.target && isSaveable) {
       addTW({
         ...entry,
-        strength: normalizeFP(loraStrength),
+        strength: normalizeFP(entry.strength),
       });
       setNewEntry(null);
     }
@@ -327,14 +325,10 @@ export function PromptAttachmentEditor() {
 
   const handleSaveEdit = (index: number, updated: PromptAttachment) => {
     let tw = updated;
-    const loraStrength = updated.strength ?? 1;
-
-    if (loraStrength < 1) {
-      tw = {
-        ...updated,
-        strength: normalizeFP(updated.strength),
-      };
-    }
+    tw = {
+      ...updated,
+      strength: normalizeFP(updated.strength),
+    };
     updateTW(index, tw);
     setEditingIndex(null);
     setEditingEntry(null);
@@ -451,7 +445,8 @@ export function PromptAttachmentEditor() {
                 >
                   <div className="grow">
                     <span className="items-center rounded bg-purple-500/20 px-2 py-1 text-xs">
-                      strength: {entry.strength ?? 1}
+                      strength:{" "}
+                      {typeof entry.strength !== "number" ? 1 : entry.strength}
                     </span>
                   </div>
                 </motion.div>

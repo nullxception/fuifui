@@ -37,9 +37,11 @@ export function optimizePrompt(
 ) {
   if ((!text || text === "") && attachment) {
     const name = attachment.target.replace(/\.(safetensors|ckpt)$/, "");
+    const strength =
+      typeof attachment.strength !== "number" ? 1 : attachment.strength;
     const embed =
       attachment.type === "lora"
-        ? `<lora:${name}:${attachment.strength ?? 1}>`
+        ? `<lora:${name}:${strength}>`
         : `embedding:${name}`;
     return [embed, ...attachment.words].join(", ");
   } else if (!text) {
@@ -147,7 +149,8 @@ export function optimizePrompt(
       if (attachment) {
         const name = attachment.target.replace(/\.(safetensors|ckpt)$/, "");
         if (attachment.type === "lora") {
-          const strength = attachment.strength ?? 1;
+          const strength =
+            typeof attachment.strength !== "number" ? 1 : attachment.strength;
           const lora = `<lora:${name}:${strength}>`;
           if (!record.lora.includes(lora)) {
             buckets.lora.push(lora);

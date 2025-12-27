@@ -57,7 +57,7 @@ export function usePromptAttachment() {
         type,
         target: filename,
         words: match?.words ?? [],
-        strength: match?.strength ?? 1,
+        strength: typeof match?.strength !== "number" ? 1 : match.strength,
       });
     },
   };
